@@ -126,6 +126,39 @@ class ItsClient
     }
 
     /**
+     * PTS (Paket Transfer Sistemi) paket sorgulama servisi.
+     *
+     * @see Kılavuz böl. 44 "PAKET TRANSFER SERVİSİ – PAKET SORGULAMA"
+     *
+     * @return array{transferDetails: array<int, array{sourceGln: string, destinationGln: string, transferId: int, transferDate: string}>}
+     */
+    public function searchPackages(Depot $depot, string $sourceGln, string $destinationGln, string $startDate, string $endDate): array
+    {
+        $token = $this->getAccessToken($depot);
+
+        try {
+            $response = $this->http->post('/pts/app/search', [
+                'headers' => [
+                    'Authorization' => "Bearer {$token}",
+                ],
+                'json' => [
+                    'sourceGln' => $sourceGln,
+                    'destinationGln' => $destinationGln,
+                    'startDate' => $startDate,
+                    'endDate' => $endDate,
+                ],
+            ]);
+
+            return json_decode((string) $response->getBody(), true) ?? [];
+        } catch (GuzzleException $e) {
+            throw new ItsIntegrationException(
+                "PTS paket sorgulama başarısız (depot #{$depot->id}): ".$e->getMessage(),
+                previous: $e,
+            );
+        }
+    }
+
+    /**
      * Depoya ait GLN/İTS şifresinin geçerli olup olmadığını, Access Token
      * servisinden token alınabilip alınamadığına bakarak doğrular.
      */

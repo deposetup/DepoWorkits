@@ -27,7 +27,9 @@ Kod listesi için ayrı servis: `GET/POST /reference/app/errorcode/`.
 - `sn` — Ürünün sıra numarası (karekod ile eşleşmeli, max 20 char)
 - `bn` — Parti numarası (karekod ile eşleşmeli, max 20 char, `0`/boşluk dolgu yasak)
 - `xd` — Son kullanma tarihi (XML-Date, bildirim tarihinden ileri olamaz)
-- Cevapta `notification_id` — sistemin ürettiği tekil bildirim numarası
+- Cevapta bildirim numarası — açıklama tablosunda `notification_id` yazsa da,
+  tüm örnek yanıtlarda tutarlı şekilde `notificationid` (alt çizgisiz)
+  kullanılmış; gerçek API doğrulanınca netleştirilmeli
 - Cevapta her ürün için `uc` — 5 haneli onay/hata kodu
 
 ## Bildirim Türleri

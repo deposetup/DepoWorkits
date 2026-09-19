@@ -16,7 +16,7 @@ class Depot extends Model
         'phone',
         'email',
         'gln_number',
-        'its_password_encrypted',
+        'its_password',
         'status',
     ];
 

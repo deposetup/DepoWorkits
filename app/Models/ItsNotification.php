@@ -53,4 +53,24 @@ class ItsNotification extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function typeLabel(): string
+    {
+        return match ($this->type) {
+            self::TYPE_ALIM => 'Mal Alım',
+            self::TYPE_SATIS => 'Satış',
+            self::TYPE_DEVIR => 'Mal Devir',
+            self::TYPE_ECZANE_SATIS => 'Eczane Satış',
+            self::TYPE_IHRACAT => 'İhracat',
+            self::TYPE_URETIM => 'Üretim',
+            self::TYPE_DEAKTIVASYON => 'Deaktivasyon',
+            self::TYPE_IPTAL_DEVIR => 'Mal Devir İptali',
+            self::TYPE_IPTAL_ECZANE_SATIS => 'Eczane Satış İptali',
+            self::TYPE_IPTAL_IADE => 'Mal İade',
+            self::TYPE_IPTAL_IHRACAT => 'İhracat İptali',
+            self::TYPE_IPTAL_SATIS => 'Satış İptali',
+            self::TYPE_IPTAL_DEAKTIVASYON => 'Deaktivasyon İptali',
+            default => $this->type,
+        };
+    }
 }
