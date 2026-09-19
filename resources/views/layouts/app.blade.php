@@ -18,6 +18,8 @@
         }
         nav a { color: #1f2933; text-decoration: none; font-size: 14px; }
         nav a:hover { text-decoration: underline; }
+        nav form { margin-left: auto; }
+        nav form button { padding: 4px 10px; font-size: 13px; }
         footer {
             height: 60px;
             display: flex;
@@ -50,6 +52,10 @@
         <a href="{{ route('depots.index') }}">Depolar</a>
         <a href="{{ route('its-notifications.index') }}">İTS Bildirimleri</a>
         <a href="{{ route('pts.index') }}">PTS Sorgulama</a>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="secondary">Çıkış ({{ auth()->user()->name }})</button>
+        </form>
     </nav>
     @endauth
 

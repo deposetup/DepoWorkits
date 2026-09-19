@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CredentialChangeRequestController;
 use App\Http\Controllers\DepotController;
 use App\Http\Controllers\ItsNotificationController;
@@ -8,7 +9,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
 
+Route::middleware('guest')->group(function () {
+    Route::get('/giris', [LoginController::class, 'create'])->name('login');
+    Route::post('/giris', [LoginController::class, 'store']);
+});
+
 Route::middleware('auth')->group(function () {
+    Route::post('/cikis', [LoginController::class, 'destroy'])->name('logout');
+
     Route::get('/depolar', [DepotController::class, 'index'])->name('depots.index');
     Route::get('/depolar/{depot}', [DepotController::class, 'show'])->name('depots.show');
 
