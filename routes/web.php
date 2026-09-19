@@ -4,6 +4,8 @@ use App\Http\Controllers\CredentialChangeRequestController;
 use App\Http\Controllers\DepotController;
 use Illuminate\Support\Facades\Route;
 
+Route::view('/', 'home')->name('home');
+
 Route::middleware('auth')->group(function () {
     Route::get('/depolar', [DepotController::class, 'index'])->name('depots.index');
     Route::get('/depolar/{depot}', [DepotController::class, 'show'])->name('depots.show');
