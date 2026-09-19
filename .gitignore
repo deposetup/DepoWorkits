@@ -6,6 +6,9 @@
 /public/storage
 /storage/*.key
 /vendor
+/bootstrap/cache/*.php
+/database/*.sqlite
+!/bootstrap/cache/.gitkeep
 .env
 .env.backup
 .env.production

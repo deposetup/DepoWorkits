@@ -12,14 +12,22 @@ Ecza depoları için Laravel tabanlı **İlaç Takip Sistemi (İTS/İEGM) entegr
   mutlaka talep açması gerekir (`credential_change_requests` onay akışı).
 - **İTS/İEGM Entegrasyonu** — `App\Services\ItsClient` üzerinden gerçek zamanlı bildirim
   gönderimi (Alım, Satış, Devir, Eczane Satış, İhracat, Üretim, Deaktivasyon ve bunların
-  iptalleri). Servis adresleri, İTS'nin resmi
-  [REST API Servis Adres Listesi](https://its.gov.tr/Content/pdf/05-07-2022_RESTAPI%20SERVIS%20ADRES%20L%C4%B0STES%C4%B0.pdf)
-  (05-07-2022) belgesinden alınmıştır; istek/yanıt şeması ve Access Token kimlik doğrulama
-  akışı ayrı bir doküman netleşince tamamlanacaktır.
+  iptalleri). Servis adresleri ve auth (Access Token) akışı, İTS'nin resmi
+  ["RESTAPI Servisleri Kullanım Kılavuzu"](https://its.gov.tr/Content/pdf/28-06-2022_%C4%B0LA%C3%87%20TAK%C4%B0P%20S%C4%B0STEM%C4%B0%20RESTAPI%20SERV%C4%B0S%20KILAVUZU.pdf)
+  baz alınarak uygulanmıştır; her bildirim türünün tam alan şeması için
+  `docs/its-api-referans.md`'ye bakın.
 - **Yıllık Lisanslama** — her depo için lisans dönemi tanımlanır; süre dolmadan önce
   (varsayılan: 30/14/7/1 gün kala) depo yetkilisine otomatik hatırlatma maili gönderilir
   (`licenses:check-expirations` zamanlanmış görevi).
 - **Roller** — `admin` ve `customer`.
+
+## Gereksinimler
+
+- PHP ^8.3, Laravel ^13
+- Node/npm **gerekmez** — arayüz düz Blade + inline CSS ile yapılıyor, ayrı bir asset
+  derleme adımı yok.
+- **Plesk'te document root, `public/` klasörüne ayarlanmalıdır** (Laravel'in front
+  controller'ı `public/index.php`'dedir; proje kökü değil).
 
 ## Kurulum (sunucu tarafı)
 
