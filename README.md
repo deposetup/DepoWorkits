@@ -12,7 +12,10 @@ Ecza depoları için Laravel tabanlı **İlaç Takip Sistemi (İTS/İEGM) entegr
   mutlaka talep açması gerekir (`credential_change_requests` onay akışı).
 - **İTS/İEGM Entegrasyonu** — `App\Services\ItsClient` üzerinden gerçek zamanlı bildirim
   gönderimi (Alım, Satış, Devir, Eczane Satış, İhracat, Üretim, Deaktivasyon ve bunların
-  iptalleri).
+  iptalleri). Servis adresleri, İTS'nin resmi
+  [REST API Servis Adres Listesi](https://its.gov.tr/Content/pdf/05-07-2022_RESTAPI%20SERVIS%20ADRES%20L%C4%B0STES%C4%B0.pdf)
+  (05-07-2022) belgesinden alınmıştır; istek/yanıt şeması ve Access Token kimlik doğrulama
+  akışı ayrı bir doküman netleşince tamamlanacaktır.
 - **Yıllık Lisanslama** — her depo için lisans dönemi tanımlanır; süre dolmadan önce
   (varsayılan: 30/14/7/1 gün kala) depo yetkilisine otomatik hatırlatma maili gönderilir
   (`licenses:check-expirations` zamanlanmış görevi).
