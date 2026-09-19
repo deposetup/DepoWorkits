@@ -32,7 +32,37 @@ class DepotController extends Controller
             abort(403);
         }
 
-        return view('depots.show', compact('depot'));
+        $changeRequests = $depot->changeRequests()->latest()->get();
+
+        return view('depots.show', compact('depot', 'changeRequests'));
+    }
+
+    /**
+     * Admin: yeni depo (müşteri) kaydı oluşturma formu.
+     */
+    public function create()
+    {
+        return view('depots.create');
+    }
+
+    /**
+     * Admin: yeni depo (müşteri) kaydı oluşturur.
+     */
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'company_title' => ['required', 'string', 'max:255'],
+            'authorized_person' => ['nullable', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'gln_number' => ['required', 'string', 'max:20', 'unique:depots,gln_number'],
+            'its_password' => ['required', 'string', 'min:6'],
+            'status' => ['required', 'in:active,passive'],
+        ]);
+
+        $depot = Depot::create($data);
+
+        return redirect()->route('depots.show', $depot)->with('status', 'Depo oluşturuldu.');
     }
 
     /**
