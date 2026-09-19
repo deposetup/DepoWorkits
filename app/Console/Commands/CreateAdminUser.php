@@ -9,13 +9,22 @@ use Illuminate\Support\Facades\Validator;
 
 class CreateAdminUser extends Command
 {
-    protected $signature = 'admin:create {email} {password} {name=Admin}';
+    // "name" değişken sayıda kelime alır (ör. "Halil Güler"); bazı arayüzler
+    // (ör. Plesk'in Artisan kutusu) tırnaklı argümanları doğru ayrıştırmıyor,
+    // bu yüzden isim tırnaksız, boşlukla ayrılmış kelimeler olarak da girilebilir.
+    protected $signature = 'admin:create {email} {password} {name?*}';
 
     protected $description = 'Sisteme giriş yapabilecek bir admin kullanıcısı oluşturur veya günceller.';
 
     public function handle(): int
     {
-        $validator = Validator::make($this->arguments(), [
+        $name = implode(' ', $this->argument('name')) ?: 'Admin';
+
+        $validator = Validator::make([
+            'email' => $this->argument('email'),
+            'password' => $this->argument('password'),
+            'name' => $name,
+        ], [
             'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:8'],
             'name' => ['required', 'string', 'max:255'],
@@ -32,7 +41,7 @@ class CreateAdminUser extends Command
         $user = User::updateOrCreate(
             ['email' => $this->argument('email')],
             [
-                'name' => $this->argument('name'),
+                'name' => $name,
                 'password' => Hash::make($this->argument('password')),
                 'role' => 'admin',
                 'depot_id' => null,
