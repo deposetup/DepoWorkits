@@ -34,7 +34,7 @@ class ItsClient
     {
         $this->http = $http ?? new Client([
             'base_uri' => config('services.its.base_url'),
-            'timeout' => config('services.its.timeout', 30),
+            'timeout' => (float) config('services.its.timeout', 30),
         ]);
     }
 
