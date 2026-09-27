@@ -65,4 +65,9 @@ class Depot extends Model
     {
         return $this->hasMany(ItsNotification::class);
     }
+
+    public function itsStocks()
+    {
+        return $this->hasMany(ItsStock::class);
+    }
 }

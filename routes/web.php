@@ -5,6 +5,7 @@ use App\Http\Controllers\CredentialChangeRequestController;
 use App\Http\Controllers\DepotController;
 use App\Http\Controllers\ItsNotificationController;
 use App\Http\Controllers\PtsController;
+use App\Http\Controllers\StockController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -33,6 +34,10 @@ Route::middleware('auth')->group(function () {
     // PTS paket sorgulama
     Route::get('/pts', [PtsController::class, 'index'])->name('pts.index');
     Route::post('/pts/sorgula', [PtsController::class, 'search'])->name('pts.search');
+
+    // İTS stok (her sabah 06:00'da güncellenir)
+    Route::get('/stok', [StockController::class, 'index'])->name('stocks.index');
+    Route::get('/stok/excel', [StockController::class, 'export'])->name('stocks.export');
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/depolar/olustur', [DepotController::class, 'create'])->name('depots.create');

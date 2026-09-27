@@ -159,6 +159,51 @@ class ItsClient
     }
 
     /**
+     * Deponun İTS'deki güncel stoğunu çeker.
+     *
+     * DİKKAT: Stok servisi elimizdeki kılavuzda (bkz. docs/its-api-referans.md)
+     * yer almıyor. Adres config('services.its.stock_endpoint') ile verilir;
+     * yanıt yapısı (stockList/gtin/productName/quantity) gerçek servis
+     * doğrulanınca aşağıdaki eşlemede güncellenmelidir.
+     *
+     * @return array<int, array{gtin: string, product_name: ?string, its_quantity: int}>
+     */
+    public function fetchStock(Depot $depot): array
+    {
+        $endpoint = config('services.its.stock_endpoint');
+
+        if (! $endpoint) {
+            throw new ItsIntegrationException('İTS stok servis adresi tanımlı değil (ITS_STOCK_ENDPOINT).');
+        }
+
+        $token = $this->getAccessToken($depot);
+
+        try {
+            $response = $this->http->post($endpoint, [
+                'headers' => [
+                    'Authorization' => "Bearer {$token}",
+                ],
+                'json' => [
+                    'gln' => $depot->gln_number,
+                ],
+            ]);
+        } catch (GuzzleException $e) {
+            throw new ItsIntegrationException(
+                "İTS stok sorgulama başarısız (depot #{$depot->id}): ".$e->getMessage(),
+                previous: $e,
+            );
+        }
+
+        $body = json_decode((string) $response->getBody(), true) ?? [];
+
+        return array_map(fn (array $row) => [
+            'gtin' => (string) $row['gtin'],
+            'product_name' => $row['productName'] ?? null,
+            'its_quantity' => (int) ($row['quantity'] ?? 0),
+        ], $body['stockList'] ?? []);
+    }
+
+    /**
      * Depoya ait GLN/İTS şifresinin geçerli olup olmadığını, Access Token
      * servisinden token alınabilip alınamadığına bakarak doğrular.
      */
