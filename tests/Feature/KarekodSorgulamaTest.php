@@ -42,7 +42,8 @@ class KarekodSorgulamaTest extends TestCase
         $this->actingAs($user)
             ->post(route('karekod.search'), ['karekod' => "010869982876004721459725419\x1D172701071020210107"])
             ->assertOk()
-            ->assertSee('8680001000011 (Gaye İlaç)', false)
+            ->assertSee('8680001000011')
+            ->assertSee('<span class="kq-pill">Gaye İlaç</span>', false)
             ->assertSee('Ürün üzerinize kayıtlıdır.');
 
         $sent = json_decode((string) $history[1]['request']->getBody(), true);
