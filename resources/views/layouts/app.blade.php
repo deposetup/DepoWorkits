@@ -52,6 +52,7 @@
         <a href="{{ route('depots.index') }}">Depolar</a>
         <a href="{{ route('its-notifications.index') }}">İTS Bildirimleri</a>
         <a href="{{ route('pts.index') }}">PTS Sorgulama</a>
+        <a href="{{ route('karekod.index') }}">Karekod Sorgulama</a>
         <a href="{{ route('stocks.index') }}">İTS Stok</a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf

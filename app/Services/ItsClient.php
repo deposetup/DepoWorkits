@@ -159,6 +159,38 @@ class ItsClient
     }
 
     /**
+     * Durum Sorgulama: ürünün son sahibini (gln1), arada ise karşı tarafı
+     * (gln2) ve durum kodunu (uc) döner.
+     *
+     * @see Kılavuz böl. 16 "DURUM SORGULAMA BİLDİRİMİ"
+     *
+     * @param  array<int, array{gtin: string, sn: string, bn?: string, xd?: string}>  $products
+     * @return array<int, array{gln1?: string, gln2?: string, gtin?: string, sn?: string, uc?: string}>
+     */
+    public function checkStatus(Depot $depot, array $products): array
+    {
+        $token = $this->getAccessToken($depot);
+
+        try {
+            $response = $this->http->post('/reference/app/check_status/', [
+                'headers' => [
+                    'Authorization' => "Bearer {$token}",
+                ],
+                'json' => [
+                    'productList' => $products,
+                ],
+            ]);
+        } catch (GuzzleException $e) {
+            throw new ItsIntegrationException(
+                "İTS durum sorgulama başarısız (depot #{$depot->id}): ".$e->getMessage(),
+                previous: $e,
+            );
+        }
+
+        return json_decode((string) $response->getBody(), true)['responseObjectList'] ?? [];
+    }
+
+    /**
      * Deponun İTS'deki güncel stoğunu çeker.
      *
      * DİKKAT: Stok servisi elimizdeki kılavuzda (bkz. docs/its-api-referans.md)
