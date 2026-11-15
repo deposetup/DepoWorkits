@@ -1,0 +1,489 @@
+      BEŞERİ TIBBİ ÜRÜNLER BARKOD VE KAREKOD UYGULAMA KILAVUZU
+
+
+                                    BİRİNCİ BÖLÜM
+                           Amaç, Kapsam, Dayanak ve Tanımlar
+
+Amaç
+MADDE 1- (1) Bu kılavuzun amacı, beşeri tıbbi ürünlerin izlenebilirliğini temin etmek için beşeri
+tıbbi ürünlerin tanımlanması amacı ile barkodlanması ve karekodlanması ile ilgili esasları
+belirlemektedir.
+
+Kapsam
+MADDE 2- (1) Bu kılavuz 25.04.2017 tarihli ve 30048 sayılı Resmî Gazete'de yayımlanan “Beşeri
+Tıbbi Ürünlerin Ambalaj Bilgileri, Kullanma Talimatı ve Takibi Yönetmeliği hükümlerince beşeri
+tıbbi ürünlerin ambalajlarına barkod ve/veya karekod basma zorunluluğu bulunan gerçek ve tüzel
+kişileri kurum ve kuruluşları kapsar.
+
+       (2) Yurtdışına ihraç amaçlı üretilmiş olup hiçbir şekilde ülkemizde kullanıma ve tedarik
+zincirine sunulmayacak ürünler barkod ve karekod uygulaması kapsamı dışındadır.
+
+Dayanak
+MADDE 3- (1) Bu kılavuz, 25.04.2017 tarihli ve 30048 sayılı Resmî Gazete'de yayımlanan “Beşeri
+Tıbbi Ürünlerin Ambalaj Bilgileri, Kullanma Talimatı ve Takibi Yönetmeliği’nin 20’nci maddesi
+gereğince hazırlanmıştır.
+
+Tanımlar
+MADDE 4- (1) Bu kılavuzun uygulanmasında;
+
+a) Bakanlık: T.C. Sağlık Bakanlığı’nı,
+
+b) Barkod Alfabesi: Barkodun taşıdığı bilgininin kodlanması ve çözümlenmesinde uygulanacak
+   yöntemi,
+
+c) Barkod/Çizgikod: Çeşitli kalınlık, aralık ve sayıda çizginin bir araya getirilmesiyle oluşturulmuş,
+   sayı veya harflerden oluşan, verinin bilgisayarlara doğru ve hızlı olarak aktarılmasını sağlayan
+   teknolojiyi,
+
+d) Barkodlama: Barkod okuyucu tarafından okunacak verinin uygun barkod alfabesi ve baskı yöntemi
+   ile belirlenen yüzeye bastırılmasını,
+
+e) Birincil tanımlayıcı: Barkodu,
+
+f) Farmasötik Kod: Ürünün farmasötik takdim şekli ve uygulamasını esas alan bir kodlama
+   sistemini,
+
+g) Grup Ayracı: GS1 uyumlu sistemler için barkod alfabesindeki karşılığı FNC1 (function1) olan
+   karakteri,
+
+
+                                            Sayfa 1 / 11
+h) GS1: Merkezi Brüksel’de bulunan, etkin tedarik zinciri çözümleri ve standartları geliştiren
+   uluslararası organizasyonu ve bu organizasyonun ülkemizdeki temsilciliğini “Türkiye Odalar
+   ve Borsalar Birliği” bünyesindeki GS1 Türkiye’nin yaptığı uluslararası organizasyonu,
+
+i) GS1 Uygulama Tanımlayıcısı (AI-Application Identifier): Barkod okuyucusu tarafından bilgi
+   sistemlerine aktarılacak verinin ne anlama geldiğinin belirlenmesinde kullanılan veri başlıklarını,
+
+j) GTIN (Barkod Numarası, Global Trade Item Number): Ticari ürünlerin dünya genelinde tek olarak
+   tanımlanmasını sağlayan, yapısı GS1 tarafından belirlenen ürün numarasını,
+
+k) İkincil tanımlayıcı: İçeriği ve yapısı bu Kılavuzda belirlenen bilgilerin beşeri tıbbi ürünlerin
+   ambalajları üzerinde bastırılmış, karekod şeklinde isimlendirilen şeklini,
+
+l) Karekod : Güvenlik özelliği olarak ürünün tekilleştirilmesini sağlayan datamatriks tipinde iki
+   boyutlu kodu,
+
+m) Kurum: Türkiye İlaç ve Tıbbi Cihaz Kurumu’nu ifade eder.
+
+
+                                      İKİNCİ BÖLÜM
+                     Beşeri Tıbbi Ürünlerin Tanımlanması, Barkodlanması
+                                     ve Karekodlanması
+
+
+Ürünlerin Tanımlanması
+MADDE 5-(1) Beşeri tıbbi ürünlerin tanımlanmasında aşağıdaki bilgiler kullanılacaktır:
+      a) Barkod Numarası (GTIN-Global Trade Item Number): Ürünleri dünya genelinde tekil
+olarak tanımlayan en fazla 14 basamaktan oluşan numaradır. Ticari ürünün perakende satış noktasında
+kullanıldığı durumlarda ürün üzerinde EAN-13 barkod alfabesi ile 13 basamaklı olarak yer alır. Bu
+durumda, 13 basamaklı numaranın başına “0” rakamı getirilerek 14 Basamaklı GTIN oluşturulur.
+GTIN içeriği 4 bölümden oluşur. Bunlar; ülke kodu, üretici kodu, ürün kodu ve kontrol rakamı
+şeklindedir. Bunlardan ürün kodu alanında yer alacak rakamlar “GTIN Atama Kuralları” gereğince
+ruhsat/izin sahipleri tarafından belirlenir.
+GTIN içeriğinde farmasötik kod kullanımı isteğe bağlıdır. Eğer farmasötik kod kullanılmak istenirse
+N9 ve N10 karakterleri farmasötik kod için kullanılabilir.
+GTIN bilgisini tanımlayan GS1 Uygulama Tanımlayıcısı “01”dir.
+
+   Uygulama                                       Barkod Numarası
+   Tanımlayıcı                                        (GTIN)
+      (AI)
+                    Uzatma              GS1 Firma Öneki         Ürün Referansı           Kontrol
+                   Basamağı                                                             Basamağı
+
+        01              0           N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13                 N14
+
+
+
+
+                                             Sayfa 2 / 11
+Örnek:
+
+   Uygulama                                        Barkod Numarası
+   Tanımlayıcı                                         (GTIN)
+      (AI)
+         01              0                           869123456789                              0
+
+         b) Sıra Numarası (Serial Number): GTIN ile tanımlanan ürünün her bir birimini tanımlamak
+için kullanılan numaradır. Bir ürün için kullanılan sıra numarası, aynı çeşit üründe bir daha
+kullanılamaz. Sıra Numarası değişken uzunlukta olup en fazla 20 karakter uzunluğundadır. Sıra
+numarası ruhsat/izin sahipleri tarafından benzersiz olarak belirlenir.
+Sıra numarasını tanımlayan GS1 Uygulama Tanımlayıcısı “21”dir.
+
+       Uygulama                                               Sıra
+     Tanımlayıcı(AI)                                        Numarası
+              21                            X1       değişken uzunluk              X20
+
+Örnek:
+
+       Uygulama                                               Sıra
+     Tanımlayıcı(AI)                                        Numarası
+              21                                   AB123456789CD
+
+        c) Son Kullanma Tarihi (Expiration Date): Beşeri tıbbi ürünlerin saklama şartlarına göre
+belirlenen raf ömrünün sonunu gösteren tarih bilgisidir. 6 karakter uzunluğunda sayısal bir veridir.
+Verinin formatı YYAAGG şeklindedir. YY iki basamak olarak Yıl bilgisini, AA iki basamaklı
+olarak Ay bilgisini, GG iki basamak olarak gün bilgisini göstermektedir.
+
+Örnek: 230430: 23; 2023 yılını, 04; Nisan ayını, 30; o ayın son gününü göstermektedir.
+
+Son kullanma tarihi iç ambalaj, dış ambalaj ve karekod içeriği ile uyumlu olmak zorundadır. Bu
+sebeple;
+
+Son kullanma tarihi iç ve dış ambalajda AA/YYYY şeklinde belirtilecek ise son kullanma tarihi olarak
+Beşeri Tıbbi Ürünlerin Ambalaj Bilgileri ve Kullanma Talimatına, Okunabilirliklerine ve Yardımcı
+Maddelere İlişkin Kılavuzun 12.1.3 Maddesine uygun olarak belirlenmiş tarih yazılmalıdır. Üretilen
+ürünün miadı ayın son gününden farklı ise, son kullanma tarihi içindeki gün alanı için, bir önceki ayın
+son günü veya “00” kullanılır.
+
+Örnek: Son kullanma tarihi 14 Mayıs 2023 olan ancak iç ve dış ambalajda AA/YYYY formatında
+belirtilmek istenildiği için Beşeri Tıbbi Ürünlerin Ambalaj Bilgileri ve Kullanma Talimatına,
+Okunabilirliklerine ve Yardımcı Maddelere İlişkin Kılavuzun 12.1.3 Maddesine uygun olarak
+karekod içerisinde son kullanma tarihi 30 Nisan 2023 olmalıdır. Bu rakam iki şekilde tanımlayıcı
+içine aktarılır. Birincisi; 230430, ikincisi 230400. İlgili yazılımlar “00” olan rakamı o ayın son günü
+
+
+                                             Sayfa 3 / 11
+olarak işletirler. Son kullanma tarihi dış ve iç ambalaj bilgilerine 04/2023 şeklinde basılmalıdır. Nisan-
+2023, Nis- 2023, 04-2023, 04.2023 şeklinde de uygulanabilir.
+Son kullanma tarihi bilgisini tanımlayan GS1 Uygulama Tanımlayıcısı “17”dir.
+
+    Uygulama Tanımlayıcı                        Son Kullanma Tarihi
+           (AI)
+                                          Yıl                    Ay                Gün
+
+               17                       N1 N2                   N3 N4           N5 N6
+
+       Örnek: 30 Nisan 2023 tarihini göstermektedir.
+
+         Uygulama                               Son Kullanma Tarihi
+       Tanımlayıcı(AI)
+               17                         23                     04                 30
+
+-   Son kullanma tarihinin ayın son gününe denk gelmesi durumunda bir önceki ayın yazılmasına
+    gerek yoktur.
+
+-   Son kullanma tarihi iç ve dış ambalajda GG/AA/YYYY şeklinde belirtilecek ise son kullanma
+    tarihi karekod içerisine aynen yazılmalıdır.
+
+Örnek: Son kullanma tarihi 14 Mayıs 2023 olan bir beşeri tıbbi ürün için karekod içerisinde son
+kullanma tarihi 14 Mayıs 2023 olmalıdır. Bu rakam tanımlayıcı içerisine 230514 şeklinde
+aktarılmalıdır. Son kullanma tarihi dış ve iç ambalaj bilgilerine 14/05/2023 şeklinde basılmalıdır. 14-
+Mayıs-2023, 14-May-2023, 14-05-2023, 14/05/23, 14-Mayıs-23, 14-May-23, 14-05-23 şeklinde de
+uygulanabilir.
+
+Örnek: 14 Mayıs 2023 tarihini göstermektedir
+
+         Uygulama                               Son Kullanma Tarihi
+       Tanımlayıcı(AI)
+               17                         23                     05                 14
+
+        d) Parti Numarası (Batch/Lot Number): Bir ürünün üretimi sırasında tek bir üretim
+döngüsünde elde edilen ve homojenliğin sağlandığı miktarı özel olarak tanımlayan rakamlar ve/veya
+harflerin ayırt edici kombinasyonudur. Beşeri tıbbi ürünlerde önceden “Seri Numarası” olarak
+kullanılan numara, “Parti Numarası” olarak ifade edilecektir. Parti Numarası değişken uzunlukta olup
+en fazla 20 karakter uzunluğundadır.
+
+Parti Numarası bilgisini tanımlayan GS1 Uygulama Tanımlayıcısı “10”dır.
+
+
+              Uygulama                                           Parti
+            Tanımlayıcı(AI)                                    Numarası
+                    10               X1         değişken uzunluk             X20
+
+                                                Sayfa 4 / 11
+       Örnek:
+
+                 Uygulama                                       Parti
+               Tanımlayıcı(AI)                                Numarası
+                    10                                    123456ABC
+
+           e) Grup Ayracı: (FNC1): (1) GS1 uyumlu sistemler için barkod alfabesindeki karşılığı FNC1
+(function1) olan bu karakter, barkod alfabesi içinde birinci ya da ikinci pozisyonda geldiğinde GS1
+uyumlu barkod tipini gösterir. Diğer pozisyonlarda geldiğinde ise alan ayracı olarak kullanılan bir
+karakteri ifade eder. Karekod içinde alan ayracı olarak kullanılan karakter, barkod okuyucu cihazlar
+tarafından uygulamalara ASCII 29 karakterine çevrilerek aktarılır. Grup ayracı, değişken uzunluklu
+bir alandan sonra bir alan daha gelecekse bu iki alan arasına konur.
+
+      (2) Ürün kodlamada sıra numarası ve parti numarası alanlarında sadece “0,1,2,3,4,5,6,7,8,9”
+nümerik ve “A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,X,W,V,Y,Z” alfanümerik karakterleri
+kullanılabilir. Bu karakterler dışındaki semboller, özel işaretler ve küçük harfler kullanılmayacaktır.
+
+Ürünlerin Barkodlanması ve Karekodlanması
+MADDE 6- (1) Çizgi Kod, ürün ambalajı üzerine EAN-13 Barkod alfabesinde GTIN (Barkod
+Numarası) birincil tanımlayıcı olarak konulabilir.
+
+      (2) 4 üncü Maddede belirtilen tüm bilgiler beşeri tıbbi ürünlerin ambalajı üzerindeki karekod
+(Data Matrix) içeriğinde yer alır.
+
+      (3) Ürün üzerindeki karekod içeriği aşağıdaki şekilde oluşturulur:
+
+      a) Karekod içeriğinin ilk karakteri her zaman “Grup Ayracı” olacaktır. İçeriğin GS1 uyumlu
+olduğunu gösteren bu karakter okuyucular tarafından bilgisayar uygulamalarına aktarılmaz.
+
+    b) GTIN: “01” Uygulama tanımlayıcısı ile birlikte uygulanan 14 basamaklı GTIN eklenir.
+GTIN, karekod içinde 2 basamaklı uygulama tanımlayıcısı ile birlikte toplam 16 basamak işgal eder.
+
+      c) Sıra Numarası: İçeriği üretici veya ithalatçı tarafından belirlenen, 21 Uygulama
+tanımlayıcısı ile birlikte uygulanan ve en fazla 20 karakter olabilen, değişken uzunluktaki “Sıra
+Numarası” eklenir. Sıra numarası, karekod içinde 2 basamaklı uygulama tanımlayıcısı ile birlikte en
+fazla 22 karakter işgal eder.
+
+      d)     Grup Ayracı, değişken uzunluktaki sıra numarasının bitişini gösteren grup ayracı karakteri
+eklenir.
+
+      e)  Son Kullanma Tarihi 17 Uygulama tanımlayıcısı ile birlikte uygulanan ve 6 basamaklı son
+kullanma tarihi bilgisi eklenir. Son kullanma tarihi, karekod içinde 2 basamaklı uygulama
+tanımlayıcısı ile birlikte toplam 8 basamak işgal eder.
+
+      f)  Parti Numarası: 10 Uygulama tanımlayıcısı ile birlikte en fazla 20 karakter olabilen,
+değişken uzunluktaki Parti Numarası eklenir. Parti numarası, karekod içinde 2 basamaklı uygulama
+
+                                               Sayfa 5 / 11
+tanımlayıcısı ile birlikte en fazla 22 basamak işgal edebilir.
+
+Örnek:
+GTIN: “08691234567890”, Sıra Numarası: “AB123456789CD”, Son Kullanma Tarihi: “30 Nisan
+2023”, Parti Numarası: “123456ABC”. Bu bilgilere karşılık gelen karekod içeriği aşağıdaki gibidir.
+Grup Ayracı Karakteri <FNC1> şeklinde gösterilmiştir.
+
+<FNC1>010869123456789021AB123456789CD <FNC1>1723043010123456ABC
+
+Bu içeriğe karşılık gelen karekod aşağıdaki gibidir:
+
+
+
+                                 veya değişik bir                      ebatla:
+
+Yukarıdaki karekodun okutulması sonucu bilgisayar uygulamalarına aktarılacak veri aşağıdaki gibidir:
+
+010869123456789021AB123456789CD <GS>1723043010123456ABC
+
+Barkod okuyucu tarafından bilgisayar uygulamasına Grup ayracı olarak ASCII 29 değeri içeren <GS>
+karakterinin aktarıldığına dikkat edilmelidir.
+
+   (4) Karekod, ECC200 standartlarında bir Datamatrix barkodu olarak, bu standart içinde belirtildiği
+üzere, kare ya da dikdörtgen şekillerinden biri ile basılabilir. Bu seçim Ruhsat/izin sahibi tarafından
+yapılır.
+
+
+                                      ÜÇÜNCÜ BÖLÜM
+                      Taşıma Birimlerinin Tanımlanması ve Barkodlanması
+
+
+
+Taşıma Birimlerinin Tanımlanması
+MADDE 7- (1) Taşıma birimleri, Tedarik Zinciri içerisinde ticari ürünün taşınması ve/veya
+depolanması amacıyla kullanılan paketleme birimleridir (kutu, kasa, palet, varil, çuval, torba vb.).
+Bir taşıma biriminin içerisinde herhangi bir ticari ürün ya da birden çok ticari ürün bulunabilir.
+
+     GS1 Sisteminde taşıma birimleri SSCC (Serial Shipping Container Code) numarası kullanılarak
+tanımlanır ve numaralandırılırlar. SSCC, taşıma birimi üzerinde GS1 - 128 (Uygulama Tanımlayıcı
+00) barkod alfabesi ile simgelenir.
+
+     Taşıma birimlerinin tanımlanması ve numaralanması, lojistik işlemlere (taşıma, sevkiyat,
+dağıtım, depolama işlemlerinin tümü) büyük kolaylıklar getirmekte, lojistik işlemlerindeki
+otomasyon uygulamalarına hız ve doğruluk kazandırarak verimliliği artırmaktadır.
+
+     Örneğin, taşıma birimleri için kullanılan SSCC numaraları, taşıma biriminin üzerinde barkod
+olarak yer aldığı gibi birbirleriyle elektronik ticaret yapan taraflar arasındaki Elektronik Veri
+Değişimi ortamındaki kayıtlarda da yer almakta, böylece aynı SSCC lojistik işlemleri ile elektronik
+ortamdaki işlemler arasında bir bağ oluşturmaktadır.
+
+                                               Sayfa 6 / 11
+     Uygulama Tanımlayıcısı (00) olan SSCC, taşıma birimlerinin tek olarak tanımlanmasında
+kullanılır. Her bir taşıma birimine, taşıma biriminin bütün ömrü boyunca (üretildiği ilk andan
+başlayarak, artık kullanılmaz hale gelinceye dek) tanınmasını sağlayan bir seri numarası verilir.
+SSCC her bir taşıma birimi için farklı bir seri numarası içerir.
+
+      Birden çok taşıma birimi hep aynı çeşit ürün içerse de her bir taşıma birimine farklı bir SSCC
+numarası, dolayısıyla seri numarası verilir. SSCC numarası, taşıma biriminin bilgisayar ortamındaki
+tanımı ve özelliklerine ilişkin bilgilere erişmek üzere bir erişim anahtarı olarak kullanılır. Bu bilgi
+öğelerinin bir kısmı taşıma biriminin üzerinde gözle görülür biçimde de yazdığı gibi EVD
+kayıtlarında da standart veri alanları olarak yer alırlar (Örnek: Ağırlık, gideceği adres, son kullanma
+tarihi, içerdiği paket sayısı vb.)
+18 basamaklı SSCC’nin yapısı şöyledir:
+
+      Uzatma            GS1 Firma Numarası ve Taşıma Biriminin Seri Numarası                 Kontrol
+     basamağı                                                                               Basamağı
+
+        N1             N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13 N14 N15 N16 N17                 N18
+
+
+-     Uzatma Basamağı (Extension Digit): SSCC’yi oluşturan firmanın iç gereksinimlerine göre
+      verilir.
+-     Genellikle taşıma biriminin tipini (konteyner, palet, varil, kasa vb) tanımlamak için kullanılır.
+-     GS1 Firma Numarası: Taşıma birimini üreten firmaya GS1 Numaralama Organizasyonunun
+      verdiği firma numarasıdır.
+-     Taşıma Biriminin Seri Numarası: Taşıma birimini üreten firmanın taşıma birimine verdiği ve
+      taşıma birimini tüm diğerlerinden ayıran seri numarasıdır.
+-     Kontrol Basamağı: Modulo-10 yöntemi ile hesaplanan kontrol basamağıdır.
+-     SSCC numarasının barkodu, GS1-128 barkod alfabesi kullanılarak basılır; Uygulama
+      Tanımlayıcısı (00)’dır. Uygulama Tanımlayıcısı (00), kendisini izleyen veri alanının 18
+      basamaklı sabit uzunlukta SSCC olduğunu belirtir. Taşıma birimleri üzerinde yer alan GS1
+      lojistik etiketinde SSCC numarasının bulunması zorunludur.
+
+    SSCC barkodunun örneği aşağıda verilmiştir:
+
+
+
+
+                                                Sayfa 7 / 11
+SSCC numarası ve barkodu aşağıda örneği verilen GS1 Lojistik Etiketi üzerinde yer alır;
+SSCC’nin GS1 Lojistik Etiketi üzerinde bulunması zorunludur.
+
+
+
+
+                                  DÖRDÜNCÜ BÖLÜM
+                     Barkod ve Karekodların Yerleşimi ve Oluşturulması
+
+
+Yerleşim
+MADDE 8-(1) Beşeri tıbbi ürünlerin barkodlarının ve karekodlarının yerleşiminde de diğer barkodların
+yerleşiminde kullanılan genel kurallara uyulur. Buna göre;
+
+      Barkod ve karekod mümkünse aynı düzlemde yer almamalı, mümkün değilse barkod ve
+       karekod arasında en az 1 cm mesafe bulunmalıdır. Bu mesafe içinde karekoda ait gözle
+       okunabilir bilgiler yer alabilir.
+
+      Barkod ve karekodun ürün ambalajı üzerindeki yeri, barkod ve karekodun okunmasını
+       kolaylaştırmalıdır. GS1 Sistemi, şekli ve boyutları birbirine benzeyen ürün ambalajları
+       üzerindeki barkod ve karekodların da benzer konumlarda olmalarını önermektedir.
+
+      Barkod ve karekod, düz (engebesiz) yüzey üzerinde olmalıdır.
+
+      Barkod ve karekod, paketin kenarlarının birleşim/bağlantı yerinde olmamalıdır.
+
+      Barkod ve karekod, paketin buruşabilecek yerinde olmamalı, barkod ve karekod basılan
+       bölüm buruşmamalı ve kıvrılmamalıdır.
+
+                                            Sayfa 8 / 11
+      Barkod ve karekodun üzeri herhangi bir cisimle veya şekille kapatılmamalıdır.
+
+Barkodların Oluşturulması
+MADDE 9- (1) Beşeri tıbbi ürünler üzerinde yer alacak barkodların okuyucu cihazlar tarafından
+sorunsuz okunacak şekilde oluşturulmasından ürün sahibi firma sorumludur.
+
+       (2) Oluşturulacak barkod ve karekodların kalite esasları belirlenirken barkod doğrulaması ile
+ilgili aşağıdaki standartlar esas alınır:
+
+     a) Linear Barkodlar (EAN-13, GS1-128) İçin: TS EN ISO/IEC 15416 Bilgi teknolojisi - Otomatik
+tanıma ve veri yakalama teknikleri - Barkod baskı kalite deney özelliği; Doğrusal semboller
+
+     b) Boyutlu Barkodlar (Karekod) İçin: TS EN ISO/IEC 15415 Bilgi teknolojisi - Otomatik
+tanımlama ve veri yakalama teknikleri - Barkod baskı kalitesi testi belirtimi - İki boyutlu semboller
+
+Gözle Okunabilir Bilgiler
+MADDE 10-(1) Beşeri tıbbi ürünler üzerinde bulunacak barkodların içeriği, doğrusal barkodlarda
+barkodun altında, karekodda karekodun yanında veya yakınında uygun bir yerde çıplak gözle
+okunabilir halde bulunur.
+
+       (2) Okumanın kolaylaştırılması için gözle okunabilir bilgiler içinde uygulama tanımlayıcıları
+parantezler içerisinde belirtilir. Ancak bu parantezler karekod içeriğinde yer almaz. Karekodun gözle
+okunabilir bilgilerinde, uygulama tanımlayıcıları parantezler ile gösterilmelidir. Bu parantezler
+karekod içeriğindeki bilgilerde yer almazlar.
+
+        (3) Gözle okunabilir bilgiler karekod içeriğini anlamlı bir şekilde toplu halde göstermek
+amacıyla tarif edilmiştir. Bazı küçük ambalajlarda yer sorunu olduğu için, son kullanma tarihi ve parti
+numarası eğer ambalajın başka bir yerinde yazılmışsa gözle okunabilir bilgiler içinde yer almayabilir.
+Ancak gözle okunabilir bilgi olarak GTIN ve Sıra Numarası mutlaka karekod ile uyumlu bir yerde,
+anlaşılabilir bir halde bulunmalıdır.
+
+       (4) Karekodun gözle okunabilir bilgilerinde son kullanma tarihi gösterilecek ise (17) uygulama
+tanımlayıcı parantezinden sonra ürünün iç ve dış ambalajındaki son kullanma formatına uyumlu
+olacak şekilde S.K.T: AA.YYYY, S.K.T: GG.AA.YYYY, SKT AA.YY, SKT GG.AA.YY
+formatlarında yazılmalıdır.
+
+Uygulama
+MADDE 11- (1) Barkod ve karekodun ambalaj üzerine basılması ile ilgili bir herhangi sınırlama
+bulunmamaktadır. Ruhsat/izin sahipleri uygulamayı kendileri için en uygun yöntemle yapmakta
+serbesttirler. Ancak ürün dış ambalajlarına etiket yöntemi ile yapılacak karekod uygulamalarında
+etiketlerin söküldükleri takdirde tahrip olacak şekilde yapılması yada etiketlerin yapışkanlarının
+sökülmesini engelleyecek şekilde belirlenmesine dikkat edilmelidir. Bu kapsam önceden yapılan
+etiketlerde değişiklik yapılarak karekod uygulanması durumunda da geçerlidir.
+
+       (2) Tüm barkod uygulamaları için baskı kalitesi derecesi TS EN ISO/IEC 15415:2004(E)
+standardına göre, “Toplam Sembol Derecesi” uyarınca minimum “D” seviyesinde olacaktır. Seri
+üretim hatlarında, örnekleme yöntemi ile ürünlerin testleri yapılarak aynı seviyenin sağlanması yeterli
+olacaktır.
+
+                                             Sayfa 9 / 11
+                                         BEŞİNCİ BÖLÜM
+                                          Diğer Hükümler
+
+
+Yerlerin Kodlanması
+MADDE 12-(1) Faaliyet alanlarının bir kod sistemi içinde birleştirilmesi için uluslar arası geçerliliği
+bulunan bir kod sistemi kabul edilmiştir. GS1 organizasyonunun tespit ettiği, Global Location Number
+(GLN) adı verilen Küresel Yer Numarası yerlerin kodlanması için kullanılacaktır.
+
+        (2) Küresel Yer Numarasının oluşturulması ve kullanımı GS1 Organizasyonunca belirlenen
+kurallara göre yapılır. GLN hakkında bilgi edinmek için GS1 sisteminin yayınladığı “GLN Atama
+Kuralları” adlı dokümana başvurulur.
+
+       (3) Küresel Yer Numarası, gerekirse evraklar üzerine EAN13 barkod standardına uygun bir
+barkod ile uygun şekilde basılır.
+
+       (4) GLN, tüm yerler için sabit olarak verilir. Taşınan birimlerin GLN’leri aynı kalır. Kapanan
+birimlere ait GLN başka bir birime 10 yıl boyunca verilemez.
+
+Yürürlükten Kaldırılan Kılavuz
+MADDE 13-(1) Beşeri İlaçlar Barkod Uygulama Kılavuzu yürürlükten kaldırılmışır.
+
+Yürürlük
+MADDE 14-(1) Bu Kılavuz yayımı tarihinde yürürlüğe girer.
+
+Geçici madde
+MADDE 15-(1) Bu Kılavuzun yayımı tarihinden önce üretilmiş ürünler için Beşeri İlaçlar Barkod
+Uygulama Kılavuzunda bulunan son kullanma tarihi hükümleri geçerlidir.
+
+Yürütme
+MADDE 16-(1) Bu Kılavuz hükümlerini Türkiye İlaç ve Tıbbi Cihaz Kurumu Başkanı yürütür.
+
+
+
+
+                                             Sayfa 10 / 11
+                        Ek 1: ÖRNEK KAREKODLU ETİKET DİZAYNLARI
+
+Standarda uygun karekodlu ürün etiketi örneği: Bu örnek resimde standart bir karekodlu ürün
+etiketi görülmektedir. Şekildeki parantezler okumayı kolaylaştırmak    için konulmaktadır.
+GTIN’in önünde (01) şeklindeki AI ve uzatma basamağı olarak kullanılan “0”ın yer aldığına dikkat
+ediniz.
+
+
+
+
+Standarda uygun dikdörtgen bir karekodlu ürün örneği: Bu örnek resimde bir defada daha düşük
+alana yazmak isteyen bir kullanıcı dikdörtgen karekod kullanmış ve yanında GTIN ve Sıra
+numarasını belirtmiş. Eğimli yüzeylere sahip ambalajlarda karekodun dikdörtgen şeklinin kullanımı
+tavsiye edilir. Bu örnekte, karekod içinde istenen 4 bilgini de yer aldığını ve son kullanma tarihi ve
+parti no bilgisinin de ambalaj üzerinde başka yerlerde mutlaka bulunduğunu gözden kaçırmamak
+gerekir.
+
+
+
+
+ Üç satırlı karekodlu ürün etiketi örneği: Bu örnek resimde, parti numarasının ambalajın başka
+ bir yerinde yazıldığı için gözle okunabilir kodlar içinde yazılmadığı durumlar için bir örnektir. Bu
+ örnekte parti numarası sadece gözle okunabilir kodlar içinde gösterilmemiştir, karekod içinde
+ mutlaka 4 alan da bulunmaktadır. Bu örnekte son kullanma tarihi bilgisinin ambalaj üzerinde başka
+ yerlerde mutlaka bulunduğunu gözden kaçırmamak gerekir.
+
+
+
+
+Standart dışı bilgiler içeren karekod örneği: Bu örnek resimde, gözle okunabilir bilgilerdeki
+standart alanların yanında başka bilgilerinde yazılabileceği gösterilmiştir. Yazılabilecek bu bilgiler
+ikinci bir yerde son kulanma tarihi ve parti numaralarının yazılmadığı durumlar için geçerlidir.
+Bilgilerin standart hale en yakın şekilde yazılmasında uzaklaşmamak kaydı ile bu tür uygulamalar
+mümkündür. Bu bilgiler gözle okunabilir bilgileri açıklayıcı mahiyette olabilir, farklı bilgiler
+içermez. (Kırmızı renk burada farkı göstermek içindir, Renk farklılaştırılması gibi bir mecburiyet
+yoktur.)
+
+
+
+
+                                              Sayfa 11 / 11
+

@@ -1,0 +1,354 @@
+İLAÇ TAKİP SİSTEMİ REFERANS SERVİSLERİ
+         KULLANIM KILAVUZU
+
+
+
+                            İLAÇ TAKİP SİSTEMİ PROJESİ
+
+
+          Tarih                   :   27.05.2022
+          Son Güncelleme Tarihi   :
+          Sürüm                   :   1.0.0
+
+
+
+
+                                                     1
+                      İLAÇ TAKİP SİSTEMİ RESTAPI SERVİSLERİ KULLANIM KILAVUZU   Tarih: 15.03.2022
+                                                                                Sayfa: 2 / 8
+
+
+
+İÇİNDEKİLER
+1.     AMAÇ, KAPSAM VE RESTAPI SERVİSLERİNİN GENEL İŞLEYİŞİ                                         3
+     1.1   AMAÇ                                                                                     3
+     1.2   KAPSAM                                                                                   3
+     1.3   HATA (FAULT)MESAJI                                                                       3
+1. İLAÇ LİSTESİ SERVİSİ                                                                             4
+2. PAYDAŞ LİSTESİ SERVİSİ                                                                           5
+3. ÜLKE LİSTESİ SERVİSİ                                                                             6
+4. CEVAP KODU LİSTESİ SERVİSİ                                                                       7
+
+
+
+
+                                                                                                    2
+                   İLAÇ TAKİP SİSTEMİ RESTAPI SERVİSLERİ KULLANIM KILAVUZU                  Tarih: 15.03.2022
+                                                                                            Sayfa: 3 / 8
+
+
+
+1. AMAÇ, KAPSAM VE RESTAPI SERVİSLERİNİN GENEL İŞLEYİŞİ
+
+1.1 AMAÇ
+  Ürün bilgilerinin çeşitli şekillerde İlaç Takip Sistemi’ne gönderilmesi veya sorgulanması gerekmektedir. Çok
+  miktardaki ürüne ait bilginin birden fazla kullanıcı tarafından sağlıklı bir şekilde merkeze iletilmesi için
+  kullanılan SOAP servisleri kullanılmaktadır. Bu bölümde, bildirim yapılırken kullanılacak olan Referans
+  servisleri anlatılacaktır.
+
+
+1.2 KAPSAM
+  Bu doküman Türkiye İlaç ve Tıbbi Cihaz Kurumu tarafından sağlanacak olan Referans servislerinin iletişim
+  yapısı, mesajlaşma yapısı ve mesajlarda kullanılacak veri yapılarını anlatır. İlaç Takip Sisteminin ve
+  paydaşlarının iç süreçlerine değinilmemiştir.
+
+
+1.3 HATA (FAULT)MESAJI
+  Hata mesajı yapısı tüm bildirim servisleri için aynıdır. Hata mesajı, web servislerinin iletişimi sırasında
+  oluşabilecek herhangi bir olası hata sonucu, paydaşları bilgilendirmeye yarar. Hata mesajı, hata kodu ve hata
+  metni olmak üzere iki farklı kısımdan oluşur. Hata metinleri eşsiz olmakla birlikte, her biri farklı bir hata
+  kodunu temsil eder. Bu alanların detayları aşağıda verilmiştir:
+
+“fc”Alanı     Bu alan, hata kodunu içerir. Hata kodu 5 karakterden oluşmak üzere olup, sadece sayıları
+              barındırır
+“fm”Alanı     Bu alan, hata mesajını içerir. Bu mesaj içeriği aynı zaman da hata kodunun açıklaması
+              olarak da düşünülebilir.
+
+
+
+
+                                                                                                                  3
+                          İLAÇ TAKİP SİSTEMİ RESTAPI SERVİSLERİ KULLANIM KILAVUZU                       Tarih: 15.03.2022
+                                                                                                        Sayfa: 4 / 8
+
+
+
+        1. İLAÇ LİSTESİ SERVİSİ
+İlaç Listesi Servisi, ITS de kayıtlı olan ilaçları sorgulama amaçlı tüm paydaşlar tarafından kullanılabilecek bir
+servisidir.
+                               İSTEK VE CEVAP MESAJ YAPISI VE ALANLARI
+ ADRES BİLGİSİ                       http://its.saglik.gov.tr/ReferenceServices/Drug?wsdl
+ AUTHORIZATION                       Basic
+ İSTEK MESAJI VERİ
+ ALANLARI                                 ALAN          AÇIKLAMA
+                                          ADI
+                                          getAll        True ve False değerini almaktadır.
+                                                        False değeri verildiğinde sistemde kayıtlı aktif ilaçlar,
+                                                        True değeri verildiğinde ise sistemde kayıtlı aktif ve pasif
+                                                        ilaçlar listelenmektedir.
+
+
+ CEVAP MESAJI VERİ
+ ALANLARI
+
+
+
+                Örnek İlaç Listesi İstek Mesajı                       Örnek İlaç Listesi Cevap Mesajı
+ <soapenv:Envelope                                         <S:Envelope
+ xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+ xmlns:ser="http://services.reference.its/">                <S:Body>
+   <soapenv:Header/>                                          <ns2:response xmlns:ns2="http://services.reference.its/">
+   <soapenv:Body>                                               <drugs>
+     <ser:request>
+                                                                  <drug isActive="true">
+       <getAll>TRUE</getAll>
+                                                                   <gtin>08699788698084</gtin>
+     </ser:request>
+                                                                   <drugName>BİOFLEKS İZOLEKS-M %5
+   </soapenv:Body>
+ </soapenv:Envelope>                                       DEKSTROZ ÇÖZELTİSİ (500 ML İNFÜZYON TORBASI
+                                                                   SETSİZ)</drugName>
+
+
+                                                                   <manufacturerGLN>8699788000016</manufacturerGLN>
+                                                                           <manufacturerName>OSEL İLAÇ SAN. VE TİC.
+                                                                   A.Ş.</manufacturerName>
+                                                                           <isImported>false</isImported>
+                                                                         </drug>
+                                                                         <drug isActive="true">
+                                                                          <gtin>08699788699050</gtin>
+                                                                         <drugName>BİOFLEKS METROSEL % 0,5 İ.V.
+                                                                   PERFÜZYON ÇÖZELTİSİ (100 ML SETLİ)</drugName>
+
+
+                                                                   <manufacturerGLN>8699788000016</manufacturerGLN>
+                                                                           <manufacturerName>OSEL İLAÇ SAN. VE TİC.
+                                                                   A.Ş.</manufacturerName>
+                                                                           <isImported>false</isImported>
+                                                                         </drug>
+                                                                   …
+                                                                         </drug>
+                                                                                                                            4
+                               İLAÇ TAKİP SİSTEMİ RESTAPI SERVİSLERİ KULLANIM KILAVUZU                            Tarih: 15.03.2022
+                                                                                                                  Sayfa: 5 / 8
+
+
+
+                                                                               </drugs>
+                                                                             </ns2:response>
+                                                                           </S:Body>
+                                                                         </S:Envelope>
+
+
+        2. PAYDAŞ LİSTESİ SERVİSİ
+Paydaş Listesi Servisi, ITS de kayıtlı olan paydaşları sorgulama amaçlı tüm paydaşlar tarafından kullanılabilecek bir
+servisidir.
+                                  İSTEK VE CEVAP MESAJ YAPISI VE ALANLARI
+ ADRES BİLGİSİ                          http://its.saglik.gov.tr/ReferenceServices/Stakeholder?wsdl
+ AUTHORIZATION                          Basic
+ İSTEK MESAJI VERİ
+ ALANLARI                                     ALAN ADI        AÇIKLAMA
+                                              stakeholderType Paydaşın tip bilgisini içerir. Değeri
+                                                              üretici,depo,eczane,hastan ve ihracatçı olarak
+                                                              tanımlanabilmektedir.
+                                              getAll          True ve False değerini almaktadır.
+                                                              False değeri verildiğinde sistemde kayıtlı aktif
+                                                              paydaşları, True değeri verildiğinde ise sistemde
+                                                              kayıtlı aktif ve pasif paydaşları listelenmektedir.
+                                              cityPlate       Şehir plakası bilgisidir.
+ CEVAP MESAJI VERİ
+ ALANLARI                                     ALAN ADI    AÇIKLAMA
+                                              gln         Paydaşın GLN numarasını içerir.
+                                              companyName İlacı üretmeye yetkili Ruhsat Sahibi Firmanın ad
+                                                          bilgisini içerir.
+                                              authorized  Yetkili bilgisini içerir.
+                                              email       Paydaşın e-mail bilgisini içerir.
+                                              phone       Paydaşın telefon bilgisini içerir.
+                                              city        Paydaşın adresine ait il bilgisini içerir.
+                                              town        Paydaşın adresine ait ilçe bilgisini içerir.
+                                              address     Paydaşın adres bilgisini içerir.
+                                              isActive    True, False değerini almaktadır.
+
+
+         Örnek Paydaş Listesi İstek Mesajı                                  Örnek Paydaş Listesi Cevap Mesajı
+ <soapenv:Envelope                                           <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+ xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"    <S:Body>
+ xmlns:ser="http://services.reference.its/">                   <ns2:response xmlns:ns2="http://services.reference.its/">
+  <soapenv:Header/>                                               <companies>
+  <soapenv:Body>                                                   <company isActive="true">
+    <ser:request>                                                    <gln>8680002146467</gln>
+     <stakeholderType>hastane</stakeholderType>                      <companyName>ELİF GÖÇER</companyName>
+      <getAll>false</getAll>                                         <authorized>ELİF GÖÇER</authorized>
+      <!--Optional:-->                                               <email>ygocer2008@hotmail.com</email>
+      <cityPlate>06</cityPlate>                                      <phone>0312 326 61 83</phone>
+    </ser:request>                                                   <city>Ankara</city>
+   </soapenv:Body>                                                   <town>Keçiören</town>
+ </soapenv:Envelope>
+
+                                                                                                                                      5
+                          İLAÇ TAKİP SİSTEMİ RESTAPI SERVİSLERİ KULLANIM KILAVUZU                       Tarih: 15.03.2022
+                                                                                                        Sayfa: 6 / 8
+
+
+
+                                                            <address>YUNUS EMRE CAD.NO:3/4 ETLİK
+                                                       ANKARA</address>
+                                                              </company>
+                                                              <company isActive="true">
+                                                                <gln>8680002088972</gln>
+                                                                <companyName>ÖZEL NEFROTEK DİYALİZ
+                                                       MERKEZİ</companyName>
+                                                            <authorized>SEBİLE YILMAZ BİLGE</authorized>
+                                                                <email>ozelnefrotekdiyaliz@hotmail.com</email>
+                                                                <phone>0312 338 00 00</phone>
+                                                                <city>Ankara</city>
+                                                                <town>Keçiören</town>
+                                                             <address>GELENDOST SOKAK NO.4
+                                                       KEÇİÖREN/ANKARA</address>
+                                                              </company>
+                                                       …
+                                                             </companies>
+                                                           </ns2:response>
+                                                         </S:Body>
+                                                       </S:Envelope>
+
+
+
+        3. ÜLKE LİSTESİ SERVİSİ
+Ülke Listesi Servisi, ITS de kayıtlı olan ülkeleri sorgulama amaçlı tüm paydaşlar tarafından kullanılabilecek bir
+servisidir.
+                               İSTEK VE CEVAP MESAJ YAPISI VE ALANLARI
+ ADRES BİLGİSİ                       http://its.saglik.gov.tr/ReferenceServices/Country?wsdl
+ AUTHORIZATION                       Basic
+ İSTEK MESAJI VERİ                   Herhangi bir parametre almamaktadır.
+ ALANLARI
+ CEVAP MESAJI VERİ
+ ALANLARI                                 ALAN ADI    AÇIKLAMA
+                                          countryCode Ülkenin kod bilgisini içerir.
+                                          countryName Ülkenin ad bilgisini içerir.
+
+
+               Örnek Ülke Listesi İstek Mesajı                       Örnek Ülke Listesi Cevap Mesajı
+ <soapenv:Envelope                                         <S:Envelope
+ xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+ xmlns:ser="http://services.reference.its/">                <S:Body>
+   <soapenv:Header/>                                          <ns2:response xmlns:ns2="http://services.reference.its/">
+   <soapenv:Body>                                               <countries>
+     <ser:request/>                                               <country>
+   </soapenv:Body>                                                 <countryCode>001</countryCode>
+ </soapenv:Envelope>                                               <countryName>FRANSA</countryName>
+                                                                             </country>
+                                                                             <country>
+                                                                              <countryCode>003</countryCode>
+
+                                                                                                                            6
+                          İLAÇ TAKİP SİSTEMİ RESTAPI SERVİSLERİ KULLANIM KILAVUZU                      Tarih: 15.03.2022
+                                                                                                       Sayfa: 7 / 8
+
+
+
+                                                                           <countryName>HOLLANDA</countryName>
+                                                                         </country>
+                                                                         <country>
+                                                                          <countryCode>004</countryCode>
+                                                                           <countryName>ALMANYA</countryName>
+                                                                         </country>
+                                                                   …
+                                                                        </countries>
+                                                                      </ns2:response>
+                                                                    </S:Body>
+                                                                   </S:Envelope>
+
+
+
+
+        4. CEVAP KODU LİSTESİ SERVİSİ
+Cevap Kodu Listesi Servisi, ITS de kayıtlı olan cevap kodlarını sorgulama amaçlı tüm paydaşlar tarafından
+kullanılabilecek bir servisidir.
+                               İSTEK VE CEVAP MESAJ YAPISI VE ALANLARI
+ ADRES BİLGİSİ                       http://its.saglik.gov.tr/ReferenceServices/ErrorCode?wsdl
+ AUTHORIZATION                       Basic
+ İSTEK MESAJI VERİ                   Herhangi bir parametre almamaktadır.
+ ALANLARI
+ CEVAP MESAJI VERİ
+ ALANLARI                                 ALAN ADI         AÇIKLAMA
+                                          code             Cevap kodu bilgisini içerir.
+                                          message          Cevap mesaj bilgisini içerir.
+                                          description      Açıklama bilgisini içerir.
+
+
+            Örnek Cevap Kodu Listesi İstek Mesajı                Örnek Cevap Kodu Listesi Cevap Mesajı
+ <soapenv:Envelope                                         <S:Envelope
+ xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+ xmlns:ser="http://services.reference.its/">                <S:Body>
+   <soapenv:Header/>                                          <ns2:response xmlns:ns2="http://services.reference.its/">
+   <soapenv:Body>                                               <errorCodes>
+     <ser:request/>                                               <errorCode>
+   </soapenv:Body>                                                 <code>11027</code>
+ </soapenv:Envelope>                                               <message>Bu Reçete Kayit Numarasi Zaten
+                                                                   Kayitli</message>
+                                                                          </errorCode>
+                                                                         <errorCode>
+                                                                          <code>11029</code>
+                                                                            <message>&lt;RKN> Bilgisi Yok ya da
+                                                                   Geçersiz!</message>
+                                                                         </errorCode>
+                                                                         <errorCode>
+                                                                           <code>11030</code>
+
+
+                                                                                                                           7
+İLAÇ TAKİP SİSTEMİ RESTAPI SERVİSLERİ KULLANIM KILAVUZU               Tarih: 15.03.2022
+                                                                      Sayfa: 8 / 8
+
+
+
+                                       <message>Belirtilen Reçete Kayit Numarasina Satis
+                              Bildirimi Yapilmamistir.</message>
+                                     </errorCode>
+                                     <errorCode>
+                                       <code>11033</code>
+                                       <message>Alici Bilgisi Geri Ödeme Kurumu
+                              Oldugunda &lt;URUNLER> alani bos olmalidir</message>
+                                    </errorCode>
+                                     <errorCode>
+                                      <code>11035</code>
+                                      <message>Ürüne Ait Son Kullanim Tarihi (XD)
+                              Formati Uyumsuz</message>
+                                     </errorCode>
+                                     <errorCode>
+                                       <code>11037</code>
+                                       <message>Ürüne ait GTIN numarasi Formati
+                              Uyumsuz</message>
+                                   </errorCode>
+                                     <errorCode>
+                                      <code>11038</code>
+                                       <message>(XD) Ürün Son Kullanma Tarihi, Üretim
+                              Tarihinden Itibaren 7 Yili Geçemez</message>
+                                     </errorCode>
+                                     <errorCode>
+                                       <code>11213</code>
+                                       <message>Belirtilen Reçete Numarasi Zaten
+                              Kayitli</message>
+                                     </errorCode>
+                                     <errorCode>
+                                      <code>11216</code>
+                                      <message>Belirtilen Reçete Kayit Numarasi
+                              Sistemimizde Kayitli Degildir</message>
+                                     </errorCode>
+                                     <errorCode>
+                                       <code>11901</code>
+                                       <message>Kullanici bu servisi kullanmaya yetkili
+                              degildir. Lütfen firma yetkilinizle görüsünüz</message>
+                                      </errorCode>
+                              ….
+                                   </errorCodes>
+                                  </ns2:response>
+                                </S:Body>
+                              </S:Envelope>
+
+
+
+
+                                                                                           8
+
