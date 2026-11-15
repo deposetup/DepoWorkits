@@ -34,6 +34,20 @@ class KullaniciController extends Controller
         return back()->with('ok', 'Kullanıcı eklendi.');
     }
 
+    /** Yönetici, müşterinin bir kullanıcısına yeni şifre belirler (eski şifre gerekmez). */
+    public function sifreDegistir(Request $request, Tenant $tenant, User $user)
+    {
+        abort_unless($user->tenant_id === $tenant->id, 404);
+        $v = $request->validate(['password' => ['required', Password::min(10)->letters()->numbers()]]);
+        if (User::where('tenant_id', $tenant->id)->where('id', '!=', $user->id)->get()->contains(fn (User $x) => \Illuminate\Support\Facades\Hash::check($v['password'], $x->password))) {
+            return back()->withErrors(['password' => 'Bu şifre bu müşterideki başka bir kullanıcıda da var. Farklı bir şifre seçin.']);
+        }
+        $user->forceFill(['password' => $v['password'], 'remember_token' => null])->save();
+        AuditLog::kaydet('kullanici_sifre_degistir', ['tenant' => $tenant->id, 'user' => $user->id]);
+
+        return back()->with('ok', $user->name.' için şifre değiştirildi. Yeni şifreyi kullanıcıya iletin.');
+    }
+
     public function aktifToggle(Tenant $tenant, User $user)
     {
         abort_unless($user->tenant_id === $tenant->id, 404);

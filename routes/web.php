@@ -90,6 +90,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/musteriler/{tenant}/uzat', [TenantController::class, 'uzat'])->name('tenants.uzat');
         Route::get('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'index'])->name('kullanici.index');
         Route::post('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'store'])->name('kullanici.store');
+        Route::post('/musteriler/{tenant}/kullanicilar/{user}/sifre', [KullaniciController::class, 'sifreDegistir'])->name('kullanici.sifre');
         Route::post('/musteriler/{tenant}/kullanicilar/{user}/aktif', [KullaniciController::class, 'aktifToggle'])->name('kullanici.aktif');
         Route::post('/musteriler/{tenant}/musteri-gozu', [\App\Http\Controllers\Admin\MusteriGozuController::class, 'basla'])->name('tenants.musteri-gozu');
         Route::get('/musteriler/{tenant}/its', [\App\Http\Controllers\Admin\ItsKimlikController::class, 'form'])->name('tenants.its');

@@ -8,7 +8,13 @@
 @forelse($kullanicilar as $k)
 <tr><td>{{ $k->name }}</td><td>{{ $k->email ?? '—' }}</td><td>{{ $k->rol }}</td><td>{{ $k->son_giris ? \Illuminate\Support\Carbon::parse($k->son_giris)->format('d.m.Y H:i') : '—' }}</td>
 <td>{!! $k->aktif ? '<span class="badge text-bg-success">Aktif</span>' : '<span class="badge text-bg-secondary">Pasif</span>' !!}</td>
-<td><form method="post" action="{{ route('admin.kullanici.aktif', [$tenant, $k]) }}">@csrf<button class="btn btn-sm btn-outline-secondary">{{ $k->aktif ? 'Pasifleştir' : 'Aktifleştir' }}</button></form></td></tr>
+<td class="text-nowrap"><button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#sf{{ $k->id }}"><i class="bi bi-key me-1"></i>Şifre Değiştir</button>
+<form method="post" action="{{ route('admin.kullanici.aktif', [$tenant, $k]) }}" class="d-inline">@csrf<button class="btn btn-sm btn-outline-secondary">{{ $k->aktif ? 'Pasifleştir' : 'Aktifleştir' }}</button></form></td></tr>
+<tr class="collapse {{ $errors->has('password') && old('_k') == $k->id ? 'show' : '' }}" id="sf{{ $k->id }}"><td colspan="6" class="bg-light">
+<form method="post" action="{{ route('admin.kullanici.sifre', [$tenant, $k]) }}" class="row g-2 align-items-center">@csrf<input type="hidden" name="_k" value="{{ $k->id }}">
+<div class="col-auto small fw-semibold">{{ $k->name }} için yeni şifre:</div>
+<div class="col-md-4"><div class="input-group input-group-sm"><input type="password" name="password" class="form-control" placeholder="Yeni şifre (min. 10, harf+rakam)" required autocomplete="new-password"><button type="button" class="btn btn-outline-secondary goz-btn" tabindex="-1" aria-label="Şifreyi göster/gizle"><i class="bi bi-eye"></i></button></div></div>
+<div class="col-auto"><button class="btn btn-sm btn-primary" onclick="return confirm('{{ addslashes($k->name) }} kullanıcısının şifresi değiştirilecek. Emin misiniz?')">Kaydet</button></div></form></td></tr>
 @empty<tr><td colspan="6" class="text-muted">Bu müşteriye bağlı kullanıcı yok.</td></tr>@endforelse
 </tbody></table>
 <h5 class="mt-4">Yeni Kullanıcı</h5>

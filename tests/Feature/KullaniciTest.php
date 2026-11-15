@@ -50,4 +50,21 @@ class KullaniciTest extends TestCase
         $this->actingAs($u)->post('/sifre', ['mevcut' => 'EskiSifre123', 'password' => 'YeniSifre123', 'password_confirmation' => 'YeniSifre123'])->assertSessionHasNoErrors();
         $this->assertTrue(Hash::check('YeniSifre123', $u->fresh()->password));
     }
+
+    public function test_admin_kullanicinin_sifresini_degistirir(): void
+    {
+        $admin = User::factory()->create(['rol' => 'super_admin', 'tenant_id' => null]);
+        $t = \App\Models\Tenant::create(['unvan' => 'T', 'gln' => '8680001000044', 'tur' => 'depo', 'lisans_baslangic' => now()->subDay(), 'lisans_bitis' => now()->addYear(), 'kvkk_onay_tarihi' => now()]);
+        $a = User::factory()->create(['tenant_id' => $t->id, 'rol' => 'kullanici', 'password' => 'EskiSifre12345']);
+        $b = User::factory()->create(['tenant_id' => $t->id, 'rol' => 'kullanici', 'password' => 'DigerSifre12345']);
+        $this->actingAs($admin)->get(route('admin.kullanici.index', $t))->assertOk()->assertSee('Şifre Değiştir');
+        $this->post(route('admin.kullanici.sifre', [$t, $a]), ['password' => 'kisa'])->assertSessionHasErrors('password');
+        $this->post(route('admin.kullanici.sifre', [$t, $a]), ['password' => 'DigerSifre12345'])->assertSessionHasErrors('password');
+        $this->post(route('admin.kullanici.sifre', [$t, $a]), ['password' => 'YeniSifre12345'])->assertSessionHasNoErrors();
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('YeniSifre12345', $a->fresh()->password));
+        $diger = \App\Models\Tenant::create(['unvan' => 'D', 'gln' => '8680001000055', 'tur' => 'depo', 'lisans_baslangic' => now()->subDay(), 'lisans_bitis' => now()->addYear()]);
+        $this->post(route('admin.kullanici.sifre', [$diger, $a]), ['password' => 'BaskaSifre12345'])->assertNotFound();
+        $m = User::factory()->create(['tenant_id' => $t->id, 'rol' => 'tenant_admin']);
+        $this->actingAs($m)->post(route('admin.kullanici.sifre', [$t, $a]), ['password' => 'Hack12345678'])->assertForbidden();
+    }
 }
