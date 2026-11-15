@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('guest')->group(function () {
     Route::get('/giris', [AuthController::class, 'form'])->name('login');
     Route::post('/giris', [AuthController::class, 'login'])->middleware('throttle:10,1');
+    Route::get('/sifremi-unuttum', [\App\Http\Controllers\SifreTalepController::class, 'form'])->name('sifre.unuttum');
+    Route::post('/sifremi-unuttum', [\App\Http\Controllers\SifreTalepController::class, 'gonder'])->middleware('throttle:5,10')->name('sifre.unuttum.gonder');
 });
 
 Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
@@ -66,6 +68,9 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
     Route::middleware('superadmin')->prefix('yonetim')->name('admin.')->group(function () {
         Route::get('/musteriler', [TenantController::class, 'index'])->name('tenants.index');
         Route::post('/musteriler', [TenantController::class, 'store'])->name('tenants.store');
+        Route::get('/talepler', [\App\Http\Controllers\Admin\TalepController::class, 'index'])->name('talepler');
+        Route::post('/talepler/{talep}/durum', [\App\Http\Controllers\Admin\TalepController::class, 'durum'])->name('talepler.durum');
+        Route::get('/giris-kayitlari', [\App\Http\Controllers\Admin\GirisKayitController::class, 'index'])->name('giris-kayitlari');
         Route::post('/musteriler/{tenant}/tur', [TenantController::class, 'turDegistir'])->name('tenants.tur');
         Route::post('/musteriler/{tenant}/uzat', [TenantController::class, 'uzat'])->name('tenants.uzat');
         Route::get('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'index'])->name('kullanici.index');

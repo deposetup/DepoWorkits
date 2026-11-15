@@ -20,11 +20,15 @@ class KullaniciController extends Controller
     {
         $v = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
+            'email' => 'nullable|email|max:255|unique:users,email',
             'rol' => 'required|in:tenant_admin,kullanici',
             'password' => ['required', Password::min(10)->letters()->numbers()],
         ]);
-        $u = User::create(['name' => $v['name'], 'email' => $v['email'], 'password' => $v['password'], 'tenant_id' => $tenant->id, 'rol' => $v['rol'], 'aktif' => true]);
+        // GLN ile girişte kullanıcı şifreden bulunduğu için aynı müşteride aynı şifre iki kullanıcıya verilemez.
+        if (User::where('tenant_id', $tenant->id)->get()->contains(fn (User $x) => \Illuminate\Support\Facades\Hash::check($v['password'], $x->password))) {
+            return back()->withErrors(['password' => 'Bu şifre bu müşterideki başka bir kullanıcıda da var. Farklı bir şifre seçin.'])->withInput();
+        }
+        $u = User::create(['name' => $v['name'], 'email' => filled($v['email'] ?? null) ? $v['email'] : null, 'password' => $v['password'], 'tenant_id' => $tenant->id, 'rol' => $v['rol'], 'aktif' => true]);
         AuditLog::kaydet('kullanici_olustur', ['tenant' => $tenant->id, 'user' => $u->id]);
 
         return back()->with('ok', 'Kullanıcı eklendi.');

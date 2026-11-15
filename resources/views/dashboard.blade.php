@@ -38,6 +38,8 @@
 @php
   $kisayol = auth()->user()->superAdminMi() ? [
     ['Müşteriler', 'Müşteri ve lisans yönetimi', 'bi-people', route('admin.tenants.index')],
+    ['Destek Talepleri', 'Şifre ve bağlantı talepleri', 'bi-life-preserver', route('admin.talepler')],
+    ['Giriş Kayıtları', 'Müşteri giriş saatleri', 'bi-clock-history', route('admin.giris-kayitlari')],
   ] : [
     ['Mal Kabul', 'Gelen ürünü kabul et', 'bi-check2-square', route('islem', 'kabul')],
     ['PTS Sorgu', 'Paketleri sorgula, XML yükle', 'bi-search', route('pts')],

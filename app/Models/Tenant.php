@@ -21,6 +21,12 @@ class Tenant extends Model
         ];
     }
 
+    /** Ünvan standardı: her kelimenin yalnızca baş harfi büyük. */
+    protected function unvan(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(set: fn ($v) => \App\Support\Metin::baslik((string) $v));
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

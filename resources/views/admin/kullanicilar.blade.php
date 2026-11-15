@@ -6,18 +6,19 @@
 <table class="table table-sm bg-white">
 <thead><tr><th>Ad</th><th>E-posta</th><th>Rol</th><th>Son Giriş</th><th>Durum</th><th></th></tr></thead><tbody>
 @forelse($kullanicilar as $k)
-<tr><td>{{ $k->name }}</td><td>{{ $k->email }}</td><td>{{ $k->rol }}</td><td>{{ $k->son_giris ? \Illuminate\Support\Carbon::parse($k->son_giris)->format('d.m.Y H:i') : '—' }}</td>
+<tr><td>{{ $k->name }}</td><td>{{ $k->email ?? '—' }}</td><td>{{ $k->rol }}</td><td>{{ $k->son_giris ? \Illuminate\Support\Carbon::parse($k->son_giris)->format('d.m.Y H:i') : '—' }}</td>
 <td>{!! $k->aktif ? '<span class="badge text-bg-success">Aktif</span>' : '<span class="badge text-bg-secondary">Pasif</span>' !!}</td>
 <td><form method="post" action="{{ route('admin.kullanici.aktif', [$tenant, $k]) }}">@csrf<button class="btn btn-sm btn-outline-secondary">{{ $k->aktif ? 'Pasifleştir' : 'Aktifleştir' }}</button></form></td></tr>
 @empty<tr><td colspan="6" class="text-muted">Bu müşteriye bağlı kullanıcı yok.</td></tr>@endforelse
 </tbody></table>
 <h5 class="mt-4">Yeni Kullanıcı</h5>
+@if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 <form method="post" action="{{ route('admin.kullanici.store', $tenant) }}" class="row g-2">@csrf
   <div class="col-md-3"><input name="name" class="form-control" placeholder="Ad Soyad" required></div>
-  <div class="col-md-3"><input type="email" name="email" class="form-control" placeholder="E-posta" required></div>
+  <div class="col-md-3"><input type="email" name="email" class="form-control" placeholder="E-posta (isteğe bağlı)"></div>
   <div class="col-md-2"><select name="rol" class="form-select"><option value="tenant_admin">Yönetici</option><option value="kullanici">Kullanıcı</option></select></div>
   <div class="col-md-3"><input type="password" name="password" class="form-control" placeholder="Geçici şifre (min. 10, harf+rakam)" required autocomplete="new-password"></div>
   <div class="col-md-1"><button class="btn btn-primary">Ekle</button></div>
 </form>
-<p class="small text-muted mt-2">Geçici şifreyi müşteriye iletin; ilk girişte "Şifre Değiştir" ekranından değiştirmesini isteyin.</p>
+<p class="small text-muted mt-2">E-posta zorunlu değildir; kullanıcı müşteri GLN'i ({{ $tenant->gln }}) ve şifresiyle de girebilir. Geçici şifreyi müşteriye iletin; ilk girişte "Şifre Değiştir" ekranından değiştirmesini isteyin.</p>
 @endsection

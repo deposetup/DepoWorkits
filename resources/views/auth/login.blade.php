@@ -68,10 +68,10 @@
         <p class="aciklama">Hesabınızla giriş yaparak devam edin.</p>
         <form method="post" action="/giris" autocomplete="on">@csrf
           <div class="mb-3">
-            <label class="form-label fw-semibold" for="email">E-posta</label>
+            <label class="form-label fw-semibold" for="email">E-posta veya GLN</label>
             <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-              <input id="email" type="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" autocomplete="username" autofocus required>
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input id="email" type="text" name="email" inputmode="email" placeholder="E-posta adresi ya da 13 haneli GLN" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" autocomplete="username" autofocus required>
               @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
           </div>
@@ -85,7 +85,8 @@
           </div>
           <button class="btn btn-giris w-100"><i class="bi bi-box-arrow-in-right me-1"></i>Giriş Yap</button>
         </form>
-        <div class="guven"><i class="bi bi-info-circle"></i><span>Şifrenizi unuttuysanız ya da İTS bağlantı bilgileriniz için DepoWork ekibiyle iletişime geçin.</span></div>
+        <div class="text-center mt-3"><a href="{{ route('sifre.unuttum') }}" class="small">Şifremi unuttum</a></div>
+        <div class="guven"><i class="bi bi-info-circle"></i><span>E-posta adresiniz ya da GLN numaranızla giriş yapabilirsiniz.</span></div>
       </div>
     </section>
   </div>
