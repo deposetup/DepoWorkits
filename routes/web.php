@@ -30,6 +30,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
     Route::middleware('lisans:salt_okunur')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('home');
         Route::get('/stok', [StokController::class, 'index'])->name('stok');
+        Route::get('/stok/barkod', [StokController::class, 'barkod'])->name('stok.barkod');
         Route::get('/kritik-miad', [StokController::class, 'kritikMiad'])->name('kritik-miad');
         Route::get('/analiz', [AnalizController::class, 'index'])->name('analiz');
     });

@@ -74,6 +74,7 @@
       ]],
       ['Stok', 'bi-boxes', null, [
         ['Stok Özeti', 'bi-bar-chart-line', route('stok'), ['stok']],
+        ['Barkod Bazlı Stok', 'bi-upc', route('stok.barkod'), ['stok.barkod']],
         ['Stok Listesi (Karekod)', 'bi-upc-scan', route('stok.liste'), ['stok.liste']],
         ['Stok İçe Aktar (İTS Doğrulamalı)', 'bi-cloud-download', route('stok.ice-aktar'), ['stok.ice-aktar*']],
         ['Kritik / Miad', 'bi-exclamation-triangle', route('kritik-miad'), ['kritik-miad']],

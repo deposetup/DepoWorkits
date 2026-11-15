@@ -36,6 +36,47 @@ class StokController extends Controller
         return view('stok.index', ['satirlar' => $q->get(), 'adlar' => $this->adlar($its), 'ara' => $ara]);
     }
 
+    /** GTIN (barkod) bazlı stok: ürün başına adet ve parti/SKT kırılımı; Excel çıktısı. */
+    public function barkod(Request $request, ItsClient $its)
+    {
+        $tid = $request->user()->tenant_id;
+        $ara = trim((string) $request->query('ara', ''));
+        $adlar = $this->adlar($its);
+
+        $temel = StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta');
+        if ($ara !== '') {
+            $gtinler = collect($adlar)->filter(fn ($ad) => mb_stripos($ad, $ara) !== false)->keys()->all();
+            $temel->where(fn ($w) => $w->where('gtin', 'like', '%'.preg_replace('/\D/', '', $ara).'%')
+                ->when(preg_replace('/\D/', '', $ara) === '', fn ($x) => $x->whereRaw('1=0'))
+                ->orWhereIn('gtin', $gtinler));
+        }
+
+        $partiler = (clone $temel)->selectRaw('gtin, bn, skt, count(*) as adet')
+            ->groupBy('gtin', 'bn', 'skt')->orderBy('gtin')->orderBy('skt')->get()->groupBy('gtin');
+
+        if ($request->boolean('excel')) {
+            $satirlar = [];
+            foreach ($partiler as $gtin => $liste) {
+                foreach ($liste as $p) {
+                    $satirlar[] = [$adlar[$gtin] ?? '', $gtin, $p->bn, $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '', (int) $p->adet];
+                }
+            }
+
+            return \App\Support\XlsxYazici::indir('barkod-bazli-stok-'.now()->format('Ymd-His').'.xlsx',
+                ['İlaç', 'GTIN', 'Parti', 'SKT', 'Adet'], $satirlar, 'Barkod Bazlı Stok');
+        }
+
+        $urunler = $partiler->map(fn ($liste, $gtin) => (object) [
+            'gtin' => $gtin,
+            'ad' => $adlar[$gtin] ?? null,
+            'adet' => $liste->sum('adet'),
+            'en_yakin_skt' => $liste->pluck('skt')->filter()->map(fn ($d) => \Illuminate\Support\Carbon::parse($d))->min(),
+            'partiler' => $liste,
+        ])->values();
+
+        return view('stok.barkod', ['urunler' => $urunler, 'ara' => $ara, 'toplam' => $urunler->sum('adet')]);
+    }
+
     /** Karekod metni (okunabilir GS1 biçimi). */
     public static function karekod(StokKalemi $k): string
     {
