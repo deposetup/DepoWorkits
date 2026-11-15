@@ -4,7 +4,7 @@
 <h4>{{ $baslik }}</h4>
 @if($tur === 'deaktive_iptal')<div class="alert alert-info small">Deaktive edilmiş ürünleri geri stoğa alır. Deaktivasyonda kullandığınız <b>sebebi</b> seçin. Kılavuz bu servisi eczaneler için tanımlar; depo hesabınızda İTS reddederse sonuç ekranında İTS'in hata mesajı görünür.</div>@endif
 @if($tur === 'devir')<div class="alert alert-info small">Mal Devir yalnızca <b>aynı role sahip</b> paydaşlar arasında yapılabilir (depo → depo). Hata yaptıysanız <b>Mal Devir İptal</b> kullanın. Karşı paydaşın aktif olup olmadığını <b>Sorgular → Paydaşlar</b> ekranından kontrol edebilirsiniz.</div>@endif
-@if($tur === 'satis')<div class="alert alert-info small">Satış bildirimi sonrası ürünler alıcıya hemen geçmez; alıcı kendi <b>Mal Alım</b> bildirimini yapana kadar arada bekler. Hata yaptıysanız <b>Satış İptal</b> kullanın.</div>@endif
+@if($tur === 'satis')<div class="alert alert-info small">Satış bildirimi sonrası ürünler alıcıya hemen geçmez; alıcı kendi <b>Mal Alım</b> bildirimini yapana kadar arada bekler. Hata yaptıysanız sonuç ekranındaki <b>Satışı geri al</b> butonunu ya da daha önceki satışlar için <a href="{{ route('islem', 'satis_iptal') }}">Satış İptal</a> ekranını kullanın.</div>@endif
 <form method="post" action="{{ route('islem.calistir', $tur) }}" class="mb-4">@csrf
   <label class="form-label">Karekodlar (her satıra bir ürün; okuyucu ile okutun)</label>
   <textarea name="kodlar" rows="8" class="form-control font-monospace" autofocus>{{ old('kodlar') }}</textarea>
@@ -24,11 +24,24 @@
 </form>
 @isset($sonuc)
 <div class="card"><div class="card-header">Sonuç @if($sonuc['bildirim'])<small class="text-muted">Bildirim No: {{ $sonuc['bildirim'] }}</small>@endif</div>
-<table class="table table-sm mb-0">
+@php
+  $geriAlinabilir = in_array($tur, ['satis', 'devir'], true);
+  $iptalTuru = $tur === 'satis' ? 'satis_iptal' : 'devir_iptal';
+  $basarili = collect($sonuc['satirlar'])->where('durum', 'tamam')->pluck('kod')->values();
+@endphp
+<table class="table table-sm mb-0 align-middle">
 @foreach($sonuc['satirlar'] as $s)
-<tr class="{{ $s['durum'] === 'tamam' ? 'table-success' : 'table-danger' }}"><td class="font-monospace small">{{ \Illuminate\Support\Str::limit($s['kod'], 60) }}</td><td>{{ $s['durum'] === 'tamam' ? 'Başarılı' : $s['mesaj'] }}</td></tr>
+<tr class="{{ $s['durum'] === 'tamam' ? 'table-success' : 'table-danger' }}"><td class="font-monospace small">{{ \Illuminate\Support\Str::limit($s['kod'], 60) }}</td><td>{{ $s['durum'] === 'tamam' ? 'Başarılı' : $s['mesaj'] }}</td>
+@if($geriAlinabilir)<td class="text-end">@if($s['durum'] === 'tamam')
+  <form method="post" action="{{ route('islem.calistir', $iptalTuru) }}" onsubmit="return confirm('Bu ürünün {{ $tur === 'satis' ? 'satışı' : 'devri' }} İTS\'te iptal edilecek. Emin misiniz?')">@csrf<input type="hidden" name="kodlar" value="{{ $s['kod'] }}"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-arrow-counterclockwise me-1"></i>{{ $tur === 'satis' ? 'Satışı geri al' : 'Devri geri al' }}</button></form>
+@endif</td>@endif
+</tr>
 @endforeach
 </table></div>
+@if($geriAlinabilir && $basarili->count() > 1)
+<form method="post" action="{{ route('islem.calistir', $iptalTuru) }}" class="mt-3" onsubmit="return confirm('Başarılı {{ $basarili->count() }} ürünün {{ $tur === 'satis' ? 'satışı' : 'devri' }} İTS\'te iptal edilecek. Emin misiniz?')">@csrf<input type="hidden" name="kodlar" value="{{ $basarili->implode("\n") }}"><button class="btn btn-danger"><i class="bi bi-arrow-counterclockwise me-1"></i>Başarılı {{ $basarili->count() }} ürünün {{ $tur === 'satis' ? 'satışını' : 'devrini' }} geri al</button></form>
+@endif
+@if($geriAlinabilir && $basarili->isNotEmpty())<div class="small text-muted mt-2">Geri alma yalnızca alıcı henüz Mal Alım bildirimi yapmadıysa mümkündür; aksi hâlde İTS reddeder ve hata mesajı sonuç ekranında görünür.</div>@endif
 @if(isset($geri))<a href="{{ $geri }}" class="btn btn-outline-secondary mt-3">Stok listesine dön</a>@endif
 @endisset
 @endsection

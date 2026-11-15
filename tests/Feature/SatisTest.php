@@ -38,6 +38,15 @@ class SatisTest extends TestCase
         $this->assertSame('stokta', StokKalemi::first()->durum);
     }
 
+    public function test_satis_sonucunda_geri_al_butonu_cikar(): void
+    {
+        $u = $this->user();
+        $this->actingAs($u)->post('/islem/kabul', ['kodlar' => self::KOD]);
+        $r = $this->actingAs($u)->post('/islem/satis', ['kodlar' => self::KOD, 'karsi_gln' => '8680001000012']);
+        $r->assertSee('Satışı geri al')->assertSee('/islem/satis_iptal', false);
+        $this->actingAs($u)->post('/islem/satis_iptal', ['kodlar' => self::KOD])->assertSee('Başarılı')->assertDontSee('Satışı geri al');
+    }
+
     public function test_stokta_olmayan_satilamaz(): void
     {
         $this->actingAs($this->user())->post('/islem/satis', ['kodlar' => self::KOD, 'karsi_gln' => '8680001000012'])->assertSee('stokta');
