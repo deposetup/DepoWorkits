@@ -27,7 +27,7 @@
     @elseif($durum === 'devir')<option value="devir_iptal">Mal Devir İptal</option>
     @else<option value="sarf_iptal">Sarf İptal</option>@endif
   </select></div>
-  <div class="col-md-3" id="glnAlan"><input name="karsi_gln" class="form-control form-control-sm" maxlength="13" placeholder="Karşı paydaş GLN (13 hane)"></div>
+  <div class="col-md-4" id="glnAlan">@include('cari._secici', ['hedef' => 'karsi_gln_input'])<input id="karsi_gln_input" name="karsi_gln" class="form-control form-control-sm" maxlength="13" placeholder="Karşı paydaş GLN (13 hane)"></div>
   <div class="col-md-3 d-none" id="sebepAlan"><select name="sebep" class="form-select form-select-sm"><option value="">Sebep seçin</option>@foreach($sebepler as $k => $ad)<option value="{{ $k }}">{{ $k }} - {{ $ad }}</option>@endforeach</select></div>
   <div class="col-auto"><button class="btn btn-sm btn-danger">Seçilenlere Uygula (<span id="sayi">0</span>)</button></div>
   <div class="col-auto small text-muted">Bu sayfadaki ürünler seçilir; başka sayfa için ayrıca uygulayın.</div>

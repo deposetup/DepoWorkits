@@ -14,10 +14,16 @@
 @if($hata)<div class="alert alert-danger">{{ $hata }}</div>@endif
 @if($liste !== null)
 <div class="d-flex justify-content-between align-items-center mb-2"><span class="text-muted small">{{ $toplam }} paydaş bulundu @if($toplam > $gosterilen->count())(ilk {{ $gosterilen->count() }} gösteriliyor; Excel'de tümü vardır)@endif</span><a href="{{ request()->fullUrlWithQuery(['excel' => 1]) }}" class="btn btn-success btn-sm"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a></div>
-<table class="table table-sm bg-white align-middle"><thead><tr><th>GLN</th><th>Ünvan</th><th>Tip</th><th>İl / İlçe</th><th>Telefon</th><th>Durum</th></tr></thead><tbody>
+<table class="table table-sm bg-white align-middle"><thead><tr><th>GLN</th><th>Ünvan</th><th>Tip</th><th>İl / İlçe</th><th>Telefon</th><th>Durum / Cari</th></tr></thead><tbody>
 @forelse($gosterilen as $p)
 <tr><td class="font-monospace">{{ $p['gln'] }}</td><td>{{ $p['companyName'] }}</td><td>{{ $tipler[$p['tip']] ?? $p['tip'] }}</td><td>{{ $p['city'] }} {{ $p['town'] ? '/ '.$p['town'] : '' }}</td><td>{{ $p['phone'] ?: '—' }}</td>
-<td>@if($p['active'])<span class="badge text-bg-success">Aktif</span>@else<span class="badge text-bg-secondary">Pasif</span>@endif</td></tr>
+<td class="text-nowrap">@if($p['active'])<span class="badge text-bg-success">Aktif</span>@else<span class="badge text-bg-secondary">Pasif</span>@endif
+@if(isset($cariGlnler[$p['gln']]))<span class="badge text-bg-primary ms-1"><i class="bi bi-person-check"></i> Cari ekli</span>
+@else<form method="post" action="{{ route('cari.ekle') }}" class="d-inline ms-1">@csrf
+<input type="hidden" name="gln" value="{{ $p['gln'] }}"><input type="hidden" name="unvan" value="{{ $p['companyName'] }}"><input type="hidden" name="tip" value="{{ $p['tip'] }}">
+<input type="hidden" name="il" value="{{ $p['city'] }}"><input type="hidden" name="ilce" value="{{ $p['town'] }}"><input type="hidden" name="eposta" value="{{ filter_var($p['email'] ?? '', FILTER_VALIDATE_EMAIL) ?: '' }}">
+<input type="hidden" name="telefon" value="{{ preg_match('/^[0-9+()\s-]{7,30}$/', (string) $p['phone']) ? $p['phone'] : '' }}"><input type="hidden" name="aktif" value="{{ $p['active'] ? 1 : 0 }}">
+<button class="btn btn-sm btn-outline-primary py-0" title="Bu paydaşı cari listenize ekleyin"><i class="bi bi-person-plus me-1"></i>Cari Ekle</button></form>@endif</td></tr>
 @empty<tr><td colspan="6" class="text-muted">Sonuç yok.</td></tr>@endforelse
 </tbody></table>
 @endif

@@ -76,7 +76,7 @@ class PtsGonderimController extends Controller
 
         $yeni = PtsGonderim::create(PtsGonderim::mevcutAlanlar([
             'tenant_id' => $tenantId, 'user_id' => $request->user()->id, 'kaynak_id' => $gonderim->id,
-            'alici_gln' => $gonderim->alici_gln, 'alici_unvan' => $gonderim->alici_unvan ?? PtsGonderim::unvanBul($gonderim->alici_gln),
+            'alici_gln' => $gonderim->alici_gln, 'alici_unvan' => $gonderim->alici_unvan ?? PtsGonderim::unvanBul($gonderim->alici_gln, $tenantId),
             'bildirim_id' => $gonderim->bildirim_id, 'adet' => $guncel->count(), 'kalemler' => $guncel->all(), 'durum' => 'gonderiliyor',
         ]));
         AuditLog::kaydet('pts_gonderim_tekrar', ['kaynak' => $gonderim->id, 'yeni' => $yeni->id, 'alici' => $yeni->alici_gln]);
@@ -109,7 +109,7 @@ class PtsGonderimController extends Controller
 
         $g->update(PtsGonderim::mevcutAlanlar([
             'durum' => 'gonderildi', 'transfer_id' => $sonuc['transferId'], 'md5' => $sonuc['md5'], 'gonderildi_at' => now(), 'hata' => null,
-            'belge_no' => $belgeNo, 'alici_unvan' => $g->alici_unvan ?? PtsGonderim::unvanBul($g->alici_gln),
+            'belge_no' => $belgeNo, 'alici_unvan' => $g->alici_unvan ?? PtsGonderim::unvanBul($g->alici_gln, $g->tenant_id),
         ]));
         AuditLog::kaydet('pts_gonderim', ['gonderim' => $g->id, 'alici' => $g->alici_gln, 'adet' => $g->adet, 'transfer' => $sonuc['transferId']]);
 

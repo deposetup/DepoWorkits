@@ -50,6 +50,7 @@
     ['Kritik / Miad', 'Yaklaşan SKT ve eşikler', 'bi-exclamation-triangle', route('kritik-miad')],
     ['Karekod Oluşturucu', 'Silinen karekodu yeniden üret, yazdır', 'bi-qr-code', route('karekod.olustur')],
     ['Paydaşlar', 'Aktif / pasif paydaş listesi', 'bi-building', route('paydaslar')],
+    ['Cari Kartları', 'Sık çalışılan alıcı/tedarikçiler', 'bi-person-lines-fill', route('cari.index')],
     ['İTS Bağlantısı', 'Bağlantıyı sına', 'bi-plug', route('ayarlar.its')],
   ];
 @endphp

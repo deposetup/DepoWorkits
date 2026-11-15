@@ -18,10 +18,11 @@
     <button class="btn btn-primary"><i class="bi bi-upload me-1"></i>Dosyayı Oku</button>
   </form>
 </div></div>
+@php $cariAdlari = \App\Models\Cari::adlar(auth()->user()->tenant_id); @endphp
 @if(is_array($sonuc))
 <div class="mb-2 text-end"><a href="{{ request()->fullUrlWithQuery(['excel' => 1]) }}" class="btn btn-success btn-sm"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a></div>
 <table class="table table-sm bg-white"><thead><tr><th>Transfer No</th><th>Gönderen GLN</th><th>Alıcı GLN</th><th>Tarih</th><th>Durum</th><th></th></tr></thead><tbody>
-@forelse($sonuc as $r)<tr><td>{{ $r['transferId'] }}</td><td>{{ $r['gonderen'] }}</td><td>{{ $r['alici'] ?? '' }}</td><td>{{ $r['tarih'] ? \Illuminate\Support\Carbon::parse($r['tarih'])->format('d.m.Y H:i') : '' }}</td><td>{{ $r['alindi'] === null ? '—' : ($r['alindi'] ? 'Alındı' : 'Alınmadı') }}</td><td><form method="post" action="{{ route('pts.al') }}">@csrf<input type="hidden" name="transfer_id" value="{{ $r['transferId'] }}"><button class="btn btn-sm btn-outline-primary">Paketi Al</button></form></td></tr>
+@forelse($sonuc as $r)<tr><td>{{ $r['transferId'] }}</td><td>{{ $r['gonderen'] }}@if($ad = ($cariAdlari[$r['gonderen']] ?? null))<div class="small text-primary"><i class="bi bi-person-check"></i> {{ $ad }}</div>@endif</td><td>{{ $r['alici'] ?? '' }}@if($ad2 = ($cariAdlari[$r['alici'] ?? ''] ?? null))<div class="small text-primary"><i class="bi bi-person-check"></i> {{ $ad2 }}</div>@endif</td><td>{{ $r['tarih'] ? \Illuminate\Support\Carbon::parse($r['tarih'])->format('d.m.Y H:i') : '' }}</td><td>{{ $r['alindi'] === null ? '—' : ($r['alindi'] ? 'Alındı' : 'Alınmadı') }}</td><td><form method="post" action="{{ route('pts.al') }}">@csrf<input type="hidden" name="transfer_id" value="{{ $r['transferId'] }}"><button class="btn btn-sm btn-outline-primary">Paketi Al</button></form></td></tr>
 @empty<tr><td colspan="6" class="text-muted">Kayıt yok.</td></tr>@endforelse</tbody></table>
 <p class="small text-muted">Tarih aralığı en fazla 31 gün. "Alındı" bilgisi yalnızca "Sadece alınmayanlar" seçiliyken kesindir. Not: PTS paketi almak mal kabul sayılmaz; ürünler için ayrıca Mal Kabul bildirimi gerekir.</p>
 @endif

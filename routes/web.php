@@ -59,6 +59,10 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/kritik-miad', [StokController::class, 'ayarKaydet'])->name('kritik-miad.kaydet');
         Route::get('/stok/liste', [StokController::class, 'liste'])->name('stok.liste');
         Route::post('/stok/toplu', [StokController::class, 'toplu'])->name('stok.toplu');
+        Route::get('/cariler', [\App\Http\Controllers\CariController::class, 'index'])->name('cari.index');
+        Route::get('/cariler/ara', [\App\Http\Controllers\CariController::class, 'ara'])->name('cari.ara');
+        Route::post('/cariler', [\App\Http\Controllers\CariController::class, 'ekle'])->name('cari.ekle');
+        Route::post('/cariler/{cari}/sil', [\App\Http\Controllers\CariController::class, 'sil'])->name('cari.sil');
         Route::get('/paydaslar', [\App\Http\Controllers\PaydasController::class, 'index'])->name('paydaslar');
         Route::get('/stok/ice-aktar', [\App\Http\Controllers\StokAktarController::class, 'form'])->name('stok.ice-aktar');
         Route::post('/stok/ice-aktar', [\App\Http\Controllers\StokAktarController::class, 'calistir'])->name('stok.ice-aktar.calistir');

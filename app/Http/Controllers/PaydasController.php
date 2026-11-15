@@ -45,6 +45,7 @@ class PaydasController extends Controller
 
         return view('paydas.index', [
             'tipler' => self::TIPLER, 'liste' => $liste, 'toplam' => $liste?->count(), 'gosterilen' => $liste?->take(self::LIMIT),
+            'cariGlnler' => \App\Models\Cari::where('tenant_id', $request->user()->tenant_id)->pluck('id', 'gln'),
             'hata' => $hata, 'f' => ['tip' => $v['tip'] ?? 'depo', 'durum' => $durum, 'plaka' => $v['plaka'] ?? '', 'ara' => $v['ara'] ?? ''],
         ]);
     }

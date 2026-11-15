@@ -86,6 +86,7 @@
       ['Sorgular', 'bi-patch-question', null, [
         ['Durum Sorgu', 'bi-shield-check', route('durum'), ['durum*']],
         ['Paydaşlar', 'bi-building', route('paydaslar'), ['paydaslar']],
+        ['Cari Kartları', 'bi-person-lines-fill', route('cari.index'), ['cari.*']],
       ]],
       ['Analiz', 'bi-graph-up', 'analiz', []],
     ];

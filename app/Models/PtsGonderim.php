@@ -26,8 +26,11 @@ class PtsGonderim extends Model
     }
 
     /** Alıcı GLN'inin ünvanı: portal müşterisi ya da daha önce İTS paydaş listesinden getirilmişse. */
-    public static function unvanBul(string $gln): ?string
+    public static function unvanBul(string $gln, ?int $tenantId = null): ?string
     {
+        if ($tenantId && Schema::hasTable('cariler') && ($c = Cari::where(['tenant_id' => $tenantId, 'gln' => $gln])->value('unvan'))) {
+            return $c;
+        }
         $t = Tenant::where('gln', $gln)->value('unvan');
         if ($t) {
             return $t;
