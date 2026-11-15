@@ -52,4 +52,13 @@ class MusteriItsBilgisiTest extends TestCase
         $r->assertSee('Bilgiler kayıtlı')->assertDontSee('GizliSifre!2')->assertDontSee('kullanici1');
         $this->assertSame('GizliSifre!2', ItsCredential::where('tenant_id', $t->id)->first()->sifre);
     }
+
+    public function test_sifre_alanlarinda_goster_gizle_dugmesi_var(): void
+    {
+        $t = Tenant::create(['unvan' => 'T', 'gln' => '8680001000044', 'lisans_baslangic' => now(), 'lisans_bitis' => now()->addYear()]);
+        $this->actingAs($this->admin());
+        foreach ([route('admin.tenants.index'), route('admin.tenants.duzelt', $t), route('admin.tenants.its', $t)] as $url) {
+            $this->get($url)->assertOk()->assertSee('goz-btn', false);
+        }
+    }
 }

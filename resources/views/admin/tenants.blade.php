@@ -40,8 +40,17 @@
   <div class="col-md-2"><input id="telefon" name="telefon" class="form-control" placeholder="Telefon" maxlength="30"></div>
   <div class="col-12"><div class="fw-semibold small mt-2">İTS portal kullanıcı bilgileri <span class="text-muted fw-normal">(isteğe bağlı; sonradan Düzelt ekranından da girilebilir. Kullanıcı hesabı oluşturmaz.)</span></div></div>
   <div class="col-md-3"><input name="its_kullanici_adi" class="form-control" placeholder="İTS kullanıcı adı (genelde GLN)" autocomplete="off" maxlength="100"></div>
-  <div class="col-md-3"><input type="password" name="its_sifre" class="form-control" placeholder="İTS şifresi" autocomplete="new-password" maxlength="200"></div>
+  <div class="col-md-3"><div class="input-group"><input type="password" name="its_sifre" class="form-control" placeholder="İTS şifresi" autocomplete="new-password" maxlength="200"><button type="button" class="btn btn-outline-secondary goz-btn" tabindex="-1" aria-label="Şifreyi göster/gizle" title="Şifreyi göster/gizle"><i class="bi bi-eye"></i></button></div></div>
   <div class="col-12"><div class="form-text">GLN'i yazınca ünvan, tür, il, ilçe, e-posta ve telefon İTS paydaş listesinden otomatik gelir; dilerseniz düzeltebilirsiniz.</div>@include('admin._gln-sorgu')</div>
   <div class="col-12"><button class="btn btn-primary">Ekle</button></div>
 </form>
+<script>
+document.querySelectorAll('.goz-btn').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var i = b.closest('.input-group').querySelector('input'), g = i.type === 'password';
+    i.type = g ? 'text' : 'password';
+    b.querySelector('i').className = g ? 'bi bi-eye-slash' : 'bi bi-eye';
+  });
+});
+</script>
 @endsection
