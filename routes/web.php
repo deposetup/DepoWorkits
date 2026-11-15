@@ -38,6 +38,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
     // İTS işlemleri: lisans zorunlu (ekranlar Aşama 3'te eklenecek)
     Route::middleware('lisans')->group(function () {
         Route::get('/ayarlar/its', [AyarController::class, 'its'])->name('ayarlar.its');
+        Route::post('/ayarlar/its/talep', [AyarController::class, 'talep'])->middleware('throttle:5,1')->name('ayarlar.its.talep');
         Route::post('/ayarlar/its/test', [AyarController::class, 'itsTest'])->name('ayarlar.its.test');
         Route::get('/durum', [DurumController::class, 'form'])->name('durum');
         Route::post('/durum', [DurumController::class, 'sorgula'])->name('durum.sorgula');
