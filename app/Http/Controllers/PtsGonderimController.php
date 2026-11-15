@@ -21,7 +21,10 @@ class PtsGonderimController extends Controller
     public function gonder(Request $request, PtsGonderim $gonderim, ItsClient $its)
     {
         abort_unless($gonderim->tenant_id === $request->user()->tenant_id, 404);
-        $request->validate(['onay' => 'accepted'], ['onay.accepted' => 'PTS verisini göndermek için onay kutusunu işaretleyin.']);
+        $v = $request->validate(
+            ['onay' => 'accepted', 'belge_no' => ['nullable', 'string', 'max:30', 'regex:/^[A-Za-z0-9._\\-\/]+$/']],
+            ['onay.accepted' => 'PTS verisini göndermek için onay kutusunu işaretleyin.', 'belge_no.regex' => 'İrsaliye/belge no yalnızca harf, rakam ve . _ - / içerebilir.']
+        );
 
         if (! config('its.pts_gonderim') || ! config('its.yazma')) {
             return back()->with('hata', 'PTS paket gönderimi bu ortamda henüz etkinleştirilmedi. Paket gönderilmedi.');
@@ -35,8 +38,9 @@ class PtsGonderimController extends Controller
         $tenant = $request->user()->tenant;
 
         try {
-            $xml = PtsXmlYazici::xml($tenant->gln, $gonderim->alici_gln, 'DW'.$gonderim->id.'-'.now()->format('Ymd'), $gonderim->kalemler);
-            $sonuc = $its->ptsPaketGonder($tenant, $gonderim->alici_gln, PtsXmlYazici::zip($xml));
+            $belgeNo = ($v['belge_no'] ?? null) ?: 'DW'.$gonderim->id.now()->format('Ymd');
+            $xml = PtsXmlYazici::xml($tenant->gln, $gonderim->alici_gln, $belgeNo, $gonderim->kalemler, PtsXmlYazici::carrierLabel($tenant->gln, $gonderim->id));
+            $sonuc = $its->ptsPaketGonder($tenant, $gonderim->alici_gln, PtsXmlYazici::zip($xml, $belgeNo.'.xml'));
         } catch (\Throwable $e) {
             $gonderim->update(['durum' => 'hata', 'hata' => mb_substr($e->getMessage(), 0, 500)]);
             AuditLog::kaydet('pts_gonderim_hata', ['gonderim' => $gonderim->id, 'alici' => $gonderim->alici_gln]);

@@ -49,6 +49,7 @@
   <p class="mb-2">Satış bildirimi <b>tamamen başarılı</b> (Bildirim No: {{ $ptsGonderim->bildirim_id ?? '—' }}). Alıcının Mal Alım yapabilmesi için <b>{{ $ptsGonderim->adet }} ürünün</b> PTS verisini <b class="font-monospace">{{ $ptsGonderim->alici_gln }}</b> GLN'li paydaşa göndermek ister misiniz?</p>
   @if(! $ptsAcik)<div class="alert alert-warning small mb-2">PTS paket gönderimi bu ortamda henüz etkinleştirilmedi. Kayıt <a href="{{ route('pts.gonderimler') }}">PTS Gönderimleri</a> ekranında bekletilir; etkinleştirildiğinde oradan gönderebilirsiniz.</div>@endif
   <form method="post" action="{{ route('pts.gonder', $ptsGonderim) }}">@csrf
+    <div class="col-md-5 mb-3"><label class="form-label small mb-1">İrsaliye / belge no (isteğe bağlı)</label><input name="belge_no" maxlength="30" class="form-control form-control-sm" placeholder="Boş bırakılırsa otomatik üretilir"></div>
     <div class="form-check mb-3"><input class="form-check-input" type="checkbox" name="onay" value="1" id="ptsOnay" required><label class="form-check-label" for="ptsOnay">Ürün listesini ve alıcı GLN'ini kontrol ettim; PTS verisinin alıcıya gönderilmesini onaylıyorum.</label></div>
     <button class="btn btn-primary" @disabled(! $ptsAcik)><i class="bi bi-send me-1"></i>PTS verisini gönder</button>
   </form>

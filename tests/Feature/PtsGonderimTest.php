@@ -103,15 +103,36 @@ class PtsGonderimTest extends TestCase
         $this->actingAs($b)->post(route('pts.vazgec', $g))->assertNotFound();
     }
 
-    public function test_xml_ve_zip_okuyucuyla_geri_okunur(): void
+    public function test_xml_gercek_pts_bicimiyle_uretilir_ve_geri_okunur(): void
     {
-        $xml = PtsXmlYazici::xml('8680001000044', '8680001000099', 'DW1', [['gtin' => '08699617650153', 'sn' => 'A&B1', 'bn' => 'LOT1', 'xd' => '2030-12-31']]);
+        $kalemler = [
+            ['gtin' => '08699617650153', 'sn' => 'A&B1', 'bn' => 'LOT1', 'xd' => '2030-12-31'],
+            ['gtin' => '08699617650153', 'sn' => 'S2', 'bn' => 'LOT1', 'xd' => '2030-12-31'],
+            ['gtin' => '08680400770851', 'sn' => 'X1', 'bn' => 'L9', 'xd' => '2029-01-31'],
+        ];
+        $etiket = PtsXmlYazici::carrierLabel('8680001087815', 7);
+        $this->assertSame(20, strlen($etiket));
+        $xml = PtsXmlYazici::xml('8680001087815', '8680001000099', 'EAR1', $kalemler, $etiket);
+
+        foreach (['<sourceGLN>8680001087815</sourceGLN>', '<destinationGLN>8680001000099</destinationGLN>', '<actionType>S</actionType>', '<shipTo>8680001000099</shipTo>', '<version>1.4</version>', 'containerType="S"', 'carrierLabel="'.$etiket.'"', 'xsi:noNamespaceSchemaLocation="its.gov.tr/packageTransfer.xsd"'] as $beklenen) {
+            $this->assertStringContainsString($beklenen, $xml);
+        }
+        $this->assertSame(2, substr_count($xml, '<productList ')); // iki ayrı GTIN/parti grubu
+        $this->assertStringContainsString('GTIN="08699617650153" lotNumber="LOT1" expirationDate="2030-12-31"', $xml);
+
         $zip = PtsXmlYazici::zip($xml);
         $okunan = PtsXmlParser::parse(array_values(PtsDosya::xmllerCikar($zip))[0]);
-        $this->assertCount(1, $okunan['urunler']);
+        $this->assertCount(3, $okunan['urunler']);
         $this->assertSame('A&B1', $okunan['urunler'][0]['sn']);
         $this->assertSame('8680001000099', $okunan['alici']);
-        $this->assertSame('2030-12-31', $okunan['urunler'][0]['xd']);
+        $this->assertSame('8680001087815', $okunan['kaynak']);
+        $this->assertSame('EAR1', $okunan['belge']);
+    }
+
+    public function test_carrier_label_kontrol_hanesi_gs1_mod10(): void
+    {
+        // GS1'in bilinen örnek SSCC'si: 1 0614141 123456789 → kontrol hanesi 7 (uzantı=1, sıra=16789).
+        $this->assertSame('00106141411234567897', PtsXmlYazici::carrierLabel('061414112345', 16789));
     }
 
     public function test_rest_send_package_istegi_ve_kapali_koruma(): void
