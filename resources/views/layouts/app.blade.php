@@ -60,6 +60,7 @@
       ['Alım', 'bi-box-arrow-in-down', null, [
         ['PTS Sorgu', 'bi-search', route('pts'), ['pts', 'pts.paket', 'pts.excel', 'pts.yukle', 'pts.al', 'pts.mal-alim', 'pts.dogrula']],
         ['Mal Kabul', 'bi-check2-square', route('islem', 'kabul'), ['islem:kabul']],
+        ['Manuel Ekle', 'bi-plus-square', route('manuel.ekle'), ['manuel.*']],
       ]],
       ['Satış & Çıkış', 'bi-box-arrow-up', null, [
         ['Satış', 'bi-cart-check', route('islem', 'satis'), ['islem:satis']],

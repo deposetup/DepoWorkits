@@ -23,7 +23,7 @@ class IslemController extends Controller
         abort_unless($request->user()->tenant_id, 403);
         $this->sarfYetkisi($tur);
         $v = $request->validate([
-            'kodlar' => 'required|string|max:50000',
+            'kodlar' => 'required|string|max:100000',
             'sebep' => 'nullable|in:'.implode(',', array_keys(StokServisi::DEAKTIVE_SEBEPLER)),
             'aciklama' => 'nullable|string|max:255',
             'karsi_gln' => 'nullable|digits:13',

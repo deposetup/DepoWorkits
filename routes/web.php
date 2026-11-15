@@ -58,6 +58,8 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/pts/gonderimler/{gonderim}/tekrar', [\App\Http\Controllers\PtsGonderimController::class, 'tekrar'])->name('pts.tekrar');
         Route::post('/pts/gonderimler/{gonderim}/vazgec', [\App\Http\Controllers\PtsGonderimController::class, 'vazgec'])->name('pts.vazgec');
         Route::post('/kritik-miad', [StokController::class, 'ayarKaydet'])->name('kritik-miad.kaydet');
+        Route::get('/manuel-ekle', [\App\Http\Controllers\ManuelEkleController::class, 'form'])->name('manuel.ekle');
+        Route::post('/manuel-ekle', [\App\Http\Controllers\ManuelEkleController::class, 'onizle'])->name('manuel.onizle');
         Route::get('/stok/liste', [StokController::class, 'liste'])->name('stok.liste');
         Route::post('/stok/lokasyon', [StokController::class, 'lokasyonAta'])->name('stok.lokasyon');
         Route::post('/stok/toplu', [StokController::class, 'toplu'])->name('stok.toplu');
