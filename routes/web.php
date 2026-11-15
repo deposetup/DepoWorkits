@@ -37,7 +37,6 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
     // İTS işlemleri: lisans zorunlu (ekranlar Aşama 3'te eklenecek)
     Route::middleware('lisans')->group(function () {
         Route::get('/ayarlar/its', [AyarController::class, 'its'])->name('ayarlar.its');
-        Route::post('/ayarlar/its', [AyarController::class, 'itsKaydet'])->name('ayarlar.its.kaydet');
         Route::post('/ayarlar/its/test', [AyarController::class, 'itsTest'])->name('ayarlar.its.test');
         Route::get('/durum', [DurumController::class, 'form'])->name('durum');
         Route::post('/durum', [DurumController::class, 'sorgula'])->name('durum.sorgula');
@@ -66,6 +65,8 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'store'])->name('kullanici.store');
         Route::post('/musteriler/{tenant}/kullanicilar/{user}/aktif', [KullaniciController::class, 'aktifToggle'])->name('kullanici.aktif');
         Route::post('/musteriler/{tenant}/musteri-gozu', [\App\Http\Controllers\Admin\MusteriGozuController::class, 'basla'])->name('tenants.musteri-gozu');
+        Route::get('/musteriler/{tenant}/its', [\App\Http\Controllers\Admin\ItsKimlikController::class, 'form'])->name('tenants.its');
+        Route::post('/musteriler/{tenant}/its', [\App\Http\Controllers\Admin\ItsKimlikController::class, 'kaydet'])->name('tenants.its.kaydet');
         Route::post('/musteriler/{tenant}/aktif', [TenantController::class, 'aktifToggle'])->name('tenants.aktif');
     });
 });

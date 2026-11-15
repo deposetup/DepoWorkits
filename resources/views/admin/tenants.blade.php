@@ -13,6 +13,7 @@
       <td class="d-flex gap-1">
         <form method="post" action="{{ route('admin.tenants.musteri-gozu', $t) }}">@csrf<button class="btn btn-sm btn-success" title="Bu müşteriyi, kendi ekranı gibi salt okunur görüntüle"><i class="bi bi-eye me-1"></i>Müşteri Gözü</button></form>
         <a href="{{ route('admin.kullanici.index', $t) }}" class="btn btn-sm btn-outline-dark">Kullanıcılar</a>
+        <a href="{{ route('admin.tenants.its', $t) }}" class="btn btn-sm btn-outline-dark"><i class="bi bi-key me-1"></i>İTS Bilgileri</a>
         <form method="post" action="{{ route('admin.tenants.uzat', $t) }}" class="d-flex gap-1">@csrf
           <input type="number" name="gun" value="365" min="1" class="form-control form-control-sm" style="width:80px"><button class="btn btn-sm btn-outline-primary">Uzat</button></form>
         <form method="post" action="{{ route('admin.tenants.aktif', $t) }}">@csrf<button class="btn btn-sm btn-outline-secondary">{{ $t->aktif ? 'Pasifleştir' : 'Aktifleştir' }}</button></form>

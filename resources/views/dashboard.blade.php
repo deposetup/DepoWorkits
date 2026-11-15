@@ -46,7 +46,7 @@
     ['Durum Sorgu', 'Ürünün İTS durumu', 'bi-shield-check', route('durum')],
     ['Kritik / Miad', 'Yaklaşan SKT ve eşikler', 'bi-exclamation-triangle', route('kritik-miad')],
     ['Paydaşlar', 'Aktif / pasif paydaş listesi', 'bi-building', route('paydaslar')],
-    ['İTS Ayarları', 'Bağlantı ve kimlik bilgileri', 'bi-gear', route('ayarlar.its')],
+    ['İTS Bağlantısı', 'Bağlantıyı sına', 'bi-plug', route('ayarlar.its')],
   ];
 @endphp
 <h5 class="mt-4 mb-3" style="color:#0b2447;font-weight:700">Hızlı Erişim</h5>

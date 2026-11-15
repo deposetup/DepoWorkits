@@ -28,15 +28,26 @@ class ItsTest extends TestCase
         $this->actingAs($u)->get('/stok')->assertOk();
     }
 
-    public function test_its_kimligi_sifreli_saklanir(): void
+    public function test_its_kimligini_yalnizca_yonetici_girer_ve_sifreli_saklanir(): void
     {
         $t = $this->tenant();
         $u = User::factory()->create(['tenant_id' => $t->id, 'rol' => 'tenant_admin']);
-        $this->actingAs($u)->post('/ayarlar/its', ['kullanici_adi' => '8680001000044', 'sifre' => 'GizliSifre1'])->assertSessionHasNoErrors();
+        $sa = User::factory()->create(['rol' => 'super_admin', 'tenant_id' => null]);
+
+        // müşteri kullanıcısı (tenant_admin dahil) kimlik kaydedemez
+        $this->actingAs($u)->post('/ayarlar/its', ['kullanici_adi' => '8680001000044', 'sifre' => 'GizliSifre1'])->assertStatus(405);
+        $this->actingAs($u)->post("/yonetim/musteriler/{$t->id}/its", ['kullanici_adi' => 'x', 'sifre' => 'y'])->assertForbidden();
+        $this->assertSame(0, \DB::table('its_credentials')->count());
+
+        $this->actingAs($sa)->post("/yonetim/musteriler/{$t->id}/its", ['kullanici_adi' => '8680001000044', 'sifre' => 'GizliSifre1'])->assertSessionHasNoErrors();
         $ham = \DB::table('its_credentials')->first();
         $this->assertStringNotContainsString('GizliSifre1', $ham->sifre);
         $this->assertSame('GizliSifre1', $t->fresh()->itsCredential->sifre);
-        $this->actingAs($u)->get('/ayarlar/its')->assertOk()->assertDontSee('GizliSifre1');
+        $this->assertSame(0, \DB::table('audit_logs')->where('detay', 'like', '%GizliSifre1%')->count());
+
+        // ne müşteri ekranı ne yönetici ekranı değeri gösterir
+        $this->actingAs($u)->get('/ayarlar/its')->assertOk()->assertDontSee('GizliSifre1')->assertDontSee('8680001000044')->assertSee('Bağlantıyı Sına');
+        $this->actingAs($sa)->get("/yonetim/musteriler/{$t->id}/its")->assertOk()->assertDontSee('GizliSifre1');
     }
 
     public function test_rest_istemci_dogru_istek_gonderir(): void

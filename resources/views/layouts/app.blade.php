@@ -112,7 +112,7 @@
           @endif
         @endforeach
         <div class="yan-bolum">Hesap</div>
-        <a class="yan-link {{ request()->routeIs('ayarlar.its') ? 'aktif' : '' }}" href="{{ route('ayarlar.its') }}"><i class="bi bi-gear"></i>İTS Ayarları</a>
+        <a class="yan-link {{ request()->routeIs('ayarlar.its') ? 'aktif' : '' }}" href="{{ route('ayarlar.its') }}"><i class="bi bi-plug"></i>İTS Bağlantısı</a>
       @else
         <a class="yan-link {{ request()->routeIs('admin.*') ? 'aktif' : '' }}" href="{{ route('admin.tenants.index') }}"><i class="bi bi-people"></i>Müşteriler</a>
       @endif
