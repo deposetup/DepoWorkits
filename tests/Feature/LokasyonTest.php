@@ -67,4 +67,17 @@ class LokasyonTest extends TestCase
         $r->assertOk();
         $this->assertSame('Reyon C', StokKalemi::first()->lokasyon);
     }
+
+    public function test_kritik_miad_sayfasi_cok_sayida_suresi_gecen_urunle_acilir(): void
+    {
+        $u = $this->user();
+        $simdi = now();
+        $satirlar = [];
+        for ($i = 0; $i < 3000; $i++) {
+            $satirlar[] = ['tenant_id' => $u->tenant_id, 'gtin' => '0869984475'.str_pad((string) ($i % 50), 4, '0', STR_PAD_LEFT), 'sn' => 'S'.$i, 'bn' => 'B'.($i % 7), 'skt' => now()->subDays(1 + $i % 40)->toDateString(), 'durum' => 'stokta', 'created_at' => $simdi, 'updated_at' => $simdi];
+        }
+        foreach (array_chunk($satirlar, 500) as $c) { \Illuminate\Support\Facades\DB::table('stok_kalemleri')->insert($c); }
+        $this->kalem($u, 'Y1', now()->addDays(30)->toDateString());
+        $this->actingAs($u)->get(route('kritik-miad'))->assertOk()->assertSee('Süresi Geçenler')->assertSee('3.000 adet')->assertSee('Miadı Yaklaşan');
+    }
 }

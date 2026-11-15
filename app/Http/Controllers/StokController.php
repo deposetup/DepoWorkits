@@ -215,15 +215,30 @@ class StokController extends Controller
             }
         }
 
+        // Binlerce ürün olabileceği için tek tek değil, ilaç/parti/SKT bazında gruplanarak okunur.
+        StokKalemi::redOdasinaAl($tid);
+        $enGeniş = max(90, (int) $ayar->max('miad_gun'));
+        $gruplar = StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')->whereNotNull('skt')
+            ->where('skt', '<=', now()->addDays($enGeniş)->toDateString())
+            ->selectRaw('gtin, bn, skt, count(*) as adet')->groupBy('gtin', 'bn', 'skt')->orderBy('skt')->orderBy('gtin')->get();
         $miad = [];
-        foreach (StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')->whereNotNull('skt')->orderBy('skt')->get() as $k) {
-            $gun = $ayar[$k->gtin]->miad_gun ?? 90;
-            if ($k->skt->lte(now()->addDays($gun))) {
-                $miad[] = ['kalem' => $k, 'ad' => $adlar[$k->gtin] ?? $k->gtin, 'kalan' => (int) now()->startOfDay()->diffInDays($k->skt, false)];
+        $gecen = [];
+        $gecenAdet = 0;
+        $yaklasanAdet = 0;
+        foreach ($gruplar as $g) {
+            $skt = \Illuminate\Support\Carbon::parse($g->skt);
+            $kalan = (int) now()->startOfDay()->diffInDays($skt->startOfDay(), false);
+            $satir = ['gtin' => $g->gtin, 'ad' => $adlar[$g->gtin] ?? null, 'bn' => $g->bn, 'skt' => $skt, 'adet' => (int) $g->adet, 'kalan' => $kalan];
+            if ($kalan < 0) {
+                $gecenAdet += $satir['adet'];
+                $gecen[] = $satir;
+            } elseif ($kalan <= ($ayar[$g->gtin]->miad_gun ?? 90)) {
+                $yaklasanAdet += $satir['adet'];
+                $miad[] = $satir;
             }
         }
 
-        return view('stok.kritik-miad', ['adlar' => $adlar, 'ayar' => $ayar, 'kritik' => $kritik, 'miad' => $miad]);
+        return view('stok.kritik-miad', ['adlar' => $adlar, 'ayar' => $ayar, 'kritik' => $kritik, 'miad' => $miad, 'gecen' => $gecen, 'gecenAdet' => $gecenAdet, 'yaklasanAdet' => $yaklasanAdet]);
     }
 
     public function ayarKaydet(Request $request)
