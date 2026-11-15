@@ -87,4 +87,20 @@ class CariTest extends TestCase
             ->post(route('cari.ekle'), ['gln' => '8680001000029', 'unvan' => 'X'])->assertRedirect();
         $this->assertSame(0, Cari::count());
     }
+
+    public function test_cari_elle_eklenir_duzeltilir_ve_baska_musteri_duzeltemez(): void
+    {
+        $a = $this->user('depo', '8680001000044');
+        $b = $this->user('hastane', '8680001000055');
+        $this->actingAs($a)->get(route('cari.yeni'))->assertOk();
+        $this->post(route('cari.olustur'), ['gln' => '8680001000029', 'unvan' => 'ELLE CARI', 'telefon' => '0212 555 00 00', 'eposta' => 'a@b.com'])->assertRedirect(route('cari.index'));
+        $this->post(route('cari.olustur'), ['gln' => '8680001000029', 'unvan' => 'Tekrar'])->assertSessionHasErrors('gln');
+        $c = Cari::first();
+        $this->get(route('cari.duzelt', $c))->assertOk()->assertSee('a@b.com');
+        $this->post(route('cari.guncelle', $c), ['unvan' => 'Yeni Ad', 'telefon' => '0216 111 22 33', 'eposta' => 'x@y.com'])->assertRedirect();
+        $this->assertSame('0216 111 22 33', $c->fresh()->telefon);
+        $this->get(route('cari.index'))->assertSee('x@y.com')->assertSee('Düzelt');
+        $this->actingAs($b)->get(route('cari.duzelt', $c))->assertNotFound();
+        $this->post(route('cari.guncelle', $c), ['unvan' => 'Hack'])->assertNotFound();
+    }
 }

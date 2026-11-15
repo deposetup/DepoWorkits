@@ -86,8 +86,8 @@
       ['Sorgular', 'bi-patch-question', null, [
         ['Durum Sorgu', 'bi-shield-check', route('durum'), ['durum*']],
         ['Paydaşlar', 'bi-building', route('paydaslar'), ['paydaslar']],
-        ['Cari Kartları', 'bi-person-lines-fill', route('cari.index'), ['cari.*']],
       ]],
+      ['Cari Kartları', 'bi-person-lines-fill', 'cari.index', []],
       ['Analiz', 'bi-graph-up', 'analiz', []],
     ];
   }
@@ -108,7 +108,7 @@
       @if($menu)
         @foreach($menu as $n => [$ad, $ikon, $rota, $alt])
           @if(! $alt)
-            <a class="yan-link {{ request()->routeIs($rota) ? 'aktif' : '' }}" href="{{ route($rota) }}"><i class="bi {{ $ikon }}"></i>{{ $ad }}</a>
+            <a class="yan-link {{ request()->routeIs($rota, str_contains($rota, '.') ? explode('.', $rota)[0].'.*' : $rota) ? 'aktif' : '' }}" href="{{ route($rota) }}"><i class="bi {{ $ikon }}"></i>{{ $ad }}</a>
           @else
             @php $grupAktif = collect($alt)->contains(fn ($a) => $aktifMi($a[3])); @endphp
             <button class="yan-grup {{ $grupAktif ? 'aktif' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#grup{{ $n }}" aria-expanded="{{ $grupAktif ? 'true' : 'false' }}"><i class="bi {{ $ikon }}"></i>{{ $ad }}<i class="bi bi-chevron-down ok"></i></button>

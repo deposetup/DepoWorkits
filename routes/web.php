@@ -61,6 +61,10 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/stok/toplu', [StokController::class, 'toplu'])->name('stok.toplu');
         Route::get('/cariler', [\App\Http\Controllers\CariController::class, 'index'])->name('cari.index');
         Route::get('/cariler/ara', [\App\Http\Controllers\CariController::class, 'ara'])->name('cari.ara');
+        Route::get('/cariler/yeni', [\App\Http\Controllers\CariController::class, 'yeni'])->name('cari.yeni');
+        Route::post('/cariler/yeni', [\App\Http\Controllers\CariController::class, 'olustur'])->name('cari.olustur');
+        Route::get('/cariler/{cari}/duzelt', [\App\Http\Controllers\CariController::class, 'duzelt'])->name('cari.duzelt');
+        Route::post('/cariler/{cari}/duzelt', [\App\Http\Controllers\CariController::class, 'guncelle'])->name('cari.guncelle');
         Route::post('/cariler', [\App\Http\Controllers\CariController::class, 'ekle'])->name('cari.ekle');
         Route::post('/cariler/{cari}/sil', [\App\Http\Controllers\CariController::class, 'sil'])->name('cari.sil');
         Route::get('/paydaslar', [\App\Http\Controllers\PaydasController::class, 'index'])->name('paydaslar');
