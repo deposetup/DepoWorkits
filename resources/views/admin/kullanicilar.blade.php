@@ -17,8 +17,17 @@
   <div class="col-md-3"><input name="name" class="form-control" placeholder="Ad Soyad" required></div>
   <div class="col-md-3"><input type="email" name="email" class="form-control" placeholder="E-posta (isteğe bağlı)"></div>
   <div class="col-md-2"><select name="rol" class="form-select"><option value="tenant_admin">Yönetici</option><option value="kullanici">Kullanıcı</option></select></div>
-  <div class="col-md-3"><input type="password" name="password" class="form-control" placeholder="Geçici şifre (min. 10, harf+rakam)" required autocomplete="new-password"></div>
+  <div class="col-md-3"><div class="input-group"><input type="password" name="password" class="form-control" placeholder="Giriş şifresi (min. 10, harf+rakam)" required autocomplete="new-password"><button type="button" class="btn btn-outline-secondary goz-btn" tabindex="-1" aria-label="Şifreyi göster/gizle"><i class="bi bi-eye"></i></button></div></div>
   <div class="col-md-1"><button class="btn btn-primary">Ekle</button></div>
 </form>
-<p class="small text-muted mt-2">E-posta zorunlu değildir; kullanıcı müşteri GLN'i ({{ $tenant->gln }}) ve şifresiyle de girebilir. Geçici şifreyi müşteriye iletin; ilk girişte "Şifre Değiştir" ekranından değiştirmesini isteyin.</p>
+<p class="small text-muted mt-2">Kullanıcı giriş ekranında <b>GLN ({{ $tenant->gln }}) + kendi şifresi</b> ile girer; e-posta zorunlu değildir. Aynı müşterideki iki kullanıcıya aynı şifre verilemez (GLN ile girişte kullanıcı şifreden bulunur). Geçici şifreyi müşteriye iletin; ilk girişte "Şifre Değiştir" ekranından değiştirmesini isteyin.</p>
+<script>
+document.querySelectorAll('.goz-btn').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var i = b.closest('.input-group').querySelector('input'), g = i.type === 'password';
+    i.type = g ? 'text' : 'password';
+    b.querySelector('i').className = g ? 'bi bi-eye-slash' : 'bi bi-eye';
+  });
+});
+</script>
 @endsection

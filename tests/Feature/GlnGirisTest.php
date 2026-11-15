@@ -107,4 +107,15 @@ class GlnGirisTest extends TestCase
         $t = Tenant::create(['unvan' => 'ÖZGÜR ECZA DEPOSU', 'gln' => '8680001000099', 'lisans_baslangic' => now(), 'lisans_bitis' => now()->addYear()]);
         $this->assertSame('Özgür Ecza Deposu', $t->fresh()->unvan);
     }
+
+    public function test_yonetici_sayfasindan_olusturulan_kullanici_gln_ve_sifreyle_girer(): void
+    {
+        $t = $this->tenant();
+        $admin = User::factory()->create(['rol' => 'super_admin', 'tenant_id' => null]);
+        $this->actingAs($admin)->get(route('admin.kullanici.index', $t))->assertOk()->assertSee('GLN (8680001000044) + kendi şifresi', false)->assertSee('goz-btn', false);
+        $this->post(route('admin.kullanici.store', $t), ['name' => 'Ayşe Yılmaz', 'rol' => 'tenant_admin', 'password' => 'GucluSifre123'])->assertSessionHasNoErrors();
+        auth()->logout();
+        $this->post('/giris', ['email' => '8680001000044', 'password' => 'GucluSifre123'])->assertRedirect('/');
+        $this->assertSame('Ayşe Yılmaz', auth()->user()->name);
+    }
 }
