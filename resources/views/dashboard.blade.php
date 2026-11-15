@@ -12,17 +12,16 @@
 @endif
 @if($tenant)
 @php $gun = $tenant->kalanGun(); @endphp
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-start mb-3">
   <h4 class="mb-0">Ana Sayfa</h4>
-  <span class="badge fs-6 px-3 py-2 text-bg-{{ ! $tenant->lisansAktifMi() || $gun <= 7 ? 'danger' : ($gun <= 30 ? 'warning' : 'success') }}" title="Lisans bitiş: {{ $tenant->lisans_bitis->format('d.m.Y') }}">
-    <i class="bi bi-hourglass-split me-1"></i>Kalan süre: {{ $gun }} gün
-  </span>
-</div>
-<div class="row g-3">
-  <div class="col-md-4"><div class="card"><div class="card-body">
-    <div class="text-muted small">İletişim</div>
-    <div class="fw-semibold"><i class="bi bi-telephone me-1"></i><a href="tel:+908509080042" class="text-decoration-none">0850 908 00 42</a></div><div class="small text-muted">Depo Setup Yazılım ve Danışmanlık Ltd. Şti.</div>
-  </div></div></div>
+  <div class="text-end">
+    <span class="badge fs-6 px-3 py-2 text-bg-{{ ! $tenant->lisansAktifMi() || $gun <= 7 ? 'danger' : ($gun <= 30 ? 'warning' : 'success') }}" title="Lisans bitiş: {{ $tenant->lisans_bitis->format('d.m.Y') }}">
+      <i class="bi bi-hourglass-split me-1"></i>Kalan süre: {{ $gun }} gün
+    </span>
+    <div class="mt-2 small text-muted">İletişim</div>
+    <div class="fw-semibold"><i class="bi bi-telephone me-1"></i><a href="tel:+908509080042" class="text-decoration-none">0850 908 00 42</a></div>
+    <div class="small text-muted">Depo Setup Yazılım ve Danışmanlık Ltd. Şti.</div>
+  </div>
 </div>
 @endif
 @php
