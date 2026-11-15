@@ -19,19 +19,9 @@
   </span>
 </div>
 <div class="row g-3">
-  <div class="col-md-4"><div class="card {{ $gun <= 7 ? 'border-danger' : '' }}"><div class="card-body">
-    <div class="text-muted small">Kalan Süre</div>
-    <div class="fs-3">{{ $gun }} gün</div>
-    <div class="small">Bitiş Tarihi: {{ $tenant->lisans_bitis->format('d.m.Y') }}</div>
-    @if(! $tenant->lisansAktifMi())<span class="badge text-bg-danger">Lisans süresi doldu</span>@endif
-  </div></div></div>
-  <div class="col-md-4"><div class="card"><div class="card-body">
-    <div class="text-muted small">KVKK Onay Tarihi</div>
-    <div class="fs-5">{{ $tenant->kvkk_onay_tarihi?->format('d.m.Y H:i') ?? '—' }}</div>
-  </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
     <div class="text-muted small">İletişim</div>
-    <div>{{ $tenant->eposta ?? '—' }}</div><div>{{ $tenant->telefon ?? '' }}</div>
+    <div class="fw-semibold"><i class="bi bi-telephone me-1"></i><a href="tel:+908509080042" class="text-decoration-none">0850 908 00 42</a></div><div class="small text-muted">Depo Setup Yazılım ve Danışmanlık Ltd. Şti.</div>
   </div></div></div>
 </div>
 @endif
@@ -98,5 +88,9 @@
   @foreach($kisayol as [$ad, $acik, $ikon, $url])
   <div class="col-sm-6 col-xl-3"><a class="hizli" href="{{ $url }}"><span class="ikon"><i class="bi {{ $ikon }}"></i></span><span><strong>{{ $ad }}</strong><small>{{ $acik }}</small></span></a></div>
   @endforeach
+  @if($tenant)
+  <div class="col-sm-6 col-xl-3"><div class="hizli {{ $gun <= 7 ? 'border-danger' : '' }}"><span class="ikon"><i class="bi bi-hourglass-split"></i></span><span><strong>Kalan Süre: {{ $gun }} gün</strong><small>Bitiş: {{ $tenant->lisans_bitis->format('d.m.Y') }}@if(! $tenant->lisansAktifMi()) · Lisans süresi doldu @endif</small></span></div></div>
+  <div class="col-sm-6 col-xl-3"><div class="hizli"><span class="ikon"><i class="bi bi-shield-check"></i></span><span><strong>KVKK Onay Tarihi</strong><small>{{ $tenant->kvkk_onay_tarihi?->format('d.m.Y H:i') ?? '—' }}</small></span></div></div>
+  @endif
 </div>
 @endsection
