@@ -46,6 +46,7 @@
     ['Stok Listesi', 'Karekodlu stok, Excel', 'bi-upc-scan', route('stok.liste')],
     ['Durum Sorgu', 'Ürünün İTS durumu', 'bi-shield-check', route('durum')],
     ['Kritik / Miad', 'Yaklaşan SKT ve eşikler', 'bi-exclamation-triangle', route('kritik-miad')],
+    ['Karekod Oluşturucu', 'Silinen karekodu yeniden üret, yazdır', 'bi-qr-code', route('karekod.olustur')],
     ['Paydaşlar', 'Aktif / pasif paydaş listesi', 'bi-building', route('paydaslar')],
     ['İTS Bağlantısı', 'Bağlantıyı sına', 'bi-plug', route('ayarlar.its')],
   ];

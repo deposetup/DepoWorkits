@@ -81,6 +81,7 @@
         ['Stok Listesi (Karekod)', 'bi-upc-scan', route('stok.liste'), ['stok.liste']],
         ['Stok İçe Aktar (İTS Doğrulamalı)', 'bi-cloud-download', route('stok.ice-aktar'), ['stok.ice-aktar*']],
         ['Kritik / Miad', 'bi-exclamation-triangle', route('kritik-miad'), ['kritik-miad']],
+        ['Karekod Oluşturucu', 'bi-qr-code', route('karekod.olustur'), ['karekod.olustur']],
       ]],
       ['Sorgular', 'bi-patch-question', null, [
         ['Durum Sorgu', 'bi-shield-check', route('durum'), ['durum*']],
