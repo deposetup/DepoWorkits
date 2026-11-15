@@ -14,7 +14,7 @@ class AltBilgiTest extends TestCase
         $this->travelTo(now()->setYear(2031));
         $this->get('/giris')->assertOk()
             ->assertSee('Depo Setup Yazılım ve Danışmanlık Ltd. Şti.')
-            ->assertSee('© 2031', false)
+            ->assertSee('&copy; 2031', false)
             ->assertSee('Sürüm '.config('its.surum'));
     }
 }
