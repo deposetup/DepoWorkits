@@ -11,6 +11,7 @@
       <td>{{ $t->lisans_bitis->format('d.m.Y') }}</td><td>{{ $t->kalanGun() }} gün</td>
       <td>{!! $t->lisansAktifMi() ? '<span class="badge text-bg-success">Aktif</span>' : '<span class="badge text-bg-danger">Pasif/Süresi doldu</span>' !!}</td>
       <td class="d-flex gap-1">
+        <form method="post" action="{{ route('admin.tenants.musteri-gozu', $t) }}">@csrf<button class="btn btn-sm btn-success" title="Bu müşteriyi, kendi ekranı gibi salt okunur görüntüle"><i class="bi bi-eye me-1"></i>Müşteri Gözü</button></form>
         <a href="{{ route('admin.kullanici.index', $t) }}" class="btn btn-sm btn-outline-dark">Kullanıcılar</a>
         <form method="post" action="{{ route('admin.tenants.uzat', $t) }}" class="d-flex gap-1">@csrf
           <input type="number" name="gun" value="365" min="1" class="form-control form-control-sm" style="width:80px"><button class="btn btn-sm btn-outline-primary">Uzat</button></form>

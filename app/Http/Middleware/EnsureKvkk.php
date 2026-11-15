@@ -12,7 +12,7 @@ class EnsureKvkk
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if ($user && ! $user->superAdminMi() && $user->tenant && ! $user->tenant->kvkk_onay_tarihi
+        if ($user && ! $request->session()->has('musteri_gozu_yonetici_id') && ! $user->superAdminMi() && $user->tenant && ! $user->tenant->kvkk_onay_tarihi
             && ! $request->routeIs('kvkk.form', 'kvkk.onay', 'logout', 'sifre', 'sifre.guncelle')) {
             return redirect()->route('kvkk.form');
         }

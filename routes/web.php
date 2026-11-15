@@ -18,7 +18,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/giris', [AuthController::class, 'login'])->middleware('throttle:10,1');
 });
 
-Route::middleware(['auth', 'kvkk'])->group(function () {
+Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
+    Route::post('/musteri-gozu/bitir', [\App\Http\Controllers\Admin\MusteriGozuController::class, 'bitir'])->name('musteri-gozu.bitir');
     Route::post('/cikis', [AuthController::class, 'logout'])->name('logout');
     Route::get('/sifre', [SifreController::class, 'form'])->name('sifre');
     Route::post('/sifre', [SifreController::class, 'guncelle'])->name('sifre.guncelle');
@@ -64,6 +65,7 @@ Route::middleware(['auth', 'kvkk'])->group(function () {
         Route::get('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'index'])->name('kullanici.index');
         Route::post('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'store'])->name('kullanici.store');
         Route::post('/musteriler/{tenant}/kullanicilar/{user}/aktif', [KullaniciController::class, 'aktifToggle'])->name('kullanici.aktif');
+        Route::post('/musteriler/{tenant}/musteri-gozu', [\App\Http\Controllers\Admin\MusteriGozuController::class, 'basla'])->name('tenants.musteri-gozu');
         Route::post('/musteriler/{tenant}/aktif', [TenantController::class, 'aktifToggle'])->name('tenants.aktif');
     });
 });

@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'lisans' => \App\Http\Middleware\EnsureLicenseActive::class,
             'kvkk' => \App\Http\Middleware\EnsureKvkk::class,
             'superadmin' => \App\Http\Middleware\EnsureSuperAdmin::class,
+            'musteri-gozu' => \App\Http\Middleware\MusteriGozuKoruma::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -26,6 +26,12 @@
 </style>
 </head>
 <body>
+@if(session('musteri_gozu_yonetici_id'))
+<div class="bg-warning-subtle border-bottom border-warning py-2 px-3 d-flex flex-wrap gap-2 justify-content-between align-items-center" style="position:sticky;top:0;z-index:1100">
+  <span><i class="bi bi-eye-fill me-1"></i><strong>Müşteri gözü:</strong> {{ auth()->user()->tenant?->unvan }} ekranını görüntülüyorsunuz. Salt okunur, hiçbir işlem yapılmaz.</span>
+  <form method="post" action="{{ route('musteri-gozu.bitir') }}">@csrf<button class="btn btn-sm btn-dark"><i class="bi bi-box-arrow-left me-1"></i>Yönetici görünümüne dön</button></form>
+</div>
+@endif
 @php
   $u = auth()->user();
   $menu = null;
