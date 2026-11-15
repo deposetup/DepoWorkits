@@ -3,8 +3,8 @@
 @section('icerik')
 <h4>Tarih ile PTS Sorgulama</h4>
 <form method="get" class="row g-2 align-items-end mb-3">
-  <div class="col-md-3"><label class="form-label">Başlangıç</label><input type="date" name="baslangic" value="{{ request('baslangic') }}" class="form-control"></div>
-  <div class="col-md-3"><label class="form-label">Bitiş</label><input type="date" name="bitis" value="{{ request('bitis') }}" class="form-control"></div>
+  <div class="col-md-3"><label class="form-label">Başlangıç</label><input type="date" id="baslangic" name="baslangic" value="{{ request('baslangic') }}" class="form-control"></div>
+  <div class="col-md-3"><label class="form-label">Bitiş</label><input type="date" id="bitis" name="bitis" value="{{ request('bitis') }}" class="form-control"></div>
   <div class="col-md-3"><label class="form-label">Gönderen GLN (isteğe bağlı)</label><input name="kaynak_gln" value="{{ request('kaynak_gln') }}" maxlength="13" class="form-control" placeholder="13 hane"></div>
   <div class="col-md-3 form-check ms-2"><input type="checkbox" class="form-check-input" name="sadece_alinmayan" value="1" id="sa" @checked(request('sadece_alinmayan'))><label for="sa" class="form-check-label">Sadece alınmayanlar</label></div>
   <div class="col-md-2"><button class="btn btn-primary">Sorgula</button></div>
@@ -25,4 +25,16 @@
 @empty<tr><td colspan="6" class="text-muted">Kayıt yok.</td></tr>@endforelse</tbody></table>
 <p class="small text-muted">Tarih aralığı en fazla 31 gün. "Alındı" bilgisi yalnızca "Sadece alınmayanlar" seçiliyken kesindir. Not: PTS paketi almak mal kabul sayılmaz; ürünler için ayrıca Mal Kabul bildirimi gerekir.</p>
 @endif
+<script>
+// Başlangıç tarihi seçilince bitiş, aynı ayın son günü olur (bu ay ise bugün).
+document.getElementById('baslangic').addEventListener('change', function () {
+    if (!this.value) return;
+    var p = this.value.split('-'), y = +p[0], m = +p[1];
+    var son = new Date(y, m, 0), bugun = new Date();
+    bugun = new Date(bugun.getFullYear(), bugun.getMonth(), bugun.getDate());
+    if (son > bugun && bugun >= new Date(y, m - 1, +p[2])) son = bugun;
+    var f = function (n) { return String(n).padStart(2, '0'); };
+    document.getElementById('bitis').value = son.getFullYear() + '-' + f(son.getMonth() + 1) + '-' + f(son.getDate());
+});
+</script>
 @endsection
