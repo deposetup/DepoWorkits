@@ -36,6 +36,10 @@
   .yan-kullanici { border-top: 1px solid rgba(255,255,255,.1); padding: .75rem .65rem; background: rgba(0,0,0,.12); }
   .yan-kullanici .kim { padding: .25rem .8rem .6rem; font-size: .85rem; }
   .yan-kullanici .kim .firma { color: #9fb3d9; font-size: .75rem; display: block; }
+  html, body { min-height: 100%; }
+  .icerik-alan, .icerik-kap { min-height: 100vh; display: flex; flex-direction: column; }
+  .icerik-alan > main, .icerik-kap > main { flex: 1 0 auto; width: 100%; }
+  .alt-bilgi { border-top: 1px solid #e3e8f2; background: #fff; color: #6b7a99; font-size: .8rem; padding: .8rem 1rem; display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; justify-content: space-between; }
   .ust-serit { background: #fff; border-bottom: 1px solid #e3e8f2; }
   main .card, main .table { box-shadow: 0 1px 3px rgba(0,0,0,.06); }
   main h4 { font-weight: 700; color: var(--lacivert); margin-bottom: 1rem; }
@@ -137,7 +141,7 @@
   </div>
 @else
 <div class="ust-serit px-3 py-3 text-center"><strong style="color:var(--lacivert)"><i class="bi bi-capsule-pill me-1"></i>DepoWork İTS</strong></div>
-<div>
+<div class="icerik-kap">
 @endauth
 <main class="container-xl py-4">
   @if(session('ok'))<div class="alert alert-success">{{ session('ok') }}</div>@endif
@@ -145,6 +149,10 @@
   @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
   @yield('icerik')
 </main>
+<footer class="alt-bilgi">
+  <span>&copy; {{ now()->year }} {{ config('its.firma') }}</span>
+  <span>DepoWork İTS &middot; Sürüm {{ config('its.surum') }}</span>
+</footer>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
