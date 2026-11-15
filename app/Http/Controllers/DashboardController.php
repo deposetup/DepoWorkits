@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $tenant = $user->tenant;
 
         return view('dashboard', ['tenant' => $tenant] + ($tenant ? [
-            'sarf' => $this->aylikSarf($tenant->id),
+            'sarf' => $tenant->sarfYapabilir() ? $this->aylikSarf($tenant->id) : null,
             'pts' => $this->ptsHavuzu($tenant->id),
         ] : []));
     }

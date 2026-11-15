@@ -11,6 +11,7 @@ class IslemController extends Controller
     public function form(string $tur)
     {
         abort_unless(isset(StokServisi::TURLER[$tur]), 404);
+        $this->sarfYetkisi($tur);
 
         return view('islem.form', ['tur' => $tur, 'baslik' => StokServisi::TURLER[$tur][2], 'sebepler' => StokServisi::DEAKTIVE_SEBEPLER]);
     }
@@ -19,6 +20,7 @@ class IslemController extends Controller
     {
         abort_unless(isset(StokServisi::TURLER[$tur]), 404);
         abort_unless($request->user()->tenant_id, 403);
+        $this->sarfYetkisi($tur);
         $v = $request->validate([
             'kodlar' => 'required|string|max:50000',
             'sebep' => 'nullable|in:'.implode(',', array_keys(StokServisi::DEAKTIVE_SEBEPLER)),
@@ -49,5 +51,14 @@ class IslemController extends Controller
             'tur' => $tur, 'baslik' => StokServisi::TURLER[$tur][2], 'sebepler' => StokServisi::DEAKTIVE_SEBEPLER, 'sonuc' => $sonuc,
             'ptsGonderim' => $ptsGonderim, 'ptsAcik' => (bool) config('its.pts_gonderim') && (bool) config('its.yazma'),
         ]);
+    }
+
+    /** Ecza depolarında Hastane Sarf / Sarf İptal kapalıdır (depolar sarf yapamaz). */
+    private function sarfYetkisi(string $tur): void
+    {
+        if (in_array($tur, ['sarf', 'sarf_iptal'], true)) {
+            $tenant = auth()->user()->tenant;
+            abort_if($tenant && ! $tenant->sarfYapabilir(), 403, 'Ecza depoları sarf bildirimi yapamaz.');
+        }
     }
 }

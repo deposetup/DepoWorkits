@@ -128,6 +128,7 @@ class StokController extends Controller
             'sebep' => 'nullable|in:'.implode(',', array_keys(StokServisi::DEAKTIVE_SEBEPLER)),
             'aciklama' => 'nullable|string|max:255',
         ], ['secili.required' => 'Önce listeden ürün seçin.']);
+        abort_if(in_array($v['tur'], ['sarf', 'sarf_iptal'], true) && ! $request->user()->tenant->sarfYapabilir(), 403, 'Ecza depoları sarf bildirimi yapamaz.');
         if (in_array($v['tur'], ['satis', 'iade', 'devir'], true)) {
             $request->validate(['karsi_gln' => 'required|digits:13']);
         }

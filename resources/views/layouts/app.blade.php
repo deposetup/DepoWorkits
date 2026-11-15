@@ -67,8 +67,10 @@
         ['PTS Gönderimleri', 'bi-send', route('pts.gonderimler'), ['pts.gonderimler']],
         ['Mal Devir', 'bi-arrow-left-right', route('islem', 'devir'), ['islem:devir']],
         ['Mal Devir İptal', 'bi-x-circle', route('islem', 'devir_iptal'), ['islem:devir_iptal']],
-        ['Hastane Sarf', 'bi-hospital', route('islem', 'sarf'), ['islem:sarf']],
-        ['Sarf İptal', 'bi-arrow-counterclockwise', route('islem', 'sarf_iptal'), ['islem:sarf_iptal']],
+        ...(($u->tenant?->sarfYapabilir() ?? true) ? [
+          ['Hastane Sarf', 'bi-hospital', route('islem', 'sarf'), ['islem:sarf']],
+          ['Sarf İptal', 'bi-arrow-counterclockwise', route('islem', 'sarf_iptal'), ['islem:sarf_iptal']],
+        ] : []),
         ['Ürün İade', 'bi-arrow-return-left', route('islem', 'iade'), ['islem:iade']],
         ['Deaktive', 'bi-slash-circle', route('islem', 'deaktive'), ['islem:deaktive']],
         ['Deaktivasyon İptal', 'bi-check-circle', route('islem', 'deaktive_iptal'), ['islem:deaktive_iptal']],

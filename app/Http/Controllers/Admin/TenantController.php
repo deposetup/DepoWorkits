@@ -40,6 +40,16 @@ class TenantController extends Controller
         return back()->with('ok', 'Lisans uzatıldı.');
     }
 
+    public function turDegistir(Request $request, Tenant $tenant)
+    {
+        $tur = $request->validate(['tur' => 'required|in:eczane,hastane,depo,uretici,ihracatci'])['tur'];
+        $eski = $tenant->tur;
+        $tenant->update(['tur' => $tur]);
+        AuditLog::kaydet('tenant_tur_degistir', ['tenant' => $tenant->id, 'eski' => $eski, 'yeni' => $tur]);
+
+        return back()->with('ok', 'Müşteri türü güncellendi.');
+    }
+
     public function aktifToggle(Tenant $tenant)
     {
         $tenant->update(['aktif' => ! $tenant->aktif]);

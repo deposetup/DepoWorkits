@@ -6,7 +6,8 @@
 @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 <div class="mb-3 d-flex gap-2 align-items-center flex-wrap">
   <div class="btn-group">
-    @foreach(['stokta' => 'Stokta', 'satis' => 'Satıldı (alıcı bekliyor)', 'devir' => 'Devredildi', 'deaktive' => 'Deaktive', 'sarf' => 'Sarf'] as $d => $ad)
+    @php $sarfVar = auth()->user()->tenant?->sarfYapabilir() ?? true; @endphp
+    @foreach(array_filter(['stokta' => 'Stokta', 'satis' => 'Satıldı (alıcı bekliyor)', 'devir' => 'Devredildi', 'deaktive' => 'Deaktive', 'sarf' => 'Sarf'], fn ($k) => $sarfVar || $k !== 'sarf', ARRAY_FILTER_USE_KEY) as $d => $ad)
     <a class="btn btn-sm {{ $durum === $d ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('stok.liste', ['durum' => $d]) }}">{{ $ad }}</a>
     @endforeach
   </div>
@@ -20,7 +21,7 @@
 <div class="card mb-3"><div class="card-body py-2 row g-2 align-items-center">
   <div class="col-auto"><select name="tur" id="tur" class="form-select form-select-sm" onchange="alanlar()">
     @if($durum === 'stokta')
-      <option value="satis">Satış</option><option value="sarf">Hastane Sarf</option><option value="devir">Mal Devir</option><option value="iade">Ürün İade</option><option value="deaktive">Deaktive</option>
+      <option value="satis">Satış</option>@if($sarfVar)<option value="sarf">Hastane Sarf</option>@endif<option value="devir">Mal Devir</option><option value="iade">Ürün İade</option><option value="deaktive">Deaktive</option>
     @elseif($durum === 'satis')<option value="satis_iptal">Satış İptal</option>
     @elseif($durum === 'deaktive')<option value="deaktive_iptal">Deaktivasyon İptal</option>
     @elseif($durum === 'devir')<option value="devir_iptal">Mal Devir İptal</option>

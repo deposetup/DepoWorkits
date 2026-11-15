@@ -65,6 +65,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
     Route::middleware('superadmin')->prefix('yonetim')->name('admin.')->group(function () {
         Route::get('/musteriler', [TenantController::class, 'index'])->name('tenants.index');
         Route::post('/musteriler', [TenantController::class, 'store'])->name('tenants.store');
+        Route::post('/musteriler/{tenant}/tur', [TenantController::class, 'turDegistir'])->name('tenants.tur');
         Route::post('/musteriler/{tenant}/uzat', [TenantController::class, 'uzat'])->name('tenants.uzat');
         Route::get('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'index'])->name('kullanici.index');
         Route::post('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'store'])->name('kullanici.store');

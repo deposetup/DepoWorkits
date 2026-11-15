@@ -31,6 +31,12 @@ class Tenant extends Model
         return $this->hasOne(ItsCredential::class);
     }
 
+    /** Ecza depoları sarf (hastane sarf) bildirimi yapamaz; yalnızca tüketim noktaları (hastane, eczane vb.) yapar. */
+    public function sarfYapabilir(): bool
+    {
+        return $this->tur !== 'depo';
+    }
+
     public function lisansAktifMi(): bool
     {
         return $this->aktif && $this->lisans_bitis->endOfDay()->isFuture();

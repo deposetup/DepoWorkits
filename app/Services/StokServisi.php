@@ -75,6 +75,9 @@ class StokServisi
         }
         [$gereken, $yeni] = self::TURLER[$tur];
         $tenant = $user->tenant;
+        if (in_array($tur, ['sarf', 'sarf_iptal'], true) && ! $tenant->sarfYapabilir()) {
+            throw new InvalidArgumentException('Ecza depoları sarf bildirimi yapamaz.');
+        }
 
         $satirlar = [];
         $gonderilecek = [];

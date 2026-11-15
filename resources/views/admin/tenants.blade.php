@@ -7,7 +7,10 @@
   <tbody>
   @foreach($tenants as $t)
     <tr>
-      <td>{{ $t->unvan }}</td><td>{{ $t->gln }}</td><td>{{ $t->tur }}</td>
+      <td>{{ $t->unvan }}</td><td>{{ $t->gln }}</td><td><form method="post" action="{{ route('admin.tenants.tur', $t) }}" class="d-flex gap-1">@csrf
+        <select name="tur" class="form-select form-select-sm" style="width:115px" onchange="this.form.submit()">
+          @foreach(['eczane' => 'Eczane', 'hastane' => 'Hastane', 'depo' => 'Depo', 'uretici' => 'Üretici', 'ihracatci' => 'İhracatçı'] as $k => $ad)<option value="{{ $k }}" @selected($t->tur === $k)>{{ $ad }}</option>@endforeach
+        </select></form></td>
       <td>{{ $t->lisans_bitis->format('d.m.Y') }}</td><td>{{ $t->kalanGun() }} gün</td>
       <td>{!! $t->lisansAktifMi() ? '<span class="badge text-bg-success">Aktif</span>' : '<span class="badge text-bg-danger">Pasif/Süresi doldu</span>' !!}</td>
       <td class="d-flex gap-1">
