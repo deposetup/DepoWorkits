@@ -8,30 +8,45 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <style>
+  :root { --yan-genislik: 270px; --lacivert: #0b2447; --lacivert2: #19376d; --vurgu: #5fd0ff; }
   body { background: #f4f6fa; }
-  .ust { background: linear-gradient(90deg, #0b2447, #19376d); box-shadow: 0 2px 8px rgba(0,0,0,.15); }
-  .ust .navbar-brand { font-weight: 700; letter-spacing: .3px; }
-  .ust .navbar-brand .nokta { color: #5fd0ff; }
-  .ust .nav-link { color: rgba(255,255,255,.82); font-weight: 500; padding: .6rem .85rem; border-radius: .4rem; }
-  .ust .nav-link:hover, .ust .nav-link.show { color: #fff; background: rgba(255,255,255,.1); }
-  .ust .nav-link.aktif { color: #fff; background: rgba(95,208,255,.22); }
-  .ust .dropdown-menu { border: 0; border-radius: .6rem; box-shadow: 0 10px 30px rgba(11,36,71,.25); padding: .4rem; min-width: 14rem; margin-top: .35rem; }
-  .ust .dropdown-item { border-radius: .4rem; padding: .5rem .75rem; display: flex; gap: .6rem; align-items: center; }
-  .ust .dropdown-item i { color: #19376d; width: 1.1rem; text-align: center; }
-  .ust .dropdown-item.active, .ust .dropdown-item:active { background: #e8f0ff; color: #0b2447; font-weight: 600; }
-  .ust .dropdown-header { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; }
-  .firma { font-size: .8rem; color: #9fb3d9; }
+  .yan { width: var(--yan-genislik); background: linear-gradient(180deg, var(--lacivert), #0d2b57 60%, var(--lacivert2)); color: #fff; }
+  @media (min-width: 992px) {
+    .yan { position: fixed; inset: 0 auto 0 0; display: flex !important; flex-direction: column; z-index: 1030; box-shadow: 2px 0 12px rgba(0,0,0,.15); }
+    .icerik-alan { margin-left: var(--yan-genislik); }
+  }
+  .yan .offcanvas-body { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+  .yan-marka { display: flex; align-items: center; gap: .6rem; padding: 1.1rem 1.25rem; font-weight: 700; font-size: 1.15rem; color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .yan-marka .nokta { color: var(--vurgu); }
+  .yan-marka small { display: block; font-weight: 400; font-size: .7rem; color: #9fb3d9; letter-spacing: .04em; }
+  .yan-menu { flex: 1; overflow-y: auto; padding: .75rem .65rem; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.2) transparent; }
+  .yan-bolum { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: #8196c4; padding: .6rem .75rem .3rem; }
+  .yan-link, .yan-grup { display: flex; align-items: center; gap: .7rem; width: 100%; padding: .6rem .8rem; border: 0; background: transparent; color: rgba(255,255,255,.85); font-weight: 500; border-radius: .55rem; text-decoration: none; text-align: left; transition: background .2s, color .2s; }
+  .yan-link:hover, .yan-grup:hover { background: rgba(255,255,255,.09); color: #fff; }
+  .yan-link i, .yan-grup > i:first-child { font-size: 1.05rem; width: 1.2rem; text-align: center; color: var(--vurgu); }
+  .yan-link.aktif, .yan-grup.aktif { background: rgba(95,208,255,.18); color: #fff; }
+  .yan-grup .ok { margin-left: auto; font-size: .75rem; transition: transform .3s; }
+  .yan-grup:not(.collapsed) .ok { transform: rotate(180deg); }
+  .yan-alt { list-style: none; margin: .15rem 0 .35rem 1.15rem; padding: 0 0 0 .85rem; border-left: 1px solid rgba(255,255,255,.15); }
+  .yan-alt .yan-link { font-size: .9rem; padding: .45rem .7rem; font-weight: 400; }
+  .yan-alt .yan-link i { font-size: .9rem; color: #9fb3d9; }
+  .yan-alt .yan-link.aktif { background: #fff; color: var(--lacivert); font-weight: 600; }
+  .yan-alt .yan-link.aktif i { color: var(--lacivert2); }
+  .yan-alt-sarmal.collapsing { transition: height .35s ease; }
+  .yan-kullanici { border-top: 1px solid rgba(255,255,255,.1); padding: .75rem .65rem; background: rgba(0,0,0,.12); }
+  .yan-kullanici .kim { padding: .25rem .8rem .6rem; font-size: .85rem; }
+  .yan-kullanici .kim .firma { color: #9fb3d9; font-size: .75rem; display: block; }
+  .ust-serit { background: #fff; border-bottom: 1px solid #e3e8f2; }
   main .card, main .table { box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-  main h4 { font-weight: 700; color: #0b2447; margin-bottom: 1rem; }
+  main h4 { font-weight: 700; color: var(--lacivert); margin-bottom: 1rem; }
+  .hizli { display: flex; gap: .9rem; align-items: center; padding: 1rem 1.1rem; background: #fff; border: 1px solid #e3e8f2; border-radius: .8rem; text-decoration: none; color: var(--lacivert); height: 100%; box-shadow: 0 1px 3px rgba(0,0,0,.05); transition: transform .15s, box-shadow .15s, border-color .15s; }
+  .hizli:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(11,36,71,.12); border-color: var(--vurgu); color: var(--lacivert); }
+  .hizli .ikon { width: 2.8rem; height: 2.8rem; flex: none; display: grid; place-items: center; border-radius: .7rem; background: #e8f0ff; color: var(--lacivert2); font-size: 1.35rem; }
+  .hizli small { display: block; color: #6b7a99; font-weight: 400; }
+  .hizli strong { display: block; }
 </style>
 </head>
 <body>
-@if(session('musteri_gozu_yonetici_id'))
-<div class="bg-warning-subtle border-bottom border-warning py-2 px-3 d-flex flex-wrap gap-2 justify-content-between align-items-center" style="position:sticky;top:0;z-index:1100">
-  <span><i class="bi bi-eye-fill me-1"></i><strong>Müşteri gözü:</strong> {{ auth()->user()->tenant?->unvan }} ekranını görüntülüyorsunuz. Salt okunur, hiçbir işlem yapılmaz.</span>
-  <form method="post" action="{{ route('musteri-gozu.bitir') }}">@csrf<button class="btn btn-sm btn-dark"><i class="bi bi-box-arrow-left me-1"></i>Yönetici görünümüne dön</button></form>
-</div>
-@endif
 @php
   $u = auth()->user();
   $menu = null;
@@ -75,55 +90,62 @@
     return false;
   };
 @endphp
-<nav class="navbar navbar-expand-lg navbar-dark ust sticky-top px-3">
-  <a class="navbar-brand me-4" href="{{ $u ? route('home') : '#' }}"><i class="bi bi-capsule-pill me-1"></i>Web<span class="nokta">İTS</span></a>
-  @auth
-  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"><span class="navbar-toggler-icon"></span></button>
-  <div class="collapse navbar-collapse" id="menu">
-    <ul class="navbar-nav me-auto gap-1">
+@auth
+<aside class="yan offcanvas-lg offcanvas-start" tabindex="-1" id="yanMenu" aria-label="Ana menü">
+  <div class="offcanvas-body">
+    <a class="yan-marka" href="{{ route('home') }}"><i class="bi bi-capsule-pill fs-3"></i><span>DepoWork <span class="nokta">İTS</span><small>İlaç Takip Sistemi Portalı</small></span></a>
+    <nav class="yan-menu" id="yanAkordeon">
       @if($menu)
-        @foreach($menu as [$ad, $ikon, $rota, $alt])
+        @foreach($menu as $n => [$ad, $ikon, $rota, $alt])
           @if(! $alt)
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs($rota) ? 'aktif' : '' }}" href="{{ route($rota) }}"><i class="bi {{ $ikon }} me-1"></i>{{ $ad }}</a></li>
+            <a class="yan-link {{ request()->routeIs($rota) ? 'aktif' : '' }}" href="{{ route($rota) }}"><i class="bi {{ $ikon }}"></i>{{ $ad }}</a>
           @else
             @php $grupAktif = collect($alt)->contains(fn ($a) => $aktifMi($a[3])); @endphp
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {{ $grupAktif ? 'aktif' : '' }}" href="#" role="button" data-bs-toggle="dropdown"><i class="bi {{ $ikon }} me-1"></i>{{ $ad }}</a>
-              <ul class="dropdown-menu">
+            <button class="yan-grup {{ $grupAktif ? 'aktif' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#grup{{ $n }}" aria-expanded="{{ $grupAktif ? 'true' : 'false' }}"><i class="bi {{ $ikon }}"></i>{{ $ad }}<i class="bi bi-chevron-down ok"></i></button>
+            <div class="collapse yan-alt-sarmal {{ $grupAktif ? 'show' : '' }}" id="grup{{ $n }}" data-bs-parent="#yanAkordeon">
+              <ul class="yan-alt">
                 @foreach($alt as [$altAd, $altIkon, $url, $desen])
-                  <li><a class="dropdown-item {{ $aktifMi($desen) ? 'active' : '' }}" href="{{ $url }}"><i class="bi {{ $altIkon }}"></i>{{ $altAd }}</a></li>
+                  <li><a class="yan-link {{ $aktifMi($desen) ? 'aktif' : '' }}" href="{{ $url }}"><i class="bi {{ $altIkon }}"></i>{{ $altAd }}</a></li>
                 @endforeach
               </ul>
-            </li>
+            </div>
           @endif
         @endforeach
+        <div class="yan-bolum">Hesap</div>
+        <a class="yan-link {{ request()->routeIs('ayarlar.its') ? 'aktif' : '' }}" href="{{ route('ayarlar.its') }}"><i class="bi bi-gear"></i>İTS Ayarları</a>
       @else
-        <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.*') ? 'aktif' : '' }}" href="{{ route('admin.tenants.index') }}"><i class="bi bi-people me-1"></i>Müşteriler</a></li>
+        <a class="yan-link {{ request()->routeIs('admin.*') ? 'aktif' : '' }}" href="{{ route('admin.tenants.index') }}"><i class="bi bi-people"></i>Müşteriler</a>
       @endif
-    </ul>
-    <ul class="navbar-nav align-items-lg-center">
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-          <i class="bi bi-person-circle me-1"></i>{{ $u->name }}
-          @if($u->tenant)<span class="firma d-block d-lg-inline ms-lg-2">{{ $u->tenant->unvan }}</span>@endif
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end">
-          @if($menu)<li><a class="dropdown-item {{ request()->routeIs('ayarlar.its') ? 'active' : '' }}" href="{{ route('ayarlar.its') }}"><i class="bi bi-gear"></i>İTS Ayarları</a></li>@endif
-          <li><a class="dropdown-item" href="{{ route('sifre') }}"><i class="bi bi-key"></i>Şifre Değiştir</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><form method="post" action="{{ route('logout') }}">@csrf<button class="dropdown-item"><i class="bi bi-box-arrow-right"></i>Çıkış Yap</button></form></li>
-        </ul>
-      </li>
-    </ul>
+      <a class="yan-link {{ request()->routeIs('sifre') ? 'aktif' : '' }}" href="{{ route('sifre') }}"><i class="bi bi-key"></i>Şifre Değiştir</a>
+    </nav>
+    <div class="yan-kullanici">
+      <div class="kim"><i class="bi bi-person-circle me-1"></i><strong>{{ $u->name }}</strong>@if($u->tenant)<span class="firma">{{ $u->tenant->unvan }}</span>@endif</div>
+      <form method="post" action="{{ route('logout') }}">@csrf<button class="yan-link"><i class="bi bi-box-arrow-right"></i>Çıkış Yap</button></form>
+    </div>
   </div>
-  @endauth
-</nav>
+</aside>
+<div class="icerik-alan">
+@if(session('musteri_gozu_yonetici_id'))
+<div class="bg-warning-subtle border-bottom border-warning py-2 px-3 d-flex flex-wrap gap-2 justify-content-between align-items-center" style="position:sticky;top:0;z-index:1040">
+  <span><i class="bi bi-eye-fill me-1"></i><strong>Müşteri gözü:</strong> {{ auth()->user()->tenant?->unvan }} ekranını görüntülüyorsunuz. Salt okunur, hiçbir işlem yapılmaz.</span>
+  <form method="post" action="{{ route('musteri-gozu.bitir') }}">@csrf<button class="btn btn-sm btn-dark"><i class="bi bi-box-arrow-left me-1"></i>Yönetici görünümüne dön</button></form>
+</div>
+@endif
+  <div class="ust-serit d-lg-none d-flex align-items-center gap-2 px-3 py-2 sticky-top">
+    <button class="btn btn-outline-dark btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#yanMenu" aria-controls="yanMenu" aria-label="Menüyü aç"><i class="bi bi-list fs-5"></i></button>
+    <strong class="text-dark"><i class="bi bi-capsule-pill me-1"></i>DepoWork İTS</strong>
+  </div>
+@else
+<div class="ust-serit px-3 py-3 text-center"><strong style="color:var(--lacivert)"><i class="bi bi-capsule-pill me-1"></i>DepoWork İTS</strong></div>
+<div>
+@endauth
 <main class="container-xl py-4">
   @if(session('ok'))<div class="alert alert-success">{{ session('ok') }}</div>@endif
   @if(session('hata'))<div class="alert alert-danger">{{ session('hata') }}</div>@endif
   @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
   @yield('icerik')
 </main>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
