@@ -71,6 +71,9 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::get('/talepler', [\App\Http\Controllers\Admin\TalepController::class, 'index'])->name('talepler');
         Route::post('/talepler/{talep}/durum', [\App\Http\Controllers\Admin\TalepController::class, 'durum'])->name('talepler.durum');
         Route::get('/giris-kayitlari', [\App\Http\Controllers\Admin\GirisKayitController::class, 'index'])->name('giris-kayitlari');
+        Route::get('/musteriler/{tenant}/duzelt', [TenantController::class, 'duzelt'])->name('tenants.duzelt');
+        Route::post('/musteriler/{tenant}/duzelt', [TenantController::class, 'guncelle'])->name('tenants.guncelle');
+        Route::post('/musteriler/{tenant}/sil', [TenantController::class, 'sil'])->name('tenants.sil');
         Route::post('/musteriler/{tenant}/tur', [TenantController::class, 'turDegistir'])->name('tenants.tur');
         Route::post('/musteriler/{tenant}/uzat', [TenantController::class, 'uzat'])->name('tenants.uzat');
         Route::get('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'index'])->name('kullanici.index');
