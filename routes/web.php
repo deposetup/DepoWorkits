@@ -71,6 +71,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/cariler/{cari}/sil', [\App\Http\Controllers\CariController::class, 'sil'])->name('cari.sil');
         Route::get('/paydaslar', [\App\Http\Controllers\PaydasController::class, 'index'])->name('paydaslar');
         Route::get('/stok/ice-aktar', [\App\Http\Controllers\StokAktarController::class, 'form'])->name('stok.ice-aktar');
+        Route::post('/stok/ice-aktar/csv', [\App\Http\Controllers\StokAktarController::class, 'csv'])->name('stok.ice-aktar.csv');
         Route::post('/stok/ice-aktar', [\App\Http\Controllers\StokAktarController::class, 'calistir'])->name('stok.ice-aktar.calistir');
         Route::get('/islem/{tur}', [IslemController::class, 'form'])->name('islem');
         Route::post('/islem/{tur}', [IslemController::class, 'calistir'])->name('islem.calistir');
@@ -82,6 +83,8 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::get('/talepler', [\App\Http\Controllers\Admin\TalepController::class, 'index'])->name('talepler');
         Route::post('/talepler/{talep}/durum', [\App\Http\Controllers\Admin\TalepController::class, 'durum'])->name('talepler.durum');
         Route::get('/paydas-degisimleri', [\App\Http\Controllers\Admin\PaydasDegisimController::class, 'index'])->name('paydas-degisimleri');
+        Route::get('/musteriler/{tenant}/stok-csv', [\App\Http\Controllers\Admin\StokCsvController::class, 'form'])->name('stok-csv');
+        Route::post('/musteriler/{tenant}/stok-csv', [\App\Http\Controllers\Admin\StokCsvController::class, 'yukle'])->name('stok-csv.yukle');
         Route::get('/giris-kayitlari', [\App\Http\Controllers\Admin\GirisKayitController::class, 'index'])->name('giris-kayitlari');
         Route::get('/musteriler/{tenant}/duzelt', [TenantController::class, 'duzelt'])->name('tenants.duzelt');
         Route::post('/musteriler/{tenant}/duzelt', [TenantController::class, 'guncelle'])->name('tenants.guncelle');

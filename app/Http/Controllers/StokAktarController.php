@@ -24,6 +24,20 @@ class StokAktarController extends Controller
         return view('stok.ice-aktar', ['paketSayisi' => PtsPaketi::where('tenant_id', $request->user()->tenant_id)->count(), 'sonuc' => null]);
     }
 
+    /** İTS portalından indirilen stok CSV/ZIP dosyasını müşterinin stoğuna alır. */
+    public function csv(Request $request, \App\Services\StokCsvAktar $aktar)
+    {
+        abort_unless($request->user()->tenant_id, 403);
+        $request->validate(['dosya' => 'required|file|max:51200|mimes:csv,txt,zip']);
+        try {
+            $sonuc = $aktar->ice($request->user()->tenant, $request->file('dosya'));
+        } catch (\InvalidArgumentException $e) {
+            return back()->with('hata', $e->getMessage());
+        }
+
+        return view('stok.ice-aktar', ['paketSayisi' => PtsPaketi::where('tenant_id', $request->user()->tenant_id)->count(), 'sonuc' => null, 'csv' => $sonuc]);
+    }
+
     public function calistir(Request $request, ItsClient $its)
     {
         abort_unless($request->user()->tenant_id, 403);
