@@ -20,7 +20,10 @@ class TenantController extends Controller
             'unvan' => 'required|string|max:255',
             'gln' => 'required|digits:13|unique:tenants,gln',
             'tur' => 'required|in:eczane,hastane,depo,uretici,ihracatci',
+            'il' => 'nullable|string|max:60',
+            'ilce' => 'nullable|string|max:60',
             'eposta' => 'nullable|email',
+            'telefon' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+()\s-]{7,30}$/'],
             'lisans_baslangic' => 'required|date',
             'lisans_bitis' => 'required|date|after:lisans_baslangic',
         ]);

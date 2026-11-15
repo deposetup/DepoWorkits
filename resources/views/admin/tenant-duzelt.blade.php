@@ -6,21 +6,22 @@
 @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 <div class="card mb-4"><div class="card-header bg-white fw-semibold"><i class="bi bi-pencil-square me-1"></i>Bilgileri Düzelt</div><div class="card-body">
 <form method="post" action="{{ route('admin.tenants.guncelle', $tenant) }}" class="row g-3">@csrf
-  <div class="col-md-8"><label class="form-label">Ünvan <small class="text-muted">(kayıtta Her Kelimenin Baş Harfi Büyük olur)</small></label><input name="unvan" value="{{ old('unvan', $tenant->unvan) }}" class="form-control" required maxlength="255"></div>
-  <div class="col-md-4"><label class="form-label">GLN</label><input name="gln" value="{{ old('gln', $tenant->gln) }}" class="form-control font-monospace" maxlength="13" required>
-    <div class="form-text">GLN değişirse müşterinin İTS bildirimlerinde kullanılan GLN de değişir.</div></div>
-  <div class="col-md-4"><label class="form-label">Tür</label><select name="tur" class="form-select">
+  <div class="col-md-8"><label class="form-label">Ünvan <small class="text-muted">(kayıtta Her Kelimenin Baş Harfi Büyük olur)</small></label><input id="unvan" name="unvan" value="{{ old('unvan', $tenant->unvan) }}" class="form-control" required maxlength="255"></div>
+  <div class="col-md-4"><label class="form-label">GLN</label><div class="input-group"><input id="gln" name="gln" value="{{ old('gln', $tenant->gln) }}" class="form-control font-monospace" maxlength="13" required><button type="button" class="btn btn-outline-primary" id="glnGetir" title="İTS paydaş listesinden bilgileri getir"><i class="bi bi-cloud-download"></i></button></div>
+    <div id="glnDurumYeri"></div><div class="form-text">GLN yanındaki <i class="bi bi-cloud-download"></i> düğmesi İTS paydaş listesinden ünvan, tür, il, ilçe, e-posta ve telefonu getirir (formu doldurur; <b>Kaydet</b>'e basana kadar kaydedilmez). GLN değişirse müşterinin İTS bildirimlerinde kullanılan GLN de değişir.</div></div>
+  <div class="col-md-4"><label class="form-label">Tür</label><select id="tur" name="tur" class="form-select">
     @foreach(['eczane' => 'Eczane', 'hastane' => 'Hastane', 'depo' => 'Depo', 'uretici' => 'Üretici', 'ihracatci' => 'İhracatçı'] as $k => $ad)<option value="{{ $k }}" @selected(old('tur', $tenant->tur) === $k)>{{ $ad }}</option>@endforeach</select></div>
-  <div class="col-md-4"><label class="form-label">İl</label><input name="il" value="{{ old('il', $tenant->il) }}" class="form-control" maxlength="60"></div>
-  <div class="col-md-4"><label class="form-label">İlçe</label><input name="ilce" value="{{ old('ilce', $tenant->ilce) }}" class="form-control" maxlength="60"></div>
-  <div class="col-md-6"><label class="form-label">E-posta <small class="text-muted">(isteğe bağlı)</small></label><input type="email" name="eposta" value="{{ old('eposta', $tenant->eposta) }}" class="form-control" maxlength="255"></div>
-  <div class="col-md-6"><label class="form-label">Telefon <small class="text-muted">(isteğe bağlı)</small></label><input name="telefon" value="{{ old('telefon', $tenant->telefon) }}" class="form-control" maxlength="30"></div>
+  <div class="col-md-4"><label class="form-label">İl</label><input id="il" name="il" value="{{ old('il', $tenant->il) }}" class="form-control" maxlength="60"></div>
+  <div class="col-md-4"><label class="form-label">İlçe</label><input id="ilce" name="ilce" value="{{ old('ilce', $tenant->ilce) }}" class="form-control" maxlength="60"></div>
+  <div class="col-md-6"><label class="form-label">E-posta <small class="text-muted">(isteğe bağlı)</small></label><input id="eposta" type="email" name="eposta" value="{{ old('eposta', $tenant->eposta) }}" class="form-control" maxlength="255"></div>
+  <div class="col-md-6"><label class="form-label">Telefon <small class="text-muted">(isteğe bağlı)</small></label><input id="telefon" name="telefon" value="{{ old('telefon', $tenant->telefon) }}" class="form-control" maxlength="30"></div>
   <div class="col-md-3"><label class="form-label">Lisans başlangıç</label><input type="date" name="lisans_baslangic" value="{{ old('lisans_baslangic', $tenant->lisans_baslangic->toDateString()) }}" class="form-control" required></div>
   <div class="col-md-3"><label class="form-label">Lisans bitiş</label><input type="date" name="lisans_bitis" value="{{ old('lisans_bitis', $tenant->lisans_bitis->toDateString()) }}" class="form-control" required></div>
   <div class="col-md-6 d-flex flex-column justify-content-end gap-1">
     <div class="form-check"><input class="form-check-input" type="checkbox" name="aktif" value="1" id="aktif" @checked(old('aktif', $tenant->aktif))><label class="form-check-label" for="aktif">Aktif</label></div>
     <div class="form-check"><input class="form-check-input" type="checkbox" name="bitince_salt_okunur" value="1" id="so" @checked(old('bitince_salt_okunur', $tenant->bitince_salt_okunur))><label class="form-check-label" for="so">Lisans bitince raporlar salt okunur açık kalsın</label></div>
   </div>
+  <div class="col-12">@include('admin._gln-sorgu', ['overwrite' => true])</div>
   <div class="col-12 d-flex gap-2"><button class="btn btn-primary"><i class="bi bi-check2 me-1"></i>Kaydet</button><a href="{{ route('admin.tenants.index') }}" class="btn btn-outline-secondary">Vazgeç</a></div>
 </form></div></div>
 
