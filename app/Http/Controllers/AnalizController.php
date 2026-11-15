@@ -17,6 +17,11 @@ class AnalizController extends Controller
             ->when($request->query('tur'), fn ($q, $t) => $q->where('tur', $t))
             ->latest()->paginate(50)->withQueryString();
 
-        return view('analiz.index', ['ozet' => $ozet, 'hareketler' => $hareketler, 'turler' => StokServisi::TURLER]);
+        // Ecza depolarında kullanılmayan işlemler (sarf, devir) özet kartlarında ve filtrede gösterilmez.
+        $tenant = $request->user()->tenant;
+        $gorunen = collect(StokServisi::TURLER)->reject(fn ($t, $k) => ($tenant && ! $tenant->sarfYapabilir() && str_starts_with($k, 'sarf'))
+            || ($tenant && ! $tenant->devirYapabilir() && str_starts_with($k, 'devir')))->all();
+
+        return view('analiz.index', ['ozet' => $ozet, 'hareketler' => $hareketler, 'turler' => StokServisi::TURLER, 'gorunen' => $gorunen]);
     }
 }

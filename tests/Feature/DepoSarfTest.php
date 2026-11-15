@@ -78,4 +78,11 @@ class DepoSarfTest extends TestCase
         $this->actingAs($h)->get('/')->assertSee('Mal Devir');
         $this->actingAs($h)->get('/islem/devir')->assertOk();
     }
+
+    public function test_analiz_depoda_sarf_ve_devir_alanlarini_gostermez(): void
+    {
+        $this->actingAs($this->user('depo'))->get('/analiz')->assertOk()->assertDontSee('Hastane Sarf')->assertDontSee('Sarf İptal')->assertDontSee('Mal Devir')->assertSee('Mal Kabul')->assertSee('Satış');
+        \App\Models\Tenant::query()->delete();
+        $this->actingAs($this->user('hastane'))->get('/analiz')->assertOk()->assertSee('Hastane Sarf')->assertSee('Mal Devir');
+    }
 }
