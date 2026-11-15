@@ -38,6 +38,9 @@
   <div class="col-md-2"><input id="ilce" name="ilce" class="form-control" placeholder="İlçe" maxlength="60"></div>
   <div class="col-md-4"><input id="eposta" type="email" name="eposta" class="form-control" placeholder="E-posta (isteğe bağlı)"></div>
   <div class="col-md-2"><input id="telefon" name="telefon" class="form-control" placeholder="Telefon" maxlength="30"></div>
+  <div class="col-12"><div class="fw-semibold small mt-2">İTS portal kullanıcı bilgileri <span class="text-muted fw-normal">(isteğe bağlı; sonradan Düzelt ekranından da girilebilir. Kullanıcı hesabı oluşturmaz.)</span></div></div>
+  <div class="col-md-3"><input name="its_kullanici_adi" class="form-control" placeholder="İTS kullanıcı adı (genelde GLN)" autocomplete="off" maxlength="100"></div>
+  <div class="col-md-3"><input type="password" name="its_sifre" class="form-control" placeholder="İTS şifresi" autocomplete="new-password" maxlength="200"></div>
   <div class="col-12"><div class="form-text">GLN'i yazınca ünvan, tür, il, ilçe, e-posta ve telefon İTS paydaş listesinden otomatik gelir; dilerseniz düzeltebilirsiniz.</div>@include('admin._gln-sorgu')</div>
   <div class="col-12"><button class="btn btn-primary">Ekle</button></div>
 </form>

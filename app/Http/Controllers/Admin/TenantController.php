@@ -26,8 +26,16 @@ class TenantController extends Controller
             'telefon' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+()\s-]{7,30}$/'],
             'lisans_baslangic' => 'required|date',
             'lisans_bitis' => 'required|date|after:lisans_baslangic',
-        ]);
+            'its_kullanici_adi' => 'nullable|string|max:100|required_with:its_sifre',
+            'its_sifre' => 'nullable|string|max:200|required_with:its_kullanici_adi',
+        ], ['its_kullanici_adi.required_with' => 'İTS kullanıcı adı ve şifresi birlikte girilmelidir.', 'its_sifre.required_with' => 'İTS kullanıcı adı ve şifresi birlikte girilmelidir.']);
+        $its = \Illuminate\Support\Arr::only($data, ['its_kullanici_adi', 'its_sifre']);
+        unset($data['its_kullanici_adi'], $data['its_sifre']);
         $tenant = Tenant::create($data);
+        if (filled($its['its_kullanici_adi'] ?? null) && filled($its['its_sifre'] ?? null)) {
+            \App\Models\ItsCredential::create(['tenant_id' => $tenant->id, 'kullanici_adi' => $its['its_kullanici_adi'], 'sifre' => $its['its_sifre']]);
+            AuditLog::kaydet('its_kimlik_kaydet', ['hedef_tenant_id' => $tenant->id]); // değerler loga yazılmaz
+        }
         AuditLog::kaydet('tenant_olustur', ['tenant' => $tenant->id]);
 
         return back()->with('ok', 'Müşteri eklendi.');
