@@ -87,7 +87,7 @@
         ['Durum Sorgu', 'bi-shield-check', route('durum'), ['durum*']],
         ['Paydaşlar', 'bi-building', route('paydaslar'), ['paydaslar']],
       ]],
-      ['Cari Kartları', 'bi-person-lines-fill', 'cari.index', []],
+      ['Cari Kartlar', 'bi-person-lines-fill', 'cari.index', []],
       ['Analiz', 'bi-graph-up', 'analiz', []],
     ];
   }

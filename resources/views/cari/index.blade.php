@@ -1,7 +1,7 @@
 @extends('layouts.app')
-@section('baslik', 'Cari Kartları')
+@section('baslik', 'Cari Kartlar')
 @section('icerik')
-<h4>Cari Kartları</h4>
+<h4>Cari Kartlar</h4>
 <div class="alert alert-secondary small">Sık işlem yaptığınız karşı paydaşlar (alıcı, tedarikçi). Cariler <a href="{{ route('paydaslar') }}">Paydaşlar</a> ekranından <b>Cari Ekle</b> ile ya da <b>Yeni Cari</b> ile elle eklenir; <b>Düzelt</b> ile telefon, e-posta gibi bilgileri girebilirsiniz; satış, devir ve iade ekranlarında GLN yazmak yerine cari adını arayarak seçersiniz. Durum bilgisi, paydaşın cariye eklendiği andaki İTS durumudur; güncel durum için Paydaşlar ekranına bakın.</div>
 <form method="get" class="row g-2 mb-3"><div class="col-md-5"><input name="ara" value="{{ $ara }}" class="form-control form-control-sm" placeholder="Cari adı, GLN ya da il ara"></div>
 <div class="col-auto"><button class="btn btn-sm btn-primary">Ara</button> <a href="{{ route('cari.index') }}" class="btn btn-sm btn-outline-secondary">Sıfırla</a> <a href="{{ route('cari.yeni') }}" class="btn btn-sm btn-success"><i class="bi bi-plus-lg me-1"></i>Yeni Cari</a> <a href="{{ route('paydaslar') }}" class="btn btn-sm btn-outline-success">Paydaşlardan Ekle</a></div></form>
