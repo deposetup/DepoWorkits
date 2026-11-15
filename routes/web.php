@@ -81,6 +81,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/musteriler', [TenantController::class, 'store'])->name('tenants.store');
         Route::get('/talepler', [\App\Http\Controllers\Admin\TalepController::class, 'index'])->name('talepler');
         Route::post('/talepler/{talep}/durum', [\App\Http\Controllers\Admin\TalepController::class, 'durum'])->name('talepler.durum');
+        Route::get('/paydas-degisimleri', [\App\Http\Controllers\Admin\PaydasDegisimController::class, 'index'])->name('paydas-degisimleri');
         Route::get('/giris-kayitlari', [\App\Http\Controllers\Admin\GirisKayitController::class, 'index'])->name('giris-kayitlari');
         Route::get('/musteriler/{tenant}/duzelt', [TenantController::class, 'duzelt'])->name('tenants.duzelt');
         Route::post('/musteriler/{tenant}/duzelt', [TenantController::class, 'guncelle'])->name('tenants.guncelle');

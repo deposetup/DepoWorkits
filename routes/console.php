@@ -6,3 +6,5 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+// paydas:izle, Plesk zamanlanmış görevleriyle hafta içi 12:00 ve 17:00'de çalıştırılır (Laravel scheduler kullanılmıyor).
