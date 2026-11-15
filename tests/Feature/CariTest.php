@@ -103,4 +103,19 @@ class CariTest extends TestCase
         $this->actingAs($b)->get(route('cari.duzelt', $c))->assertNotFound();
         $this->post(route('cari.guncelle', $c), ['unvan' => 'Hack'])->assertNotFound();
     }
+
+    public function test_pts_sorguda_gonderen_cari_ise_mavi_degilse_kirmizi_ve_kim_oldugu_gorunur(): void
+    {
+        $u = $this->user();
+        $url = '/pts?baslangic='.now()->subDays(3)->toDateString().'&bitis='.now()->toDateString();
+        // Cari değil, paydaş listesinde de yok
+        $this->actingAs($u)->get($url)->assertOk()->assertSee('Cari değil, paydaş listesinde bulunamadı');
+        // Cari değil ama depo listesinde var: kırmızı + ünvan
+        \Illuminate\Support\Facades\DB::table('paydas_anliklari')->insert(['tip' => 'depo', 'gln' => '8680001000022', 'unvan' => 'ORNEK ECZA DEPOSU', 'aktif' => true, 'created_at' => now(), 'updated_at' => now()]);
+        $this->get($url)->assertSee('Ornek Ecza Deposu')->assertSee('cari değil)', false)->assertSee('text-danger', false);
+        // Cari ise mavi + cari adı
+        Cari::create(['tenant_id' => $u->tenant_id, 'gln' => '8680001000022', 'unvan' => 'Benim Carim']);
+        Cari::onbellekTemizle();
+        $this->get($url)->assertSee('Benim Carim')->assertDontSee('Ornek Ecza Deposu');
+    }
 }

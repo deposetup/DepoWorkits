@@ -43,7 +43,15 @@ class PtsController extends Controller
                 'PTS');
         }
 
-        return view('pts.index', ['sonuc' => $sonuc, 'hata' => $hata]);
+        // Gönderen GLN cari değilse, kimin olduğu İTS paydaş listesinden bulunur (kırmızı gösterilir).
+        $paydasAdlari = [];
+        if (is_array($sonuc) && $sonuc) {
+            $cariler = \App\Models\Cari::adlar($request->user()->tenant_id);
+            $cariDegil = array_values(array_diff(array_unique(array_column($sonuc, 'gonderen')), array_keys($cariler)));
+            $paydasAdlari = \App\Support\PaydasAdi::coz($cariDegil, $request->user()->tenant, $its);
+        }
+
+        return view('pts.index', ['sonuc' => $sonuc, 'hata' => $hata, 'paydasAdlari' => $paydasAdlari]);
     }
 
     /** Paketi İTS'ten indirir, saklar ve önizlemeye yönlendirir (kılavuz §43; mal kabul sayılmaz). */

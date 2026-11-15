@@ -15,15 +15,22 @@ class Cari extends Model
         return ['aktif' => 'boolean'];
     }
 
+    /** İstek içi önbellek (testlerde temizlenir). */
+    private static array $onbellek = [];
+
+    public static function onbellekTemizle(): void
+    {
+        self::$onbellek = [];
+    }
+
     /** GLN => ünvan eşlemesi (bu müşterinin carileri); ekranlarda GLN'in yanına cari adını yazmak için. */
     public static function adlar(?int $tenantId): array
     {
-        static $onbellek = [];
         if (! $tenantId || ! \Illuminate\Support\Facades\Schema::hasTable('cariler')) {
             return [];
         }
 
-        return $onbellek[$tenantId] ??= static::where('tenant_id', $tenantId)->pluck('unvan', 'gln')->all();
+        return self::$onbellek[$tenantId] ??= static::where('tenant_id', $tenantId)->pluck('unvan', 'gln')->all();
     }
 
     protected function unvan(): \Illuminate\Database\Eloquent\Casts\Attribute
