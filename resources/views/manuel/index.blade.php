@@ -67,7 +67,9 @@
     if (!kap.classList.contains('d-none')) { window.print(); }
   });
   document.getElementById('txtBtn').addEventListener('click', function () {
-    var b = new Blob([kodlar.map(function (k) { return k.kod; }).join('\r\n')], { type: 'text/plain' });
+    // Parantezsiz ham karekod: (01)..(17)..(10)parti<GS>(21)seri -> 01..17..10parti<GS>21seri (parti değişken uzunlukta olduğundan sonrasına GS ayracı konur)
+    var duz = kodlar.map(function (k) { return k.kod.replace(/\(10\)([^()]*)\(21\)/, '10$1\u001d21').replace(/[()]/g, ''); });
+    var b = new Blob([duz.join('\r\n')], { type: 'text/plain' });
     var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'karekodlar.txt'; document.body.appendChild(a); a.click(); a.remove();
   });
 })();
