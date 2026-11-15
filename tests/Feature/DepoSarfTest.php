@@ -59,4 +59,23 @@ class DepoSarfTest extends TestCase
         $this->assertSame('depo', $u->tenant->fresh()->tur);
         $this->actingAs($u->fresh())->get('/islem/sarf')->assertForbidden();
     }
+
+    public function test_depo_mal_devir_gormez_ve_kullanamaz_hastane_kullanir(): void
+    {
+        $u = $this->user('depo');
+        $this->actingAs($u)->get('/')->assertOk()->assertDontSee('Mal Devir');
+        $this->actingAs($u)->get('/islem/devir')->assertForbidden();
+        $this->actingAs($u)->get('/islem/devir_iptal')->assertForbidden();
+        $this->actingAs($u)->post('/islem/devir', ['kodlar' => self::KOD, 'karsi_gln' => '8680001000012'])->assertForbidden();
+        $this->actingAs($u)->post('/islem/kabul', ['kodlar' => self::KOD]);
+        $this->actingAs($u)->post('/stok/toplu', ['tur' => 'devir', 'secili' => [\App\Models\StokKalemi::first()->id], 'karsi_gln' => '8680001000012'])->assertForbidden();
+        $this->assertSame('stokta', \App\Models\StokKalemi::first()->durum);
+        $this->actingAs($u)->get('/stok/liste')->assertOk()->assertDontSee('Mal Devir');
+
+        \App\Models\StokKalemi::query()->delete();
+        \App\Models\Tenant::query()->delete();
+        $h = $this->user('hastane');
+        $this->actingAs($h)->get('/')->assertSee('Mal Devir');
+        $this->actingAs($h)->get('/islem/devir')->assertOk();
+    }
 }

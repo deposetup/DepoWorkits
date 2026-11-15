@@ -65,8 +65,10 @@
         ['Satış', 'bi-cart-check', route('islem', 'satis'), ['islem:satis']],
         ['Satış İptal', 'bi-cart-x', route('islem', 'satis_iptal'), ['islem:satis_iptal']],
         ['PTS Gönderimleri', 'bi-send', route('pts.gonderimler'), ['pts.gonderimler']],
-        ['Mal Devir', 'bi-arrow-left-right', route('islem', 'devir'), ['islem:devir']],
-        ['Mal Devir İptal', 'bi-x-circle', route('islem', 'devir_iptal'), ['islem:devir_iptal']],
+        ...(($u->tenant?->devirYapabilir() ?? true) ? [
+          ['Mal Devir', 'bi-arrow-left-right', route('islem', 'devir'), ['islem:devir']],
+          ['Mal Devir İptal', 'bi-x-circle', route('islem', 'devir_iptal'), ['islem:devir_iptal']],
+        ] : []),
         ...(($u->tenant?->sarfYapabilir() ?? true) ? [
           ['Hastane Sarf', 'bi-hospital', route('islem', 'sarf'), ['islem:sarf']],
           ['Sarf İptal', 'bi-arrow-counterclockwise', route('islem', 'sarf_iptal'), ['islem:sarf_iptal']],

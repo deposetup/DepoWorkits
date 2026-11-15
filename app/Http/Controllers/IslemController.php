@@ -75,5 +75,9 @@ class IslemController extends Controller
             $tenant = auth()->user()->tenant;
             abort_if($tenant && ! $tenant->sarfYapabilir(), 403, 'Ecza depoları sarf bildirimi yapamaz.');
         }
+        if (in_array($tur, ['devir', 'devir_iptal'], true)) {
+            $tenant = auth()->user()->tenant;
+            abort_if($tenant && ! $tenant->devirYapabilir(), 403, 'Ecza depoları Mal Devir kullanmaz.');
+        }
     }
 }

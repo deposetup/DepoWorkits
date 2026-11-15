@@ -43,6 +43,12 @@ class Tenant extends Model
         return $this->tur !== 'depo';
     }
 
+    /** Mal Devir / Mal Devir İptal şubeli müşteriler içindir; ecza depoları kullanmaz. */
+    public function devirYapabilir(): bool
+    {
+        return $this->tur !== 'depo';
+    }
+
     public function lisansAktifMi(): bool
     {
         return $this->aktif && $this->lisans_bitis->endOfDay()->isFuture();

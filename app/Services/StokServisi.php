@@ -79,6 +79,10 @@ class StokServisi
             throw new InvalidArgumentException('Ecza depoları sarf bildirimi yapamaz.');
         }
 
+        if (in_array($tur, ['devir', 'devir_iptal'], true) && ! $tenant->devirYapabilir()) {
+            throw new InvalidArgumentException('Ecza depoları Mal Devir kullanmaz.');
+        }
+
         $satirlar = [];
         $gonderilecek = [];
         $goruldu = [];
