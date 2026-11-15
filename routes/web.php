@@ -32,6 +32,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
     Route::middleware('lisans:salt_okunur')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('home');
         Route::get('/stok', [StokController::class, 'index'])->name('stok');
+        Route::get('/stok/red-odasi', [StokController::class, 'redOdasi'])->name('stok.red-odasi');
         Route::get('/stok/barkod', [StokController::class, 'barkod'])->name('stok.barkod');
         Route::view('/karekod-olustur', 'stok.karekod-olustur')->name('karekod.olustur');
         Route::get('/kritik-miad', [StokController::class, 'kritikMiad'])->name('kritik-miad');
@@ -58,6 +59,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/pts/gonderimler/{gonderim}/vazgec', [\App\Http\Controllers\PtsGonderimController::class, 'vazgec'])->name('pts.vazgec');
         Route::post('/kritik-miad', [StokController::class, 'ayarKaydet'])->name('kritik-miad.kaydet');
         Route::get('/stok/liste', [StokController::class, 'liste'])->name('stok.liste');
+        Route::post('/stok/lokasyon', [StokController::class, 'lokasyonAta'])->name('stok.lokasyon');
         Route::post('/stok/toplu', [StokController::class, 'toplu'])->name('stok.toplu');
         Route::get('/cariler', [\App\Http\Controllers\CariController::class, 'index'])->name('cari.index');
         Route::get('/cariler/ara', [\App\Http\Controllers\CariController::class, 'ara'])->name('cari.ara');

@@ -8,6 +8,9 @@
 <form method="post" action="{{ route('islem.calistir', $tur) }}" class="mb-4">@csrf
   <label class="form-label">Karekodlar (her satıra bir ürün; okuyucu ile okutun)</label>
   <textarea name="kodlar" rows="8" class="form-control font-monospace" autofocus>{{ old('kodlar') }}</textarea>
+  @if($tur === 'kabul' && \App\Models\StokKalemi::lokasyonVar())
+  <div class="mt-2 col-md-6"><input name="lokasyon" value="{{ old('lokasyon') }}" list="lokOneri" class="form-control" placeholder="Lokasyon: reyon / raf (isteğe bağlı, örn. Reyon A Raf 3)" maxlength="80"><datalist id="lokOneri">@foreach(\App\Models\StokKalemi::lokasyonlar(auth()->user()->tenant_id) as $l)<option value="{{ $l }}">@endforeach</datalist><div class="form-text">Bu ekranda okutulan tüm ürünler bu lokasyona yazılır. SKT'si geçen ürünler otomatik Red Odası'na alınır.</div></div>
+  @endif
   @if(in_array($tur, ['iade', 'satis', 'devir']))
   <div class="mt-2 col-md-6">@include('cari._secici', ['hedef' => 'karsi_gln_input'])<input id="karsi_gln_input" name="karsi_gln" value="{{ old('karsi_gln') }}" class="form-control" placeholder="{{ $tur === 'satis' ? 'Satış yapılan paydaşın GLN\'i (13 hane)' : ($tur === 'devir' ? 'Devir yapılan paydaşın GLN\'i (13 hane)' : 'İade edilen paydaşın GLN\'i (13 hane)') }}" maxlength="13" required></div>
   @endif

@@ -27,6 +27,7 @@ class StokController extends Controller
     public function index(Request $request, ItsClient $its)
     {
         $tid = $request->user()->tenant_id;
+        StokKalemi::redOdasinaAl($tid);
         $q = StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')
             ->selectRaw('gtin, count(*) as adet, min(skt) as en_yakin_skt')->groupBy('gtin')->orderBy('gtin');
         if ($ara = $request->query('ara')) {
@@ -40,6 +41,7 @@ class StokController extends Controller
     public function barkod(Request $request, ItsClient $its)
     {
         $tid = $request->user()->tenant_id;
+        StokKalemi::redOdasinaAl($tid);
         $ara = trim((string) $request->query('ara', ''));
         $adlar = $this->adlar($its);
 
@@ -93,8 +95,13 @@ class StokController extends Controller
         abort_unless(in_array($durum, ['stokta', 'satis', 'sarf', 'devir', 'deaktive'], true), 404);
         $ara = trim((string) $request->query('ara', ''));
         $adlar = $this->adlar($its);
+        StokKalemi::redOdasinaAl($tid);
+        $lokasyon = (string) $request->query('lokasyon', '');
 
         $q = StokKalemi::where('tenant_id', $tid)->where('durum', $durum);
+        if ($lokasyon !== '' && StokKalemi::lokasyonVar()) {
+            $lokasyon === '-' ? $q->whereNull('lokasyon') : $q->where('lokasyon', $lokasyon);
+        }
         if ($ara !== '') {
             $gtinler = collect($adlar)->filter(fn ($ad) => mb_stripos($ad, $ara) !== false)->keys()->all();
             $q->where(fn ($w) => $w->where('gtin', 'like', "%$ara%")->orWhere('sn', 'like', "%$ara%")
@@ -105,16 +112,60 @@ class StokController extends Controller
             $ad = ['stokta' => 'stok', 'satis' => 'satildi', 'sarf' => 'sarf', 'devir' => 'devredildi', 'deaktive' => 'deaktive'][$durum];
 
             return \App\Support\XlsxYazici::indir($ad.'-listesi-'.now()->format('Ymd-His').'.xlsx',
-                ['İlaç', 'GTIN', 'Seri No', 'Parti', 'SKT', 'Karekod'],
-                $q->lazy(1000)->map(fn ($k) => [$adlar[$k->gtin] ?? '', $k->gtin, $k->sn, $k->bn, $k->skt?->format('d.m.Y'), self::karekod($k)]),
+                ['İlaç', 'GTIN', 'Seri No', 'Parti', 'SKT', 'Lokasyon', 'Karekod'],
+                $q->lazy(1000)->map(fn ($k) => [$adlar[$k->gtin] ?? '', $k->gtin, $k->sn, $k->bn, $k->skt?->format('d.m.Y'), $k->lokasyon ?? '', self::karekod($k)]),
                 'Stok');
         }
         $kalemler = $q->paginate(200)->withQueryString();
 
         return view('stok.liste', [
             'kalemler' => $kalemler, 'adlar' => $adlar, 'ara' => $ara, 'durum' => $durum,
+            'lokasyon' => $lokasyon, 'lokasyonlar' => StokKalemi::lokasyonlar($tid), 'redOdasi' => StokKalemi::RED_ODASI,
             'sebepler' => StokServisi::DEAKTIVE_SEBEPLER,
         ]);
+    }
+
+    /** Red Odası: SKT'si geçmiş, stoktaki ürünlerin ilaç ve parti bazlı dökümü. */
+    public function redOdasi(Request $request, ItsClient $its)
+    {
+        $tid = $request->user()->tenant_id;
+        abort_unless($tid, 403);
+        StokKalemi::redOdasinaAl($tid);
+        $adlar = $this->adlar($its);
+        $partiler = collect();
+        if (StokKalemi::lokasyonVar()) {
+            $partiler = StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')->where('lokasyon', StokKalemi::RED_ODASI)
+                ->selectRaw('gtin, bn, skt, count(*) as adet')->groupBy('gtin', 'bn', 'skt')->orderBy('gtin')->orderBy('skt')->get();
+        }
+
+        if ($request->boolean('excel')) {
+            return \App\Support\XlsxYazici::indir('red-odasi-'.now()->format('Ymd-His').'.xlsx', ['İlaç', 'GTIN', 'Parti', 'SKT', 'Adet'],
+                $partiler->map(fn ($p) => [$adlar[$p->gtin] ?? '', $p->gtin, $p->bn, $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '', (int) $p->adet])->all(), 'Red Odası');
+        }
+
+        $urunler = $partiler->groupBy('gtin')->map(fn ($l, $gtin) => (object) ['gtin' => $gtin, 'ad' => $adlar[$gtin] ?? null, 'adet' => $l->sum('adet'), 'partiler' => $l])->values();
+
+        return view('stok.red-odasi', ['urunler' => $urunler, 'toplam' => $urunler->sum('adet'), 'hazir' => StokKalemi::lokasyonVar()]);
+    }
+
+    /** Seçili stok kalemlerine lokasyon (reyon/raf) atar; yalnızca yerel kayıttır, İTS'e bildirilmez. */
+    public function lokasyonAta(Request $request)
+    {
+        $tid = $request->user()->tenant_id;
+        abort_unless($tid && StokKalemi::lokasyonVar(), 403);
+        $v = $request->validate(['secili' => 'required|array|min:1|max:1000', 'secili.*' => 'integer', 'lokasyon' => 'nullable|string|max:80'],
+            ['secili.required' => 'Önce listeden ürün seçin.']);
+        $lok = \App\Support\Metin::baslik(trim((string) ($v['lokasyon'] ?? '')));
+        $lok = $lok === '' ? null : $lok;
+
+        $q = StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')->whereIn('id', $v['secili']);
+        $suresiGecen = (clone $q)->whereNotNull('skt')->where('skt', '<', now()->toDateString())->count();
+        // SKT'si geçenler her zaman Red Odası'nda kalır.
+        $adet = $q->where(fn ($w) => $w->whereNull('skt')->orWhere('skt', '>=', now()->toDateString()))->update(['lokasyon' => $lok]);
+        \App\Models\AuditLog::kaydet('stok_lokasyon', ['adet' => $adet, 'lokasyon' => $lok]);
+
+        return back()->with('ok', $adet.' ürünün lokasyonu '.($lok ? '"'.$lok.'"' : 'temizlendi').'.'
+            .($suresiGecen ? ' SKT\'si geçen '.$suresiGecen.' ürün Red Odası\'nda kaldı.' : ''));
     }
 
     public function toplu(Request $request, StokServisi $servis)

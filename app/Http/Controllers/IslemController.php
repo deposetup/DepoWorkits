@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PtsGonderim;
+use App\Models\StokKalemi;
 use App\Services\StokServisi;
 use Illuminate\Http\Request;
 
@@ -26,6 +27,7 @@ class IslemController extends Controller
             'sebep' => 'nullable|in:'.implode(',', array_keys(StokServisi::DEAKTIVE_SEBEPLER)),
             'aciklama' => 'nullable|string|max:255',
             'karsi_gln' => 'nullable|digits:13',
+            'lokasyon' => 'nullable|string|max:80',
         ]);
         if (in_array($tur, ['iade', 'satis', 'devir'], true)) {
             $request->validate(['karsi_gln' => 'required|digits:13']);
@@ -35,6 +37,19 @@ class IslemController extends Controller
         }
 
         $sonuc = $servis->isle($request->user(), $tur, $v['kodlar'], $v['sebep'] ?? null, $v['aciklama'] ?? null, $v['karsi_gln'] ?? null);
+
+        // Mal Kabul'de girilen reyon/raf bilgisi, başarıyla kabul edilen ürünlere yazılır (SKT'si geçenler Red Odası'na gider).
+        if ($tur === 'kabul' && StokKalemi::lokasyonVar()) {
+            $lok = \App\Support\Metin::baslik(trim((string) ($v['lokasyon'] ?? '')));
+            foreach ($sonuc['satirlar'] as $satir) {
+                if (($satir['durum'] ?? '') !== 'tamam') { continue; }
+                try { $k = \App\Support\Gs1Parser::parse($satir['kod']); } catch (\Throwable) { continue; }
+                if ($lok !== '') {
+                    StokKalemi::where(['tenant_id' => $request->user()->tenant_id, 'gtin' => $k['gtin'], 'sn' => $k['seri']])->update(['lokasyon' => $lok]);
+                }
+            }
+            StokKalemi::redOdasinaAl($request->user()->tenant_id);
+        }
 
         // PTS gönderimi yalnızca satış bildirimi TAMAMEN başarılıysa (hiç hatalı satır yok) kullanıcı onayına sunulur.
         $ptsGonderim = null;
