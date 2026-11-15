@@ -105,6 +105,7 @@ class StokServisi
         }
 
         $bildirim = null;
+        $basariliKalemler = [];
         // İTS tek istekte çok ürün kabul etmeyebilir; büyük listeler parçalara bölünür.
         foreach (array_chunk($gonderilecek, 100) as $parca) {
             $sonuc = match ($tur) {
@@ -128,6 +129,7 @@ class StokServisi
                 $hata = $ok ? null : ($u['hata'] ?? $sonuc->hataMesaji ?? 'İTS hata döndürdü.');
 
                 if ($ok) {
+                    $basariliKalemler[] = ['gtin' => $g['gtin'], 'sn' => $g['sn'], 'bn' => ($g['bn'] ?? null) ?: null, 'xd' => $g['xd'] ?? null];
                     StokKalemi::updateOrCreate(
                         ['tenant_id' => $tenant->id, 'gtin' => $g['gtin'], 'sn' => $g['sn']],
                         ['bn' => ($g['bn'] ?? null) ?: null, 'skt' => $g['xd'] ?? null, 'durum' => $yeni, 'son_islem_at' => now()]
@@ -145,6 +147,21 @@ class StokServisi
             AuditLog::kaydet('islem.'.$tur, ['adet' => count($gonderilecek), 'bildirim' => $bildirim]);
         }
 
-        return ['satirlar' => array_values($satirlar), 'bildirim' => $bildirim];
+        if ($tur === 'satis_iptal' && $basariliKalemler && \Illuminate\Support\Facades\Schema::hasTable('pts_gonderimleri')) {
+            $this->bekleyenPtsGonderimlerdenCikar($tenant->id, $basariliKalemler);
+        }
+
+        return ['satirlar' => array_values($satirlar), 'bildirim' => $bildirim, 'kalemler_ok' => $basariliKalemler];
+    }
+
+    /** Satışı geri alınan ürünler, henüz gönderilmemiş PTS kayıtlarından çıkarılır (iptal edilen satış için PTS gitmesin). */
+    private function bekleyenPtsGonderimlerdenCikar(int $tenantId, array $iptalEdilen): void
+    {
+        $anahtar = array_flip(array_map(fn ($k) => $k['gtin'].'/'.$k['sn'], $iptalEdilen));
+        foreach (\App\Models\PtsGonderim::where(['tenant_id' => $tenantId, 'durum' => 'bekliyor'])->get() as $g) {
+            $kalan = array_values(array_filter($g->kalemler, fn ($k) => ! isset($anahtar[$k['gtin'].'/'.$k['sn']])));
+            if (count($kalan) === count($g->kalemler)) { continue; }
+            $g->update($kalan ? ['kalemler' => $kalan, 'adet' => count($kalan)] : ['kalemler' => [], 'adet' => 0, 'durum' => 'vazgecildi', 'hata' => 'Satış geri alındı.']);
+        }
     }
 }

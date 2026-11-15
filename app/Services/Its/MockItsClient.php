@@ -89,6 +89,11 @@ class MockItsClient implements ItsClient
             : new ItsSonuc(false, hataKodu: '00000', hataMesaji: 'İTS kullanıcı bilgisi kayıtlı değil.');
     }
 
+    public function ptsPaketGonder(Tenant $tenant, string $aliciGln, string $zip): array
+    {
+        return ['transferId' => (string) random_int(100000000, 999999999), 'md5' => md5($zip)];
+    }
+
     public function ptsPaketAl(Tenant $tenant, string $transferId): array
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?><transfer><sourceGLN>8680001000022</sourceGLN><destinationGLN>'.$tenant->gln.'</destinationGLN>'

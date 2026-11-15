@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PtsGonderim;
 use App\Services\StokServisi;
 use Illuminate\Http\Request;
 
@@ -33,8 +34,20 @@ class IslemController extends Controller
 
         $sonuc = $servis->isle($request->user(), $tur, $v['kodlar'], $v['sebep'] ?? null, $v['aciklama'] ?? null, $v['karsi_gln'] ?? null);
 
+        // PTS gönderimi yalnızca satış bildirimi TAMAMEN başarılıysa (hiç hatalı satır yok) kullanıcı onayına sunulur.
+        $ptsGonderim = null;
+        $tamBasarili = $sonuc['satirlar'] !== [] && collect($sonuc['satirlar'])->every(fn ($s) => $s['durum'] === 'tamam');
+        if ($tur === 'satis' && $tamBasarili && ! empty($sonuc['kalemler_ok']) && \Illuminate\Support\Facades\Schema::hasTable('pts_gonderimleri')) {
+            $ptsGonderim = PtsGonderim::create([
+                'tenant_id' => $request->user()->tenant_id, 'user_id' => $request->user()->id,
+                'alici_gln' => $v['karsi_gln'], 'bildirim_id' => $sonuc['bildirim'],
+                'adet' => count($sonuc['kalemler_ok']), 'kalemler' => $sonuc['kalemler_ok'],
+            ]);
+        }
+
         return view('islem.form', [
             'tur' => $tur, 'baslik' => StokServisi::TURLER[$tur][2], 'sebepler' => StokServisi::DEAKTIVE_SEBEPLER, 'sonuc' => $sonuc,
+            'ptsGonderim' => $ptsGonderim, 'ptsAcik' => (bool) config('its.pts_gonderim') && (bool) config('its.yazma'),
         ]);
     }
 }

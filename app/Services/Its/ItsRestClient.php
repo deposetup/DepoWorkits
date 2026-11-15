@@ -115,6 +115,21 @@ class ItsRestClient implements ItsClient
         throw new RuntimeException('İTS PTS sorgusu başarısız. Denenen biçimler: '.implode(' | ', $hatalar));
     }
 
+    public function ptsPaketGonder(Tenant $tenant, string $aliciGln, string $zip): array
+    {
+        if (! config('its.yazma') || ! config('its.pts_gonderim')) {
+            throw new RuntimeException('PTS paket gönderimi bu ortamda kapalı (ITS_YAZMA ve ITS_PTS_GONDERIM açık olmalı). Paket gönderilmedi.');
+        }
+        $y = Http::withToken($this->token($tenant))->acceptJson()->timeout(120)
+            ->post($this->taban().'/pts/app/SendPackage', ['receiver' => $aliciGln, 'file' => base64_encode($zip)]);
+        $j = $y->json() ?? [];
+        if (! $y->successful() || isset($j['fc']) || empty($j['transferId'])) {
+            throw new RuntimeException('İTS PTS gönderimi başarısız: '.($j['fm'] ?? 'HTTP '.$y->status()).(isset($j['fc']) ? ' ('.$j['fc'].')' : ''));
+        }
+
+        return ['transferId' => (string) $j['transferId'], 'md5' => $j['md5Checksum'] ?? $j['md5CheckSum'] ?? null];
+    }
+
     public function ptsPaketAl(Tenant $tenant, string $transferId): array
     {
         $y = Http::withToken($this->token($tenant))->acceptJson()->timeout(120)->post($this->taban().'/pts/app/GetPackage', ['transferId' => $transferId]);

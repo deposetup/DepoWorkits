@@ -58,12 +58,13 @@
     $menu = [
       ['Ana Sayfa', 'bi-house-door', 'home', []],
       ['Alım', 'bi-box-arrow-in-down', null, [
-        ['PTS Sorgu', 'bi-search', route('pts'), ['pts', 'pts.*']],
+        ['PTS Sorgu', 'bi-search', route('pts'), ['pts', 'pts.paket', 'pts.excel', 'pts.yukle', 'pts.al', 'pts.mal-alim', 'pts.dogrula']],
         ['Mal Kabul', 'bi-check2-square', route('islem', 'kabul'), ['islem:kabul']],
       ]],
       ['Satış & Çıkış', 'bi-box-arrow-up', null, [
         ['Satış', 'bi-cart-check', route('islem', 'satis'), ['islem:satis']],
         ['Satış İptal', 'bi-cart-x', route('islem', 'satis_iptal'), ['islem:satis_iptal']],
+        ['PTS Gönderimleri', 'bi-send', route('pts.gonderimler'), ['pts.gonderimler']],
         ['Mal Devir', 'bi-arrow-left-right', route('islem', 'devir'), ['islem:devir']],
         ['Mal Devir İptal', 'bi-x-circle', route('islem', 'devir_iptal'), ['islem:devir_iptal']],
         ['Hastane Sarf', 'bi-hospital', route('islem', 'sarf'), ['islem:sarf']],

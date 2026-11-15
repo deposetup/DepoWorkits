@@ -66,4 +66,10 @@ interface ItsClient
 
     /** Satış iptal bildirimi (kılavuz §7). */
     public function satisIptal(Tenant $tenant, array $urunler): ItsSonuc;
+
+    /**
+     * PTS paket gönderimi (kılavuz §42). $zip: ham zip baytları (içinde XML). Başarısızlıkta RuntimeException.
+     * @return array{transferId:string,md5:?string}
+     */
+    public function ptsPaketGonder(Tenant $tenant, string $aliciGln, string $zip): array;
 }

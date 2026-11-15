@@ -49,6 +49,9 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::get('/pts/paket/{paket}', [PtsController::class, 'paket'])->name('pts.paket');
         Route::get('/pts/paket/{paket}/excel', [PtsController::class, 'excel'])->name('pts.excel');
         Route::post('/pts/paket/{paket}/mal-alim', [PtsController::class, 'malAlim'])->name('pts.mal-alim');
+        Route::get('/pts/gonderimler', [\App\Http\Controllers\PtsGonderimController::class, 'index'])->name('pts.gonderimler');
+        Route::post('/pts/gonderimler/{gonderim}/gonder', [\App\Http\Controllers\PtsGonderimController::class, 'gonder'])->name('pts.gonder');
+        Route::post('/pts/gonderimler/{gonderim}/vazgec', [\App\Http\Controllers\PtsGonderimController::class, 'vazgec'])->name('pts.vazgec');
         Route::post('/kritik-miad', [StokController::class, 'ayarKaydet'])->name('kritik-miad.kaydet');
         Route::get('/stok/liste', [StokController::class, 'liste'])->name('stok.liste');
         Route::post('/stok/toplu', [StokController::class, 'toplu'])->name('stok.toplu');
