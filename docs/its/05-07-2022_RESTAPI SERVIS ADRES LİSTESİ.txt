@@ -1,0 +1,45 @@
+SERVİS ADI                                          SERVİS ADRESİ
+Access Token                                        https://its2.saglik.gov.tr/token/app/token/
+Üretim Bildirim Servisi                             https://its2.saglik.gov.tr/product/app/supplynotification/
+İhracat Bildirim Servisi                            https://its2.saglik.gov.tr/wholesale/app/export/
+İhracat İptal Bildirim Servisi                      https://its2.saglik.gov.tr/wholesale/app/exportcancel/
+Satış Servisi                                       https://its2.saglik.gov.tr/wholesale/app/dispatch/
+Satış İptal Servisi                                 https://its2.saglik.gov.tr/wholesale/app/dispatchcancel/
+Eczane Satış Bildirim Servisi                       https://its2.saglik.gov.tr/prescription/app/pharmacysale/
+Eczane Satış İptal Bildirim Servisi                 https://its2.saglik.gov.tr/prescription/app/pharmacysalecancel/
+Hastane Sarf Bildirim Servisi                       https://its2.saglik.gov.tr/consume/app/consume/
+Hastane Sarf İptal Bildirim Servisi                 https://its2.saglik.gov.tr/consume/app/consumecancel/
+Mal Kabul-Alım Bildirim Servisi                     https://its2.saglik.gov.tr/common/app/accept/
+Mal İade Bildirim Servisi                           https://its2.saglik.gov.tr/common/app/return/
+Mal Devir Bildirim Servisi                          https://its2.saglik.gov.tr/common/app/transfer/
+Mal Devir İptal Bildirim Servisi                    https://its2.saglik.gov.tr/common/app/transfercancel/
+Deaktivasyon Bildirim Servisi                       https://its2.saglik.gov.tr/common/app/deactivation/
+Durum Sorgulama Servisi                             https://its2.saglik.gov.tr/reference/app/check_status/
+Ürün Doğrulama Servisi                              https://its2.saglik.gov.tr/reference/app/verification/
+İlaç Satış Sorgulama Servisi                        https://its2.saglik.gov.tr/prescription/app/querydrugsale/
+İlaç Listesi Servisi                                https://its2.saglik.gov.tr/reference/app/drug/
+Paydaş Listesi Servisi                              https://its2.saglik.gov.tr/reference/app/stakeholder/
+Ülke Listesi Servisi                                https://its2.saglik.gov.tr/reference/app/country/
+Cevap Kodu Listesi Servisi                          https://its2.saglik.gov.tr/reference/app/errorcode/
+Serum Üretim Bildirim Servisi                       https://its2.saglik.gov.tr/nonproduct/app/serumsupply
+Serum Satış Bildirim Servisi                        https://its2.saglik.gov.tr/nonproduct/app/serumdispatch
+Serum Mal Kabul Bildirim Servisi                    https://its2.saglik.gov.tr/nonproduct/app/serumaccept
+Radyofarmasötik Bildirim Servisi                    https://its2.saglik.gov.tr/nonproduct/app/radiopharmaceutical
+Radyofarmasötik İptal Bildirim Servisi              https://its2.saglik.gov.tr/nonproduct/app/radiopharmaceuticalcancel
+Radyofarmasötik Sarf Bildirim Servisi               https://its2.saglik.gov.tr/nonproduct/app/radiopharmaceuticalconsume
+Radyofarmasötik Sarf İptal Bildirim Servisi         https://its2.saglik.gov.tr/nonproduct/app/radiopharmaceuticalconsumecancel
+Tıbbı Ürün Tanıtım Numune Üretim Bildirim Servisi   https://its2.saglik.gov.tr/product/app/supplysample/
+Tıbbı Ürün Tanıtım Numune Bildirim Servisi          https://its2.saglik.gov.tr/product/app/producttosample/
+Tıbbı Ürün Tanıtım Numune Sarf Bildirim Servisi     https://its2.saglik.gov.tr/product/app/sampledelivery/
+Geri Ödeme Kurumu Eczane Satış Bildirim Servisi         https://its2.saglik.gov.tr/prescription/app/reimbursementsale/
+Geri Ödeme Kurumu Eczane Satış İptal Bildirim Servisi   https://its2.saglik.gov.tr/prescription/app/reimbursementsalecancel/
+Eczane Satış Sorgulama Bildirim Servisi                 https://its2.saglik.gov.tr/prescription/app/pharmacysalequery/
+Reçete Sorgulama Bildirim Servisi                       https://its2.saglik.gov.tr/prescription/app/prescriptionquery/
+Hastane Tekil Sarf Bildirim Servisi                     https://its2.saglik.gov.tr/consume/app/singleconsume/
+Hastane Tekil Sarf İptal Bildirim Servisi               https://its2.saglik.gov.tr/consume/app/singleconsumecancel/
+Hastane Tekil Sarf İade Bildirim Servisi                https://its2.saglik.gov.tr/consume/app/singleconsumereturn/
+Tekil Sarf Sorgulama Bildirim Servisi                   https://its2.saglik.gov.tr/consume/app/singleconsumequery/
+PTS Paket Gönderim Servisi                              https://its2.saglik.gov.tr/pts/app/SendPackage
+PTS Paket Alım Servisi                                  https://its2.saglik.gov.tr/pts/app/GetPackage
+PTS Paket Sorgulama Servisi                             https://its2.saglik.gov.tr/pts/app/search
+

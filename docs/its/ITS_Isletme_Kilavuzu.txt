@@ -1,0 +1,659 @@
+              T.C.
+       SAĞLIK BAKANLIĞI
+ĐLAÇ VE ECZACILIK GENEL MÜDÜRLÜĞÜ
+
+
+
+
+     ĐLAÇ TAKĐP SĐSTEMĐ
+     ĐŞLETME KILAVUZU
+             Sürüm 1.03
+
+
+
+
+             Ankara, 2009
+                                                 Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+                                  ĐLAÇ TAKĐP SĐSTEMĐ ĐŞLETME KILAVUZU
+
+                                                               Đçindekiler
+
+
+Đçindekiler................................................................................................................................... 2
+BĐRĐNCĐ BÖLÜM Amaç, Kapsam, Dayanak ve Tanımlar ....................................................... 3
+   Amaç ve Kapsam ................................................................................................................... 3
+   Dayanak.................................................................................................................................. 3
+   Tanımlar ................................................................................................................................. 3
+ĐKĐNCĐ BÖLÜM Sistem ve Đşleyişi........................................................................................... 4
+   Sistemin Tanımı ..................................................................................................................... 4
+   Sisteme Erişim........................................................................................................................ 4
+   Verilerin Kabul Koşulları....................................................................................................... 4
+   Verilerin Saklanması .............................................................................................................. 5
+ÜÇÜNCÜ BÖLÜM Veri Aktarım Standartları ......................................................................... 5
+   Bildirimler .............................................................................................................................. 5
+   Bildirim Tipleri ...................................................................................................................... 5
+   Bildirimlerde Kullanılacak Alanlar ........................................................................................ 7
+   Bildirimlerin Yapıları ............................................................................................................. 9
+DÖRDÜNCÜ BÖLÜM Veri Güvenliği ve Sistemin Đşletimi.................................................. 11
+   Veri Güvenliği Standartları .................................................................................................. 11
+   Erişim Kuralları.................................................................................................................... 11
+   Yetkilendirme....................................................................................................................... 11
+   Sistemin Đşletimi................................................................................................................... 12
+BEŞĐNCĐ BÖLÜM Denetim .................................................................................................... 12
+   Verilerin Denetimi................................................................................................................ 12
+ALTINCI BÖLÜM Çeşitli Hükümler...................................................................................... 12
+   Bildirim Zamanları ............................................................................................................... 12
+   Sistemin Đhlali ...................................................................................................................... 13
+   Taşıma Ambalajları .............................................................................................................. 13
+
+
+
+
+                    Not: Đtalik yazılar bu sürümde yapılan değişiklikleri göstermektedir.
+
+Đlaç Takip Sistemi Đşletme Kılavuzu                                                                                           2|Sayfa
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+                      ĐLAÇ TAKĐP SĐSTEMĐ ĐŞLETME KILAVUZU
+
+                                    BĐRĐNCĐ BÖLÜM
+                            Amaç, Kapsam, Dayanak ve Tanımlar
+
+Amaç ve Kapsam
+MADDE 1- Bu kılavuzun amacı, ilaçların izlenebilmesini temin etmek için veri toplama ve
+takip sisteminin işletimi ile ilgili esasların belirlenmesidir.
+        Kılavuz, Đlaç Takip Sistemi ile çalışmaların nasıl yapılacağına dair standartlar,
+sistemin işletilmesine ve denetimine dair kuralları kapsar.
+
+Dayanak
+MADDE 2- Bu kılavuz, 12.08.2005 tarih ve 25904 sayılı Resmî Gazete'de yayımlanan
+“Beşeri Tıbbi Ürünler Ambalaj ve Etiketleme Yönetmeliği”nin 19 uncu maddesi gereğince
+hazırlanmıştır.
+
+Tanımlar
+MADDE 3- Bu kılavuzun uygulanmasında;
+    a) Bakanlık: Sağlık Bakanlığını,
+    b) Genel Müdürlük: Đlaç ve Eczacılık Genel Müdürlüğünü,
+    c) GS1: Merkezi Brüksel’de bulunan Etkin Tedarik Zinciri Çözüm ve Standartları
+geliştiren uluslararası organizasyonu,
+    d) Barkod Alfabesi: Barkodun taşıdığı bilgininin kodlanması ve çözümlenmesinde
+uygulanacak yöntemi,(Ör: EAN-13 Barkod Alfabesi, GS1-128 Barkod Alfabesi, ITF-14 vb.)
+    e) Barkodlama: Barkod okuyucu tarafından okunacak verinin uygun barkod alfabesi ve
+baskı yöntemi ile belirlenen yüzeye bastırılmasını,
+    f) Karekod: ĐTS’de uygulanacak ve “ISO/IEC 16022 International Symbology
+Specification-Data Matrix ECC 200 Version” nu esas alacak iki boyutlu barkod alfabesini,
+    g) GTIN: (Barkod Numarası, Global Trade Item Number) Ticari ürünlerin dünya
+genelinde tek olarak tanımlanmasını sağlayan, içeriği(yapısı) GS1 tarafından belirlenen ürün
+numarasını,
+    h) GS1 Uygulama Tanımlayıcısı: (AI-Application Identifier) Barkod okuyucusu
+tarafından bilgi sistemlerine aktarılacak verinin ne anlama geldiğini belirlenmesinde
+kullanılan veri başlıklarını, (Ör: 01, GTIN, 17 Son kullanma tarihi)
+    i) Grup Ayracı: (Group Separator) GS1 uyumlu sistemler için barkod alfabesindeki
+karşılığı FNC1 karakteri ve barkod okuyucuları tarafından ASCII <GS> karakteri(ASCII
+Değeri=29) şeklinde çözümlenen, değişken uzunluktaki verilerin bilgisayar uygulamaları
+tarafından ayırt edilmesini sağlayan karakteri,
+    j) Gönderici: Üreticiler, ithalatçılar, ruhsat/izin sahipleri, ecza depoları, eczaneler,
+hastane eczaneleri, geri ödeme kurumları gibi sisteme veri sağlayan kurumlar ya da
+birimlerdir.
+    k) Küresel Yer Numarası: (GLN: Global Location Number) GS1 tarafından belirlenen ve
+GS1 Barkod Uygulama Kılavuzu’nda belirlenen şekil ve kurallarla üretici, ithalatçı, lojistik
+işlem merkezi, ecza deposu ve eczane gibi birimlerin tanımlanmasında kullanılan ve 13 byte
+uzunluğundaki uluslar arası yer numarasını,
+    l) Ürün soy ağacı: Ürünlerin her aktarımla değişen sahiplik durumlarına göre tüm
+bilgilerinin tutulduğu genel veri standardında elektronik kayıt ya da elektronik formu veya
+belgeyi,
+    m) ĐTS: Đlaç Takip Sistemini,
+    n) Sorgulayıcı: Sistemde veri sorgulama yetkisi tanımlanmış kurumlar yada birimleri,
+    o) ĐEGM2007: Đlaç ve Eczacılık Genel Müdürlüğü Otomasyonu’nu ifade eder.
+Đlaç Takip Sistemi Đşletme Kılavuzu                                             3|Sayfa
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+                                        ĐKĐNCĐ BÖLÜM
+                                        Sistem ve Đşleyişi
+
+Sistemin Tanımı
+MADDE 4- Đlaç Takip Sistemi karekodlarla izlenebilirliği sağlanmış ilaçların üretim veya
+ithalattan başlayarak geçtiği her noktadan alınacak bildirimlerle takibini sağlamak üzere
+kurulmuş bilgisayarlar, veritabanı, bu veritabanını işletmeye yarayan bilgisayar yazılımları ve
+iletişim altyapılarını içeren bir sistemdir.
+         Đlaç Takip Sistemi, ilaçların sahteciliğe karşı korunması ve güvenlik amacıyla takip
+edilmesini sağlar. Đlaç Takip Sistemi, üretici, ithalatçı, ecza deposu ve eczanelerden alınan
+bildirimler, geri ödeme kurumlarından alınan satış onayları ile bir ilacın bir kez satılmasını ve
+kontrolünü yapacaktır. Đlaç Takip Sistemi'nin mali bir yönü yoktur.
+
+Sisteme Erişim
+MADDE 5- Sisteme erişim iki yönlüdür. Bunlar veri gönderme ve sorgulama amaçlı olmak
+üzere ikiye ayrılabilir:
+    a) Veri gönderme:
+        1. Tek ürün için veri gönderme: Bildirim yapacak birimlerin tek bir ürün için ĐTS
+web uygulamalarını kullanarak veri göndermeleridir.
+        2. Toplu gönderimler: ĐTS web servisleri kullanılarak, yazılımlar aracılığı sisteme
+topluca veri gönderme yoludur.
+        3. Veri gönderme süreçleri Bakanlıkça belirlenir.
+    b) Sorgulama:
+        1. Standart sorgulamalar:
+            i. Stok sorgulamaları,
+           ii. Miat sorgulamaları,
+         iii. Geri çekme işlemlerine esas olacak sorgulamalar,
+          iv. Diğer standart sorgulamalar.
+        2. Standart dışı sorgulamalar: ĐTS yönetimi tarafından yapılabilecek diğer
+sorgulamalardır.
+         Veri gönderme ve sorgulamalar bu kılavuzda belirlenen verilerin güvenliği
+prensiplerine uyularak yapılabilir.
+         Yapılan tüm işlemler veritabanına birer hareket olarak kaydedilir. Bu hareketler
+aşağıdaki şekilde tanımlanırlar:
+    a) Ekleme: Önceden olmayan bir kaydın veritabanına istenen şekilde eklenmesidir.
+        Bildirim yapılması bir eklemedir.
+    b) Çıkarma: Yapılmış bir bildirim içinden bazı ürünlerin çıkarılmasıdır. Bildirimde hata
+        yapılmış ise, bildirime dâhil olan bazı ürünlerin bilgileri bildirimden çıkarılabilir.
+    c) Düzeltme: Sistemde bilgileri değiştirme yöntemi kullanılmayacaktır. Düzeltme
+        bildirimleri bir adet ürün için çıkarma ve yerine bir adet ürün ekleme şeklinde
+        yapılacaktır.
+    d) Geri ödeme sorgulaması: Geri ödeme kurumlarına satılan ürünlerin bu kurumlar
+        tarafından sorgulanması şeklindeki harekettir. Bu sorgu sonucunda satış iptal
+        edilemez, içindeki ürünler için yapılan bildirimler geri alınamaz hale getirilir. Bu
+        sorgulama geri ödeme kurumları için mecburidir.
+    e) Đz tutma(log): Veritabanı hareketlerinin izlenmesi ve güvenlik için gerekli durumlarda
+        anlamlı sonuçlar üretilebilmesi amacıyla sistemde bütün hareketlerin birer izinin
+        tutulmasıdır.
+
+Verilerin Kabul Koşulları
+MADDE 6- Verilerin kabul edilme koşulları:
+Đlaç Takip Sistemi Đşletme Kılavuzu                                                 4|Sayfa
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+    a) Üretim ve ithalat bildirimlerini ruhsat/izin sahipleri yapar. Ecza depoları ve
+eczanelerin bildirimleri ilgili birimler tarafından yapılır.
+    b) Đletilen veriler sisteme ulaştığında bir evrak olarak kabul edileceğinden tekrarlayan
+verilerden sadece biri kabul edilir.
+    c) Gönderenin kimliği ile bildirim yapanın kimliği uyuşmadığı hallerde veri sisteme
+kabul edilmeyecektir.
+    d) Veri içeriği sistemce denetlenecek ve uyuşmayan bilgiler kabul edilmeyip, gönderene
+sistemce geri bildirim yapılacaktır.
+
+Verilerin Saklanması
+MADDE 7- Sisteme gönderilen veriler Bakanlık tarafından belirlenen bir merkezde
+saklanacaktır.
+         Hem sistem hem de diğer bildirim yapan birimler açısından verilerin saklanma süresi
+ilaçların son kullanma tarihlerine ilaveten en az 3 yıldır.
+
+                                     ÜÇÜNCÜ BÖLÜM
+                                  Veri Aktarım Standartları
+
+Bildirimler
+MADDE 8- Bildirimler, göndericiler tarafından yapılacak veri aktarımlarıdır. Bildirim
+yapacak yerler: Üreticiler, ithalatçılar, ecza depoları, eczaneler, hastane eczaneleri olarak
+belirlenmiştir.
+         Bildirimlerin sonucu olarak sistem tarafından göndericilere bazı mesajlar
+döndürülecektir. Bu mesajlardan uyarı içerenler <UC>, hata içerenler <FC> kodu ile
+etiketlenmiştir ve hata kodları listesinde karşılıkları bulunmaktadır. Uyarı kodları içeriğinde
+sadece uyarı kodları, hata kodları içeriğinde ise hata kodlarıyla birlikte hatanın tanımı
+döndürülmektedir.
+
+Bildirim Tipleri
+MADDE 9- Bildirim için oluşturulacak veriler şu alanlardan oluşur:
+       a) Üretim bildirimi: Đlaç firmalarının üretimleri sonucu ürünlerini sisteme tanıtması
+için yaptığı bildirimdir. Sistemde “M” olarak kodlanır.
+       b) Đthalat bildirimi: Đlaç firmalarının ithal ettikleri ürünleri sisteme tanıtmak için
+yaptıkları bildirimdir. Sistemde “I” olarak kodlanır.
+       c) Satış bildirimi: Đlaç firmasından ecza depolarına, ecza depolarından eczanelere veya
+eczanelerden hastaya ürünün satışının sisteme bildirilmesi için yapılan bildirimdir. Hastane
+eczaneleri de eczaneler gibi işlem yaparlar. Satış bildirimleri sistemde “S” olarak kodlanır.
+          Hastanelerde, hasta için kesecekleri faturada ürünün doğrudan belirtilmesi mümkün
+olursa satış bildirimi yapılır.
+          Her satış, ayrı bir bildirime konu olur.
+          Üreticiler, ecza depoları ve eczanelerin kimlere satış yapabilecekleri yürürlükteki
+mevzuatta düzenlenmiştir. Satış bildirimlerine konu olacak sınırlamalar yürürlükteki mevzuat
+hükümlerine göre düzenlenmiştir. Buna göre, üreticiler ecza depolarına, eczanelere, dağıtıcı
+olarak çalışan ilaç firmalarına ve hastanelere satış yapabilirler. Ecza depoları eczanelere,
+hastanelere veya başka ecza depolarına satış yapabilirler. Eczaneler yalnızca hastalara satış
+yaparlar. Eczaneler, hastanın ilaca erişiminin sağlanması için, başka eczanelerle takas
+şeklinde ilaç alış-verişi yapabilirler. Eczaneler, ecza depolarına alım iadeleri yapabilirler.
+       d) Sarf bildirimi: Hastane eczanelerinin sarfiyat amaçlı bildirimlerdir, deaktivasyon
+bildirimi içinde değerlendirilmiştir.
+
+
+Đlaç Takip Sistemi Đşletme Kılavuzu                                                5|Sayfa
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+          Hastanelerin çalışmalarında birden fazla hasta için sarf edilen veya sarf edildiği yer
+belli olmayan ürünler için bu bildirim yapılır. Bir hasta için tek bir ürün sarf edilmiş ve
+faturada bu ürünün açıkça belirtilmesi mümkün değilse yine sarf olarak bildirim yapılabilir.
+          Hastanelerin alım iadeleri sarf olarak değerlendirilmez ve mutlaka alım iadesi olarak
+sisteme bildirilmeleri gerekir.
+          Bir hastaneden diğer hastaneye ürünlerin bedelsiz olarak gönderilmesi durumunda
+ürünler için sarf bildirimi yapılmaz.
+          Miadı geçmiş olan ürünler için sarf bildirimi yapılmaz, ancak deaktivasyon bildirimi
+yapılır.
+       e) Satış iadesi bildirimi: Geri çekme, miat veya başka bir sebeple geri iade edilen bir
+ilacın eczaneden veya ecza deposundan çıkışı için yapılan bildirimdir. Sistemde “F” olarak
+kodlanır.
+          Üreticiler veya ithalatçılar ile ecza depoları sattıkları ürünleri geri almaları gerektiği
+zaman “satış iadesi” yaparlar.
+          Eczaneler sattıkları ürünleri geri almaları gerektiği zaman, “satış iptali” yaparlar.
+       f) Deaktivasyon bildirimi: Çeşitli sebeplerle sistemdeki kaydının çıkarılması söz
+konusu ürünler için yapılan bildirimdir. Deaktivasyon bildirimleri sistemde “D” olarak
+kodlanır.
+          Deaktivasyon; hatalı üretilen veya miadı geçmiş olduğu için imha edilmesi gereken
+ürünleri sistemden çıkarmak, bir sebeple ürünleri satılamaz hale getirmek, bir işlemden dolayı
+sistemden çıkarılması istenen ürünler gibi, sistemdeki kaydın kapatılması isteğidir. Bu
+bildirimle ürünlerin sıra numaraları sistemde kapatılır ve aynı numara ile başka ürünler tekrar
+bildirilemez. Deaktivasyon sebebi bildirimlerde basitçe yer alır.
+
+         Deaktivasyon sebepleri:
+                 KOD             DEAKTĐVASYON SEBEBĐ
+                 10     “SĐSTEMDEN ÇIKARMA”,
+                 20     “ÜRETĐM FĐRELERĐ”,
+                 30     “GERĐ ÇEKME SEBEBĐYLE ĐMHA”,
+                 40     “MĐAT SEBEBĐYLE ĐMHA”.
+                 50     “REVĐZYON”
+                 60     “SARF”
+
+          Bu sayılan sebeplerden “üretim fireleri” bildirime konu olabilmesi için söz konusu
+ürünün üretim bildiriminden başka bir hareket yapmamış olması gerekmektedir.
+          Sisteme bildirilmemiş ürünlerin deaktivasyon bildirimleri yapılmayacaktır.
+          Diğer sebeplerden geri çekme ve miat sebebi ile deaktivasyon bildirimi, ecza
+depoları ve eczaneler tarafından da yapılabilir.
+          Yukarıdaki deaktivasyon sebeplerinden “SĐSTEMDEN ÇIKARMA” bir ürünün sıra
+numarasını artık kullanılamaz hale getirmektir. “ÜRETĐM FĐRELERĐ” ise üretim esnasında
+ortaya çıkan tüm fireler ve atık sayılacak ürünlerin sistemden çıkarılması için kullanılır.
+       g) Alım onayı bildirimi: Alıcı tarafından ürünlerin kontrol ve kabul edilmesini ifade
+eden bir onay mekanizması olarak, sisteme bildirilmesinin gerekli görüldüğü bazı noktalarda
+kullanılabilmesi için bu bildirim tasarlanmıştır. Sistemde “V” şeklinde kodlanır. Eczanelerin
+bu bildirimi kullanarak ürünü kontrol ve kabul etmeleri söz konusudur. Üretici, ithalatçı ve
+ecza depoları da alımlarını bu bildirim ile kontrol altına almaları söz konusudur.
+       h) Đhracat bildirimi: Firmaların ihraç ettikleri karekodlu ürünleri sisteme tanıtmak için
+yaptıkları bildirimlerdir. Bu bildirim de bir sistemden çıkarma bildirimidir, ihracat
+bildirimindeki ürünler ülkemizde artık satılamaz hale gelirler. Alıcı bilgisi sadece ülke olarak
+girilecektir. Sistemde “X” olarak kodlanır.
+
+Đlaç Takip Sistemi Đşletme Kılavuzu                                                    6|Sayfa
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+         Sistem ihracat bildirimleri için bir numara üretir.
+      i) Satış iptal bildirimi: Eczanelerin satışlarını iptal etmeleri imkan dahiline alınmıştır.
+Buna göre, elden satışlardaki ürünler ürün bazında iptal edilebilir, geri ödeme kurumlarına
+yapılan satışlar ise reçete bazında iptal edilir. Sistemde “C” olarak kodlanır.
+
+Bildirim tipleri bir tabloda aşağıda özet olarak gösterilmiştir:
+                            Bildirim Tipi            Kodu
+                       Üretim                           M
+                       Đthalat                           I
+                       Satış                            S
+                       Deaktivasyon                     D
+                       Đhracat                          X
+                       Satış Đadesi                     F
+                       Alım Onayı                       V
+                       Satış Đptal                      C
+
+        Stok hareketlerindeki hatalarda düzeltme için kullanılacak yöntem ayrı bir bildirim
+tipi olarak tarif edilmemiş olup, üretim veya ithalat bildirimlerinde düzeltme, hareket
+görmemiş bir ürünün iptali şeklinde yapılacak, hareket görmüş ürünler iptal edilemeyecektir.
+
+Bildirimlerde Kullanılacak Alanlar
+MADDE 10- Bildirimlerde kullanılacak alanların ortak tanımları yapılmıştır. Bunlar
+aşağıdaki şekildedir:
+      a) Üretici/Đthalatçı: Ürünlerin sisteme girişini yapacak firmalardır. Bu alan için belirteç
+olarak <MI> kullanılır. Üretici veya ithalatçılar GLN kodu ile sistemde yer alacaklardır.
+Sisteme ancak ruhsat veya izinleri kendilerine ait olan ilaçlar için veri gönderebileceklerdir.
+      b) Satıcı: Ürünü satan konumundaki sektör oyuncularıdır. Bunlar; Üretici, Đthalatçı,
+Ecza Deposu veya Eczanelerdir. Bu alan için belirteç olarak <FR> kullanılır, GLN kodu ile
+sistemde yer alır.
+      c) Alıcı: Ürünü alan konumunda olan sektör oyuncuları veya doğrudan vatandaştır.
+Bunlar; Üretici, Đthalatçı, Ecza Deposu, Eczaneler veya Hasta’dır. Bu alan için belirteç olarak
+<TO> kullanılır. Alıcılar Hasta hariç olmak üzere GLN kodu ile sistemde yer alır.
+      d) Üretim Tarihi: Bildirime esas olan üretimin tarihidir. Bu alan için belirteç olarak
+<MD> kullanılır. 12 byte uzunlukta “date” tipinde bir alan tutar.
+      e) Bildirim Tipi: Yapılan bildirim tipini belirten alandır. Bu alan için belirteç olarak
+<DT> kullanılır. 2 karakter uzunlukta alfanümerik tipte bir alan tutar.
+      f) Deaktivasyon Sebebi: Belirtilecek deaktivasyon sebebinin yazılacağı alandır. Bu alan
+için belirteç olarak <DS> kullanılır.
+      g) Hekim: Ürünü reçete eden hekimin tanımlayıcısıdır. Hekim tanımlayıcısı olarak “TC
+Kimlik” numaraları kullanılır. Bu alan için belirteç olarak <MD> kullanılır. 11 karakter
+uzunlukta nümerik tipte bir alan tutar.
+      h) Hasta: Ürünü kullanmak üzere alan kişidir. Kişiler “TC Kimlik” numaraları ile
+sisteme bildirilirler. Bu alan için belirteç olarak <CP> kullanılır. 11 karakter uzunlukta
+nümerik tipte bir alan tutar.
+      i) Ürün Tipi: Bu alan için belirteç olarak <PT> kullanılır. 2 karakter uzunlukta
+alfanümerik tipte bir alan tutar. Belirteç, ilaç için <PP>, ara ürün için <BP>, beslenme
+ürünleri için <FP> kullanılır.
+      j) Ürün barkodu(GTIN): Bu alan için belirteç olarak <GTIN> kullanılır. 14 karakter
+uzunlukta nümerik tipte bir alan tutar.
+
+Đlaç Takip Sistemi Đşletme Kılavuzu                                                 7|Sayfa
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+      k) Ürün Son Kullanma Tarihi: Bu alan için belirteç olarak <XD> kullanılır.
+Bildirimlerde son kullanma tarihi, XML Tarih biçimi (YYYY-MM-DD) şeklinde kodlanır.
+      l) Ürün Parti Numarası: Bu alan için belirteç olarak <BN> kullanılır. 20 karakter
+uzunlukta alfanümerik tipte bir alan tutar. Sadece Büyük harfler ve nümerik karakterler
+kullanılabilir. Türkçe karakter kullanılmaz.
+       m) Ürün Sıra No: Bu alan için belirteç olarak <SN> kullanılır. 20 karakter uzunlukta
+alfanümerik tipte bir alan tutar.
+       n) Açık Alıcı Bilgisi: Đhracat vb. gibi işlemlerde sisteme kayıtlı olmayan alıcıları
+göstermek amacıyla kullanılır.
+      o) Açıklama: Đşleme dair gerekli açıklamalar için ayrılmış bir alandır. Deaktivasyon
+işlemlerinde kullanılır.
+      p) Belge Tarihi: Bildirimlere esas olacak hareketlerle ilgili bir belge varsa bu belgenin
+tarihidir. Bu belge mali ya da mali bir özelliği olmayan dahili bir belge olabilir. Sistemde
+belge numarasının kullanımı seçimlidir.
+      r) Belge No: Bildirimlere esas olacak hareketlerle ilgili bir belge varsa bu belgenin
+numarasıdır. Bu belge mali ya da mali bir özelliği olmayan dahili bir belge olabilir. Sistemde
+belge numarasının kullanımına seçimlidir.
+
+Bildirimlerde kullanılacak alanlar bir tabloda aşağıda özet olarak gösterilmiştir:
+        Alan adı             Etiketi           Tipi          Uzunluk               Đçerik
+Üretici/Đthalatçı             MI             Nümerik            13        GLN
+Satıcı                        FR             Nümerik            13        GLN
+Alıcı                         TO             Nümerik            13        GLN
+Üretim Tarihi                 MD               Date             12        Tarih (XML – Tipi)
+Bildirim Tipi                 DT           Alfanümerik           1        Tip Kodu
+Deaktivasyon Sebebi           DS           Alfanümerik           2        Açıklama
+Hekim                         DR             Nümerik            11        TC Kimlik No
+Hasta                         CP             Nümerik            11        TC Kimlik No
+Ürün Tipi                     PT           Alfanümerik           2        Ürün Tipi
+Ürün GTIN                    GTIN            Nümerik            14        Barkod no
+Ürün Son Kullanma             XD               Date             12        Tarih (XML tipi)
+Tarihi
+Ürün Parti Numarası           BN           Alfanümerik          20        Parti, Batch yada Lot
+                                                                           numarası
+Ürün Sıra No                    SN          Alfanümerik               20   Sıra Numarası
+                                                                           (Serialized Number)
+Açık Alıcı Bilgisi              RT          Alfanümerik           100      Sisteme kayıtlı
+                                                                           olmayan alıcı bilgisi
+Açıklama                   ISACIKLAMA       Alfanümerik           250      Genel Açıklama
+Belge Tarihi                   DD               Date               10      Bildirim ile ilgili bir
+                                                                           belge tarihi
+Belge Numarası                 DN           Alfanümerik               20   Bildirim ile ilgili bir
+                                                                           belge numarası
+
+        Küresel Yer Numarası: GLN, bir iş ortamındaki ya da organizasyon içindeki yasal,
+fonksiyonel ya da fiziksel yerleşim birimini belirtir. GS1 sistemi tarafından belirlenen şekilde,
+o yeri dünyada benzersiz olarak tanımlayacak şekilde verilir. GLN hakkında bilgi edinmek
+için GS1 sisteminin yayınladığı “GLN Atama Kuralları” adlı dokümana başvurulur.
+       Đlaç Takip Sistemi’nde, eczaneler, ecza depoları, kamuya ait hastaneler, kamuya ait
+üniversiteler için GLN numarası belirlenen bir aralıktan Bakanlıkça sağlanacaktır.
+
+Đlaç Takip Sistemi Đşletme Kılavuzu                                                    8|Sayfa
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+     Üreticiler, ithalatçılar, geri ödeme kurumları ve özel hastaneleri GS1’e üye olarak
+GLN numaralarını temin ederler.
+
+Bildirimlerin Yapıları
+MADDE 11- Bildirimlerin içerikleri 10 uncu maddede tanımlanan alanlardan oluşur. Bu
+alanlar dışında bir veri, bildirimlerde yer alamaz.
+        Bildirim çeşitlerine göre bildirim yapıları şu şekildedir:
+           a) Üretim bildirimi:
+              1. Bildirim Tipi “<DT>”
+              2. Üretici/Đthalatçı “<MI>”
+              3. Ürün Tipi “<PT>”
+              4. Üretim Tarihi “<MD>”
+              5. Ürün GTIN “<GTIN>”
+              6. Ürün Son Kullanma Tarihi “<XD>”
+              7. Ürün Parti Numarası “<BN>”
+              8. Ürün Sıra No “<SN>”
+              9. Belge Tarihi “<DD>” (seçimli)
+              10. Belge Numarası “<DN>” (seçimli)
+           b) Đthalat bildirimi:
+              1. Bildirim Tipi “<DT>”
+              2. Üretici/Đthalatçı “<MI>”
+              3. Ürün Tipi “<PT>”
+              4. Üretim Tarihi “<MD>”
+              5. Ürün GTIN “<GTIN>”
+              6. Ürün Son Kullanma Tarihi “<XD>”
+              7. Ürün Parti Numarası “<BN>”
+              8. Ürün Sıra No “<SN>”
+              9. Belge Tarihi “<DD>” (seçimli)
+              10. Belge Numarası “<DN>” (seçimli)
+           c) Üretici/Đthalatçı Satış bildirimi:
+              1. Bildirim Tipi “<DT>”
+              2. Satıcı “<FR>”
+              3. Alıcı “<TO>”
+              4. Belge Tarihi “<DD>” (seçimli)
+              5. Belge Numarası “<DN>” (seçimli)
+              6. Ürün GTIN “<GTIN>”
+              7. Ürün Son Kullanma Tarihi “<XD>”
+              8. Ürün Parti Numarası “<BN>”
+              9. Ürün Sıra No “<SN>”.
+           d) Ecza Depoları Satış bildirimi:
+              1. Bildirim Tipi “<DT>”
+              2. Satıcı “<FR>”
+              3. Alıcı “<TO>”
+              4. Belge Tarihi “<DD>” (seçimli)
+              5. Belge Numarası “<DN>” (seçimli)
+              6. Ürün GTIN “<GTIN>”
+              7. Ürün Son Kullanma Tarihi “<XD>”
+              8. Ürün Parti Numarası “<BN>”
+              9. Ürün Sıra No “<SN>”.
+           e) Eczane Satış bildirimi:
+              1. Bildirim Tipi “<DT>”
+Đlaç Takip Sistemi Đşletme Kılavuzu                                          9|Sayfa
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+            2. Satıcı “<FR>”
+            3. Alıcı “<TO>” (Bir geri ödeme kurumuna fatura kesiliyorsa, bu alana Geri
+              ödeme kurumunun kodu yazılacak.)
+            4. Belge Tarihi “<DD>” (seçimli)
+            5. Belge Numarası “<DN>” (seçimli)
+            6. Hekim “<DR>” (seçimli)
+            7. Hasta “<CP>” (seçimli, satış <TO> alanında bir geri ödeme kurumu varsa
+              burada da hastanın “TC kimlik” numarası mutlaka yazılacaktır.)
+            8. Ürün GTIN “<GTIN>”
+            9. Ürün Son Kullanma Tarihi “<XD>”
+            10. Ürün Parti Numarası “<BN>”
+            11. Ürün Sıra No “<SN>”.
+          f) Sarfiyat bildirimi:
+            1. Bildirim Tipi “<DT>”
+            2. Sarfiyatın yapıldığı birim “<FR>”
+            3. Belge Tarihi “<DD>” (seçimli)
+            4. Belge Numarası “<DN>” (seçimli)
+            5. Hekim “<DR>” (seçimlidir, hastanelerde geçerlidir.)
+            6. Hasta “<CP>” (seçimlidir, hastanelerde geçerlidir.)
+            7. Ürün GTIN “<GTIN>”
+            8. Ürün Son Kullanma Tarihi “<XD>”
+            9. Ürün Parti Numarası “<BN>”
+            10. Ürün Sıra No “<SN>”.
+          g) Satış Đade bildirimi:
+            1. Bildirim Tipi “<DT>”
+            2. Satıcı bildirimi “<FR>”
+            3. Alıcı bildirimi: “<TO>”
+            4. Belge Tarihi “<DD>” (seçimli)
+            5. Belge Numarası “<DN>” (seçimli)
+            6. Ürün GTIN “<GTIN>”
+            7. Ürün Son Kullanma Tarihi “<XD>”
+            8. Ürün Parti Numarası “<BN>”
+            9. Ürün Sıra No “<SN>”.
+          h) Deaktivasyon bildirimi:
+            1. Bildirim Tipi “<DT>”
+            2. Satıcı “<FR>”
+            3. Belge Tarihi “<DD>” (seçimli)
+            4. Belge Numarası “<DN>” (seçimli)
+            5. Deaktivasyon sebebi “<DS>”
+            6. Açıklama “<CT>”
+            7. Ürün GTIN “<GTIN>”
+            8. Ürün Son Kullanma Tarihi “<XD>”
+            9. Ürün Parti Numarası “<BN>”
+            10. Ürün Sıra No “<SN>”.
+          i) Đhracat bildirimi:
+            1. Bildirim Tipi <DT>
+            2. Satıcı <FR>
+            3. Açık Alıcı Bilgisi <RT>
+            4. Belge Tarihi “<DD>” (seçimli)
+            5. Belge Numarası “<DN>” (seçimli)
+            6. Ürün GTIN <GTIN>
+Đlaç Takip Sistemi Đşletme Kılavuzu                                       10 | S a y f a
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+            7. Ürün Son Kullanma Tarihi <XD>
+            8. Ürün Parti Numarası <BN>
+            9. Ürün Sıra No <SN>,
+          j) Alım Onayı bildirimi:
+            1. Bildirim Tipi <DT>
+            2. Satıcı <FR> (seçimli)
+            3. Alıcı <RT>
+            4. Belge Tarihi “<DD>” (seçimli)
+            5. Belge Numarası “<DN>” (seçimli)
+            6. Ürün GTIN <GTIN>
+            7. Ürün Son Kullanma Tarihi <XD>
+            8. Ürün Parti Numarası <BN>
+            9. Ürün Sıra No <SN>, alanlarını içerir.
+        Tüm bildirimlere ait XML şemalarına http://www.iegm.gov.tr adresinden erişilebilir.
+        Tüm bildirimler “XML Web Servisleri” aracılığı ile sisteme kabul edileceğinden bu
+standarda uygun içeriğe sahip olmak zorundadır.
+
+                                   DÖRDÜNCÜ BÖLÜM
+                              Veri Güvenliği ve Sistemin Đşletimi
+
+Veri Güvenliği Standartları
+MADDE 12- Sistem işletiminde TSE ISO/EN 27001 Veri Güvenliği Standartları esas alınır.
+         Kimlik doğrulama: Sisteme erişim için gerekli kimlikler ve şifreler sistem tarafından
+tespit edilecek ve doğrulanacaktır.
+         Sisteme erişim ve veri sorgulama talepleri yetkilendirme kurallarına göre
+değerlendirilerek gerekli izinler verilecektir.
+         Gönderilen bilgiler aynı zamanda bir belge olarak kabul edilecektir.
+         Sisteme erişim için gerekli kullanıcı doğrulama bilgileri kullanıcının sorumluluğundadır.
+         Sisteme aktarılacak verilerin içerik bilgileri gönderenin sorumluluğundadır. Sistem
+gerekli hallerde verilerin kontrol edilebilmesi için geri bildirim yapar.
+
+Erişim Kuralları
+MADDE 13- Sisteme erişimler kurallara bağlanmıştır. Sisteme erişimler sistemde, kimlik
+yönetimi servisi tarafından belirlenir ve yetkilendirilir.
+        Sisteme erişim yetkileri: Sisteme; ĐTS programcıları, ĐTS yardım masası görevlileri,
+göndericiler ve sorgulayıcılar erişebilirler. Bu birimlerin yetkilendirilmesi bu belgede
+açıklanan yetkilendirme kuralları ile yapılır.
+
+Yetkilendirme
+MADDE 13- Sisteme erişim yetkilendirmesi Sistem Yönetimi tarafından yapılır.
+Yetkilendirme kuralları şunlardır:
+       1. Yetkilendirme, sisteme başvuru ile yapılır.
+       2. Her firma için sistem yönetimi tarafından bir kullanıcı adı tahsis edilir. Bu
+           kullanıcı adının firma içindeki kullanım yetkilendirmesi firma tarafından
+           yapılacaktır.
+       3. Ecza depoları ve eczanelerin yetkilendirilmesi ve sisteme kullanıcı olarak
+           tanımlanması Đl Sağlık Müdürlükleri’nce ĐEGM2007 sistemine yapılan kayıtlar
+           üzerinden, sistem yönetimi tarafından yapılır.
+       4. Geri ödeme kurumlarının reçete kontrolleri yapabilmeleri için birer kullanıcı
+           tahsis edilir. Bu kullanıcı veya kullanıcıların yetkilendirilmesi kurumlarla
+           yapılacak protokollerle belirlenir.
+Đlaç Takip Sistemi Đşletme Kılavuzu                                                 11 | S a y f a
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+
+
+Sistemin Đşletimi
+MADDE 14- Sistem Bakanlıkça işletilir.
+        Sistem yazılımlar ve dokümanların sürümlerini izleyerek gelişimini belgeler.
+        Sistem veri toplama işlemini bildirimler vasıtası ile yapar. Bildirimler göndericiler
+tarafından, göndericilerden sisteme doğru yapılır.
+        Sistem XML Web Servisleri ile çalışır ve bildirimler bu web servisleri aracılığı kabul
+edilir.
+        Sistem, üretim ve ithalat bildirimleri için göndericilerden, gereken hallerde “Nitelikli
+Elektronik Sertifika” edinmeleri ve bildirimleri bu sertifika ile imzalamalarını ve simetrik
+olarak şifrelemelerini ister.
+        Üretim ve Đthalat bildirimleri dışında kalan bildirimler için her bir göndericiye
+kullanıcı adı ve şifre tahsis edilir.
+        Sistem bildirimin ulaştığını teyit etmek üzere göndericiye bir onay kodu verir.
+        Sistem bildirimlerin doğrulanması için gerekirse bildirim sahibine bir kod döndürür
+veya geri bildirim yapar.
+        Sistem üzerindeki XML Web Servislerine ait bilgi ve belgelere
+http://www.iegm.gov.tr adresinden erişilebilir.
+        ĐTS Sistemi, ĐEGM2007 ile entegre çalışır. Sistem, ürünler, firma, eczane ve ecza
+depolarının tanımlanması için gereken bilgileri ĐEGM2007 sisteminden alır veya sistem
+yönetimi tarafından sağlanır.
+    1. ĐEGM2007’den tanım bilgileri sistem yönetimince belirlenen aralıklarla sisteme
+        aktarılır.
+    2. ĐEGM2007 sisteminden gelen bilgilere göre, kullanıcı açılabilmesi için mail
+        adreslerine en kısa süre içinde aktivasyon maili gönderilir.
+
+                                       BEŞĐNCĐ BÖLÜM
+                                           Denetim
+
+Verilerin Denetimi
+MADDE 15- Verinin denetimi sistem yönetimi tarafından yapılır. Verilerden çıkarılacak
+sonuçlar yetkili mercilere sistem yönetimi tarafından bildirilir.
+         Sistemin soy ağacı çıkarması: Sistemin yapılan bildirimlerle ürünlerin geçtikleri yolu
+izleyerek bir tarihçe çıkarmasıdır. Đzlemenin bütün birimlere uygulanabildiği durumlarda, soy
+ağacı sistem yönetimi tarafından değerlendirilir.
+         Veri gönderimleri yetkilendirme kurallarına göre denetlenir, kurallara uyan veri
+gönderimleri sisteme kabul edilir. Gönderilen verilerin doğruluğu yönetim tarafından
+izlenerek denetlenir. Gönderim esnasında sisteme hatalı gelen verilerin tekrar gönderilmesi
+veya sistemden çıkarılması göndericiden istenir.
+         Göndericilerin sistemlerini test etmeleri amacıyla test arabirimleri oluşturulur.
+         Đlaç Takip Sistemi kapsamına giren tüketici şikâyetleri sistem yönetimi tarafından
+alınır ve değerlendirilir.
+         Sisteme gönderilen veriler istendiğinde tekrar gönderilebilmelidir.
+
+                                       ALTINCI BÖLÜM
+                                        Çeşitli Hükümler
+
+Bildirim Zamanları
+MADDE 16- Bildirimlerin hangi zamanlarda yapılacağı kullanıcılara bırakılmıştır.
+Bildirim zamanları için kısıtlamalar şu şekildedir:
+
+Đlaç Takip Sistemi Đşletme Kılavuzu                                               12 | S a y f a
+                                  Đlaç ve Eczacılık Genel Müdürlüğü
+
+
+    1. Üretim ya da ithalat bildirimleri yapılmamış ürünler, üretici ya da ithalatçılar
+       tarafından piyasaya verilmeyecektir.
+    2. Eczane, sistemden doğrulanmamış karekodlu bir ürünü hastasına vermeyecektir.
+    3. Sisteme bildirilmemiş karekodlu ürünler, ecza depoları tarafından iade alınmayacaktır.
+    4. Yapılan ihracatlar, ihracat gerçekleştiği zaman sisteme bildirilmelidir.
+
+Sistemin Đhlali
+MADDE 17- Đlaç Takip Sistemi işleyişine göre tespit edilen bir ihlal olduğu zaman sistem,
+aşağıdaki gibi davranacaktır.
+    1. Tüketicilerin bu satışa ait perakende satış fişini beyan ederek yapacakları şikayetler
+       Đlaç Takip Sistemi'nin çalışmalarındaki ihlalleri ortaya çıkarmak için kullanılır.
+    2. Nakit satılan ürünlerin satış bildirimi yapılmayarak, geri ödeme kurumlarına tekrar
+       satılmaya çalışıldığı tespit edilirse, ilgili kullanıcıların sisteme erişimleri askıya alınır.
+    3. Ürünlere ait gönderilen bilgileri sistem tarafından onaylanmayan kullanıcılar
+       istendiğinde bu ürünlerin kaynağını ispat etmekle yükümlüdürler.
+
+Taşıma Ambalajları
+MADDE 18- Taşıma ambalajlarında her taşıma ambalajını benzersiz tanımlayacak bir sıra
+numarası kullanılacaktır. Bu sıra numaraları; bir ürüne bağlı olarak ya da firma için
+benzersizlik sağlanabilirse ürüne bağlı olmaksızın üretilebilir. Taşıma ambalajlarının
+numaralanmasında izlenecek yol üretici ya da ithalatçı firmanın yetkisi dahilindedir.
+       Taşıma ambalajlarının içerdikleri ürünlerin bilgileri ve taşıma ambalajı numarası ile
+eşlenmiş şekilde bir sonraki noktaya aktarılmak üzere saklanır. Bu bilgilerin iletiminde bir
+standart izlenecektir.
+       Taşıma ambalajlarına ait bilgiler Đlaç Takip Sistemine aktarılmaz.
+ Kullanılan taşıma ambalajları eğer tekrar kullanılıyorsa üzerine konulacak sıra numaraları
+mutlaka yenilenir, eski numaralar tekrar kullanılmaz.
+       Taşıma ambalajlarının dış ambalaj gibi kullanılmak üzere karekodlandığı durumlarda
+Genel Müdürlüğümüzce yayımlanan “Taşıma Ambalajlı Ürünler Listesi”ndeki birim
+barkodları ve çarpanları dikkate alınarak işlem yapılır. Bu şekildeki ürünler, taşıma
+ambalajları üzerindeki sıra numaraları ile izlenir. Taşıma ambalajları bu durumda içindeki
+ürün adedine bakılmaksızın, bir ürün ambalajı gibi değerlendirilir.
+
+Örnek:
+8690123123450 Periton Diyaliz Solüsyonu 1 adet plastik ambalaj.
+8690123001230 Periton Diyaliz Solüsyonu 5 adet içeren Koli.
+         Bu iki üründen ikincisi birinciden 5 tane içerir. Ürünün fiyatı, Genel Müdürlüğümüzce
+örnekteki birinci ürün için belirlenmiş ve listelere konulmuştur. Satış, örnekteki ikinci ürün
+bilgisi ile yapılacaktır. Ürünler örnekteki ikinci ürün üzerindeki sıra numarası ile izlenir. Geri
+ödeme kurumları, Taşıma Ambalajlı Ürünler Listesi’ndeki çarpan ile örnekteki birinci ürünün
+fiyatının çarpılması sonucu çıkan miktar ödemeye esas olarak alınacaktır.
+         Taşıma ambalajlı ürünlerin ambalajlarında bulunan miktarlar, bütün tarafların
+sistemleri tarafından değerlendirilmeli ve listede bulunan miktarlara göre, hastaya uygun
+miktarda ürün ulaşması sağlanmalıdır.
+
+
+
+
+Đlaç Takip Sistemi Đşletme Kılavuzu                                                    13 | S a y f a
+

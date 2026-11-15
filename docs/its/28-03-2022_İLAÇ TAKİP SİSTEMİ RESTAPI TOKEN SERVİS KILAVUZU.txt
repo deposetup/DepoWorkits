@@ -1,0 +1,223 @@
+İLAÇ TAKİP SİSTEMİ RESTAPI TOKEN SERVİSLERİ
+
+
+
+                              İLAÇ TAKİP SİSTEMİ PROJESİ
+
+
+            Tarih                   :   28.03.2022
+            Son Güncelleme Tarihi   :
+            Sürüm                   :   1.0.0
+
+
+
+
+                                                       1
+                       İLAÇ TAKİP SİSTEMİ RESTAPI TOKEN SERVİSLERİ KULLANIM   Tarih: 28.03.2022
+                                             KILAVUZU                         Sayfa: 2 / 6
+
+
+
+
+İÇİNDEKİLER
+1.     AMAÇ, KAPSAM VE RESTAPI SERVİSLERİNİN GENEL İŞLEYİŞİ                                       3
+     1.1   AMAÇ                                                                                   3
+     1.2   KAPSAM                                                                                 3
+2.     TOKEN ALIMI VE KULLANIM AKIŞI                                                              3
+3.     ACCESS TOKEN ALIMI VE KULLANIM AKIŞI                                                       4
+4.     REFRESH TOKEN ALIMI VE KULLANIM AKIŞI                                                      5
+
+
+
+
+                                                                                                  2
+                               İLAÇ TAKİP SİSTEMİ RESTAPI TOKEN SERVİSLERİ KULLANIM                     Tarih: 28.03.2022
+                                                     KILAVUZU                                           Sayfa: 3 / 6
+
+
+
+
+      1. AMAÇ, KAPSAM VE RESTAPI SERVİSLERİNİN GENEL İŞLEYİŞİ
+
+      1.1 AMAÇ
+           Ürün bilgilerinin çeşitli şekillerde İlaç Takip Sistemi’ne gönderilmesi veya sorgulanması gerekmektedir. Çok
+           miktardaki ürüne ait bilginin birden fazla kullanıcı tarafından sağlıklı bir şekilde merkeze iletilmesi için
+           kullanılan SOAP servisleri RESTAPI servisine dönüştürülmüştür. Bu bölümde, bildirim yapılırken
+           kullanılacak olan RESTAPI TOKEN servisleri anlatılacaktır.
+
+
+      1.2 KAPSAM
+           Bu doküman Türkiye İlaç ve Tıbbi Cihaz Kurumu tarafından sağlanacak olan RESTAPI TOKEN
+           servislerinin iletişim yapısı, mesajlaşma yapısı ve mesajlarda kullanılacak veri yapılarını anlatır.
+
+
+       2. TOKEN ALIMI VE KULLANIM AKIŞI
+İstemcilerin RESTAPI servislerine erişim sağlayabilmeleri için Bearer Token yönetimini kullanmaları gerekmektedir.
+Erişim için Access token için istek yapmalıdırlar ve istek sonucu elde ettikleri tokenı erişmek istedikleri servisin
+HTTP Authorization header ına göndermeleri gerekmektedir.
+Token geçerlilik süresi 1 saatir. Yeni bir token üretildiğinde eski token ‘ın geçerlilik süresi dolana kadar kullanılmaya
+devam edilebilir.
+
+                                  İSTEK VE CEVAP MESAJ YAPISI VE ALANLARI
+ ADRES BİLGİSİ                          https://itstest2.saglik.gov.tr/token/app/token/
+ RESTAPI METOT                          POST
+ İSTEK FORMATI                          JSON
+ İSTEK MESAJI VERİ
+ ALANLARI                                   ALAN           AÇIKLAMA
+                                            ADI
+                                            username       İstemcinin ITS de tanımlı kullanıcı adı bilgisi girilmelidir.
+                                            password       İstemcinin ITS de tanımlı kullanıcı adı için geçerli şifre
+                                                           bilgisi girilmelidir.
+
+
+ CEVAP MESAJI VERİ
+ ALANLARI                                   ALAN ADI     AÇIKLAMA
+                                            access_token RESTAPI servislerine erişim için kullanılacak olan token
+                                                         bilgisini içermektedir.
+
+
+
+
+           Örnek Token İstek Mesajı                                    Örnek Token Cevap Mesajı
+ {                                               {
+     "username":"86800010000110000",             "access_token": "eyJhbGciOiJSUzI1NiI
+     "password":"test123"                        sInR5cCIgOiAiSldUIiwia2lkIiA6ICJuOWt
+ }
+                                                 IMHBCYnM3eG83NlFxU3huYzQ3QnNXcXpSVHJ
+                                                 sSmYxOEkyb2lPcXpFIn0.o5dQGhwRSiFGK_Hv
+
+                                                                                                                            3
+                          İLAÇ TAKİP SİSTEMİ RESTAPI TOKEN SERVİSLERİ KULLANIM                     Tarih: 28.03.2022
+                                                KILAVUZU                                           Sayfa: 4 / 6
+
+
+
+
+                                             9MIuC4NYGoRSEzxOjMGTLzyXDDgWqQNcqxuUi
+                                             JlWGHWUMEEsKPd7pKf2aifJQY3L1QZQ …"
+                                             }
+
+
+
+
+ 3. ACCESS TOKEN ALIMI VE KULLANIM AKIŞI
+ İstemcilerin RESTAPI servislerine erişim sağlayabilmeleri için Bearer Token yönetimini kullanmaları
+ gerekmektedir. Erişim için Access token için istek yapmalıdırlar ve istek sonucu elde ettikleri tokenı erişmek
+ istedikleri servisin HTTP Authorization header ına göndermeleri gerekmektedir.
+ Access token servisi üzerinden yeni token elde edilebileceği gibi refresh token da elde edilmektedir.
+ Servis sonucu hem Access token hem de refresh token için geçerlilik süreleri parametre olarak cevap mesajı
+ içerisinde yer almaktadır.
+ Token için geçerlilik süresi 1 saat, refresh token için ise 24 saat olarak tanımlanmıştır.
+                            İSTEK VE CEVAP MESAJ YAPISI VE ALANLARI
+ADRES BİLGİSİ                     https://itstest2.saglik.gov.tr/token/app/accesstoken/
+RESTAPI METOT                     POST
+İSTEK FORMATI                     JSON
+İSTEK MESAJI VERİ
+ALANLARI                               ALAN           AÇIKLAMA
+                                       ADI
+                                       username       İstemcinin ITS de tanımlı kullanıcı adı bilgisi girilmelidir.
+                                       password       İstemcinin ITS de tanımlı kullanıcı adı için geçerli şifre
+                                                      bilgisi girilmelidir.
+
+
+CEVAP MESAJI VERİ
+ALANLARI                               ALAN ADI           AÇIKLAMA
+                                       access_token       RESTAPI servislerine erişim için kullanılacak olan
+                                                          token bilgisini içermektedir.
+                                       expires_in         Access token geçerlilik süresi (saniye)
+                                       refresh_expires_in Geçerlilik süresi (saniye)
+                                       refresh_token      Refresh token servisinde kullanılacak olan istek
+                                                          mesaj alan token bilgisinin değerini içermektedir.
+                                       token_type         Bearer
+                                       session_state      Oturum durumu
+
+
+
+
+                                                                                                                       4
+                              İLAÇ TAKİP SİSTEMİ RESTAPI TOKEN SERVİSLERİ KULLANIM                         Tarih: 28.03.2022
+                                                    KILAVUZU                                               Sayfa: 5 / 6
+
+
+
+
+    Örnek Access Token İstek                                      Örnek Access Token Cevap Mesajı
+            Mesajı
+{                                    {
+    "username":"8680001000011000         "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldU
+0",                                  Iiwia2lkIiA6ICI1dno1OWpYMUNpYmlacC1VM1B1NGhteTl2MGdNZjVHdFR0bHI2Q2ly …",
+  "password":"test123"                  "expires_in": 3600,
+}
+                                         "refresh_expires_in": 86400,
+                                         "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwi
+                                     a2lkIiA6ICIzMGIzYjY2NS02ZTNkLTQ5NWUtODI1MC04YTk5ZmRhZWE5MzMifQ.
+                                     eyJleHAiOjE2NDg0NTcxNzEsImlhdCI6MTY0ODQ1NTM3MSwianRpIjoiYmJmMzE4MGYtOGY3
+                                     Y..",
+                                       "token_type": "Bearer",
+                                         "session_state": "21aa2de7-2601-463a-bba3-3b49d11587e4"
+                                     }
+
+
+
+
+     4. REFRESH TOKEN ALIMI VE KULLANIM AKIŞI
+     İstemcilerin RESTAPI servislerine erişim sağlayabilmeleri için Bearer Token yönetimini kullanmaları
+     gerekmektedir. Erişim için Access token için istek yapmalıdırlar ve istek sonucu elde ettikleri tokenı erişmek
+     istedikleri servisin HTTP Authorization header ına göndermeleri gerekmektedir.
+     Access Token istediği sonucu refresh_token değeri cevap mesajında yer almaktadır. Refresh token servisinde istek
+     mesajında yer alan token parametresine, Access Token istediği sonucu elde edilen refresh_token değeri verilerek
+     Access token elde edilir.
+     Token için geçerlilik süresi 1 saat, refresh token için ise 24 saat olarak tanımlanmıştır.
+                                   İSTEK VE CEVAP MESAJ YAPISI VE ALANLARI
+ADRES BİLGİSİ                            https://itstest2.saglik.gov.tr/token/app/refreshtoken/
+RESTAPI METOT                            POST
+İSTEK FORMATI                            JSON
+İSTEK MESAJI VERİ
+ALANLARI                                       ALAN              AÇIKLAMA
+                                               ADI
+                                               token             Access Token istediği sonucu elde edilen refresh_token
+                                                                 değeridir.
+
+
+CEVAP MESAJI VERİ
+ALANLARI                                       ALAN ADI           AÇIKLAMA
+                                               access_token       RESTAPI servislerine erişim için kullanılacak olan
+                                                                  token bilgisini içermektedir.
+                                               expires_in         Access token geçerlilik süresi (saniye)
+                                               refresh_expires_in Geçerlilik süresi (saniye)
+                                               refresh_token      Refresh token servisinde kullanılacak olan istek
+                                                                  mesaj alan token bilgisinin değerini içermektedir.
+                                               token_type         Bearer
+                                                                                                                               5
+                        İLAÇ TAKİP SİSTEMİ RESTAPI TOKEN SERVİSLERİ KULLANIM                       Tarih: 28.03.2022
+                                              KILAVUZU                                             Sayfa: 6 / 6
+
+
+
+
+                                    session_state          Oturum durumu
+
+
+
+
+         Örnek Refresh Token İstek Mesajı                          Örnek Refresh Token Cevap Mesajı
+{                                                      {
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwi      "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldU
+a2lkIiA6ICIzMGIzYjY2NS02ZTNkLTQ5NWUtODI1MC04YTk5Z      Iiwia2lkIiA6ICI1dno1OWpYMUNpYmlacC1VM1B1NGhteTl2MG
+mRhZWE5MzMifQ.                                         dNZjVHdFR0bHI2Q2ly …",
+eyJleHAiOjE2NDg0NTcxNzEsImlhdCI6MTY0ODQ1NTM3MSwia        "expires_in": 3600,
+nRpIjoiYmJmMzE4MGYtOGY3Y..",                               "refresh_expires_in": 86400,
+}                                                          "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwi
+                                                       a2lkIiA6ICIzMGIzYjY2NS02ZTNkLTQ5NWUtODI1MC04YTk5Z
+                                                       mRhZWE5MzMifQ.
+                                                       eyJleHAiOjE2NDg0NTcxNzEsImlhdCI6MTY0ODQ1NTM3MSwia
+                                                       nRpIjoiYmJmMzE4MGYtOGY3Y..",
+                                                           "token_type": "Bearer",
+                                                           "session_state": "21aa2de7-2601-463a-bba3-3b49d11587e4"
+                                                       }
+
+
+
+
+                                                                                                                        6
+
