@@ -1,4 +1,4 @@
-# WebİTS
+# DepoWork ITS
 
 Çok müşterili, süre lisanslı İTS web portalı. Laravel (PHP 8.4), Plesk üzerinde çalışır.
 
