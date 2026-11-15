@@ -154,4 +154,70 @@ class PtsGonderimTest extends TestCase
         $this->assertSame('100004870', $r['transferId']);
         \Illuminate\Support\Facades\Http::assertSent(fn ($q) => str_ends_with($q->url(), '/pts/app/SendPackage') && $q['receiver'] === '8680001000099' && $q['file'] === base64_encode('ZIP'));
     }
+
+    public function test_gonderilmis_paket_ayni_alicıya_yeniden_olusturulur_ve_yeni_transfer_no_gosterilir(): void
+    {
+        config(['its.pts_gonderim' => true, 'its.yazma' => true]);
+        $u = $this->user();
+        $this->satis($u, self::KOD."\n".self::KOD2);
+        $g = PtsGonderim::first();
+        $this->actingAs($u)->post(route('pts.gonder', $g), ['onay' => 1]);
+        $g->refresh();
+        $this->assertSame('gonderildi', $g->durum);
+
+        $this->actingAs($u)->post(route('pts.tekrar', $g))->assertSessionHasErrors('onay');
+        $r = $this->actingAs($u)->post(route('pts.tekrar', $g), ['onay' => 1, 'belge_no' => 'IRS-77']);
+        $r->assertRedirect(route('pts.gonderimler'))->assertSessionHas('ok');
+        $this->assertSame(2, PtsGonderim::count());
+        $yeni = PtsGonderim::where('kaynak_id', $g->id)->first();
+        $this->assertSame('gonderildi', $yeni->durum);
+        $this->assertSame('8680001000099', $yeni->alici_gln);
+        $this->assertSame(2, $yeni->adet);
+        $this->assertNotNull($yeni->transfer_id);
+        $this->assertSame('IRS-77', $yeni->belge_no);
+        $this->assertSame('gonderildi', $g->fresh()->durum); // eski kayıt değişmez
+
+        $sayfa = $this->actingAs($u)->withSession(['yeni_id' => $yeni->id])->get(route('pts.gonderimler'));
+        $sayfa->assertOk()->assertSee($yeni->transfer_id)->assertSee('Yeniden Oluştur');
+    }
+
+    public function test_tekrarda_satisi_geri_alinan_urunler_dislanir_ve_hepsi_gittiyse_olusmaz(): void
+    {
+        config(['its.pts_gonderim' => true, 'its.yazma' => true]);
+        $u = $this->user();
+        $this->satis($u, self::KOD."\n".self::KOD2);
+        $g = PtsGonderim::first();
+        $this->actingAs($u)->post(route('pts.gonder', $g), ['onay' => 1]);
+        $this->actingAs($u)->post('/islem/satis_iptal', ['kodlar' => self::KOD]);
+
+        \Illuminate\Support\Facades\Cache::flush();
+        $this->actingAs($u)->post(route('pts.tekrar', $g->fresh()), ['onay' => 1])->assertSessionHas('ok');
+        $yeni = PtsGonderim::where('kaynak_id', $g->id)->first();
+        $this->assertSame(1, $yeni->adet);
+
+        \Illuminate\Support\Facades\Cache::flush();
+        $this->actingAs($u)->post('/islem/satis_iptal', ['kodlar' => self::KOD2]);
+        $this->actingAs($u)->post(route('pts.tekrar', $g->fresh()), ['onay' => 1])->assertSessionHas('hata');
+        $this->assertSame(2, PtsGonderim::count()); // yeni kayıt oluşmadı
+    }
+
+    public function test_tekrar_baska_musteriye_kapali_ozellik_kapaliyken_gitmez_ve_filtre_calisir(): void
+    {
+        config(['its.pts_gonderim' => true, 'its.yazma' => true]);
+        $u = $this->user();
+        $this->satis($u, self::KOD);
+        $g = PtsGonderim::first();
+        $this->actingAs($u)->post(route('pts.gonder', $g), ['onay' => 1]);
+
+        $t2 = Tenant::create(['unvan' => 'B', 'gln' => '8680001000055', 'lisans_baslangic' => now()->subDay(), 'lisans_bitis' => now()->addYear(), 'kvkk_onay_tarihi' => now()]);
+        $b = User::factory()->create(['tenant_id' => $t2->id, 'rol' => 'kullanici']);
+        $this->actingAs($b)->post(route('pts.tekrar', $g), ['onay' => 1])->assertNotFound();
+
+        config(['its.pts_gonderim' => false]);
+        $this->actingAs($u)->post(route('pts.tekrar', $g), ['onay' => 1])->assertSessionHas('hata');
+        $this->assertSame(1, PtsGonderim::count());
+
+        $this->actingAs($u)->get(route('pts.gonderimler', ['ara' => '8680001000099']))->assertSee('8680001000099');
+        $this->actingAs($u)->get(route('pts.gonderimler', ['ara' => '0000000000000']))->assertDontSee('Yeniden Oluştur');
+    }
 }

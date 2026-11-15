@@ -40,11 +40,11 @@ class IslemController extends Controller
         $ptsGonderim = null;
         $tamBasarili = $sonuc['satirlar'] !== [] && collect($sonuc['satirlar'])->every(fn ($s) => $s['durum'] === 'tamam');
         if ($tur === 'satis' && $tamBasarili && ! empty($sonuc['kalemler_ok']) && \Illuminate\Support\Facades\Schema::hasTable('pts_gonderimleri')) {
-            $ptsGonderim = PtsGonderim::create([
+            $ptsGonderim = PtsGonderim::create(PtsGonderim::mevcutAlanlar([
                 'tenant_id' => $request->user()->tenant_id, 'user_id' => $request->user()->id,
-                'alici_gln' => $v['karsi_gln'], 'bildirim_id' => $sonuc['bildirim'],
+                'alici_gln' => $v['karsi_gln'], 'alici_unvan' => PtsGonderim::unvanBul($v['karsi_gln']), 'bildirim_id' => $sonuc['bildirim'],
                 'adet' => count($sonuc['kalemler_ok']), 'kalemler' => $sonuc['kalemler_ok'],
-            ]);
+            ]));
         }
 
         return view('islem.form', [
