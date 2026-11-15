@@ -29,8 +29,8 @@
 <h5 class="mt-4">Yeni Müşteri</h5>
 @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 <form method="post" action="{{ route('admin.tenants.store') }}" class="row g-2">@csrf
+  <div class="col-md-2"><input id="gln" name="gln" class="form-control" placeholder="GLN (13 hane)" maxlength="13" inputmode="numeric" autocomplete="off" autofocus required></div>
   <div class="col-md-4"><input id="unvan" name="unvan" class="form-control" placeholder="Ünvan (otomatik: Her Kelimenin Baş Harfi Büyük)" required></div>
-  <div class="col-md-2"><input id="gln" name="gln" class="form-control" placeholder="GLN (13 hane)" maxlength="13" inputmode="numeric" autocomplete="off" required></div>
   <div class="col-md-2"><select id="tur" name="tur" class="form-select"><option value="eczane">Eczane</option><option value="hastane">Hastane</option><option value="depo">Depo</option><option value="uretici">Üretici</option><option value="ihracatci">İhracatçı</option></select></div>
   <div class="col-md-2"><input type="date" name="lisans_baslangic" value="{{ now()->toDateString() }}" class="form-control" required></div>
   <div class="col-md-2"><input type="date" name="lisans_bitis" value="{{ now()->addYear()->toDateString() }}" class="form-control" required></div>
