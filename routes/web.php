@@ -105,6 +105,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/musteriler/{tenant}/musteri-gozu', [\App\Http\Controllers\Admin\MusteriGozuController::class, 'basla'])->name('tenants.musteri-gozu');
         Route::get('/musteriler/{tenant}/its', [\App\Http\Controllers\Admin\ItsKimlikController::class, 'form'])->name('tenants.its');
         Route::post('/musteriler/{tenant}/its', [\App\Http\Controllers\Admin\ItsKimlikController::class, 'kaydet'])->name('tenants.its.kaydet');
+        Route::post('/musteriler/{tenant}/pts-havuzu-sifirla', [TenantController::class, 'ptsHavuzuSifirla'])->name('tenants.pts-sifirla');
         Route::post('/musteriler/{tenant}/aktif', [TenantController::class, 'aktifToggle'])->name('tenants.aktif');
     });
 });

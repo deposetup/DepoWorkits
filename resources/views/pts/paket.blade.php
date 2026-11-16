@@ -7,7 +7,7 @@
   @php $cariAdlari = \App\Models\Cari::adlar(auth()->user()->tenant_id); @endphp
   Gönderen: {{ $paket->kaynak_gln ?? '—' }}@if($ad = ($cariAdlari[$paket->kaynak_gln ?? ''] ?? null)) <span class="badge text-bg-primary"><i class="bi bi-person-check"></i> Cari: {{ $ad }}</span>@elseif($paket->kaynak_gln) <a href="{{ route('paydaslar') }}" class="small">(cariye ekle)</a>@endif · Belge No: {{ $paket->belge_no ?? '—' }} ·
   Bütünlük (MD5): {!! is_null($paket->md5_uyumlu) ? '<span class="text-muted">kontrol edilemedi</span>' : ($paket->md5_uyumlu ? '<span class="text-success">uyumlu</span>' : '<span class="text-danger">UYUMSUZ</span>') !!} ·
-  Durum: <span class="badge text-bg-{{ $paket->durum === 'mal_alindi' ? 'success' : 'secondary' }}">{{ $paket->durum === 'mal_alindi' ? 'Mal alındı' : 'İndirildi (mal kabul yapılmadı)' }}</span>
+  Durum: <span class="badge text-bg-{{ $paket->durum === 'mal_alindi' ? 'success' : 'secondary' }}">{{ $paket->durum === 'mal_alindi' ? 'Mal alındı' : ($paket->durum === 'sifirlandi' ? 'Havuzdan çıkarıldı (sıfırlandı)' : 'İndirildi (mal kabul yapılmadı)') }}</span>
 </div>
 <div class="alert alert-warning small">Paketi indirmek mal kabul sayılmaz. Ürünler stoğa ancak aşağıdaki <b>Mal Alım</b> bildirimi başarılı olunca girer.</div>
 @foreach($hatalar as $h)<div class="alert alert-danger">{{ $h }}</div>@endforeach

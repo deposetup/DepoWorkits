@@ -51,6 +51,15 @@ class TenantController extends Controller
         return back()->with('ok', 'Lisans uzatıldı.');
     }
 
+    /** PTS havuzundaki (mal alımı yapılmamış) paketleri havuzdan çıkarır; kayıtlar silinmez, durumu 'sifirlandi' olur. */
+    public function ptsHavuzuSifirla(Tenant $tenant)
+    {
+        $adet = \App\Models\PtsPaketi::where('tenant_id', $tenant->id)->where('durum', 'indirildi')->update(['durum' => 'sifirlandi']);
+        AuditLog::kaydet('pts_havuz_sifirla', ['tenant' => $tenant->id, 'paket' => $adet]);
+
+        return back()->with('ok', $tenant->unvan.': PTS havuzu sıfırlandı ('.$adet.' paket havuzdan çıkarıldı).');
+    }
+
     public function turDegistir(Request $request, Tenant $tenant)
     {
         $tur = $request->validate(['tur' => 'required|in:eczane,hastane,depo,uretici,ihracatci'])['tur'];

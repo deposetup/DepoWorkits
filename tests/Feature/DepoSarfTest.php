@@ -79,6 +79,18 @@ class DepoSarfTest extends TestCase
         $this->actingAs($h)->get('/analiz')->assertOk()->assertSee('16.11.2026 07:51');
     }
 
+    public function test_admin_pts_havuzunu_sifirlar(): void
+    {
+        $h = $this->user('hastane');
+        $p = \App\Models\PtsPaketi::create(['tenant_id' => $h->tenant_id, 'transfer_id' => 'T1', 'urun_sayisi' => 3, 'durum' => 'indirildi', 'xml' => '<x/>']);
+        $m = \App\Models\PtsPaketi::create(['tenant_id' => $h->tenant_id, 'transfer_id' => 'T2', 'urun_sayisi' => 1, 'durum' => 'mal_alindi', 'xml' => '<x/>']);
+        $admin = User::factory()->create(['tenant_id' => null, 'rol' => 'super_admin']);
+        $this->actingAs($admin)->post(route('admin.tenants.pts-sifirla', $h->tenant_id))->assertSessionHas('ok');
+        $this->assertSame('sifirlandi', $p->fresh()->durum);
+        $this->assertSame('mal_alindi', $m->fresh()->durum);
+        $this->actingAs($h->fresh())->get('/')->assertOk()->assertSee('Mal Alım bekleyen paket yok');
+    }
+
     public function test_hastane_satis_yapamaz_sarf_ve_iade_yapar(): void
     {
         $h = $this->user('hastane');
