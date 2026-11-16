@@ -26,7 +26,7 @@ class StokListeTest extends TestCase
     public function test_liste_karekodu_gosterir_ve_toplu_satis_yapar(): void
     {
         $u = $this->kurulum();
-        $this->actingAs($u)->get('/stok/liste')->assertOk()->assertSee('(01)08699999999990(21)A1');
+        $this->actingAs($u)->get('/stok/liste')->assertOk()->assertSee('01' . '08699999999990' . '17' . now()->addYear()->format('ymd') . '10L121A1');
 
         $ids = StokKalemi::pluck('id')->all();
         $this->actingAs($u)->post('/stok/toplu', ['tur' => 'satis', 'secili' => $ids, 'karsi_gln' => '8680001000011'])->assertOk();

@@ -44,7 +44,7 @@ class ExcelTest extends TestCase
         $u = $this->user();
         StokKalemi::create(['tenant_id' => $u->tenant_id, 'gtin' => '08699617650153', 'sn' => 'S1', 'bn' => 'L1', 'skt' => '2030-12-31', 'durum' => 'stokta']);
         $xml = $this->xlsxIcerik($this->actingAs($u)->get('/stok/liste?excel=1')->assertOk());
-        $this->assertStringContainsString('(01)08699617650153(21)S1(10)L1(17)301231', $xml);
+        $this->assertStringContainsString('01086996176501531730123110L121S1', $xml);
 
         $paket = PtsPaketi::create(['tenant_id' => $u->tenant_id, 'transfer_id' => '123', 'urun_sayisi' => 1, 'xml' => json_encode(['a.xml' => '<?xml version="1.0"?><transfer><product><gtin>08699617650153</gtin><serialNumber>P1</serialNumber><batchNumber>B1</batchNumber><expirationDate>2030-12-31</expirationDate></product></transfer>'])]);
         $r = $this->actingAs($u)->get(route('pts.excel', $paket))->assertOk();

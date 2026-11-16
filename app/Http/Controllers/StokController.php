@@ -87,6 +87,15 @@ class StokController extends Controller
             .($k->skt ? '(17)'.$k->skt->format('ymd') : '');
     }
 
+    /** Parantezsiz, taranabilir ham GS1 metni: 01GTIN 17SKT 10PARTI<GS>21SERI */
+    public static function karekodHam(StokKalemi $k): string
+    {
+        return '01'.$k->gtin
+            .($k->skt ? '17'.$k->skt->format('ymd') : '')
+            .($k->bn ? '10'.$k->bn."\x1d" : '')
+            .'21'.$k->sn;
+    }
+
     /** Ürün bazlı (karekodlu) stok listesi; seçilenlere toplu işlem yapılabilir. */
     public function liste(Request $request, ItsClient $its)
     {
@@ -113,7 +122,7 @@ class StokController extends Controller
 
             return \App\Support\XlsxYazici::indir($ad.'-listesi-'.now()->format('Ymd-His').'.xlsx',
                 ['İlaç', 'GTIN', 'Seri No', 'Parti', 'SKT', 'Lokasyon', 'Karekod'],
-                $q->lazy(1000)->map(fn ($k) => [$adlar[$k->gtin] ?? '', $k->gtin, $k->sn, $k->bn, $k->skt?->format('d.m.Y'), $k->lokasyon ?? '', self::karekod($k)]),
+                $q->lazy(1000)->map(fn ($k) => [$adlar[$k->gtin] ?? '', $k->gtin, $k->sn, $k->bn, $k->skt?->format('d.m.Y'), $k->lokasyon ?? '', self::karekodHam($k)]),
                 'Stok');
         }
         $kalemler = $q->paginate(200)->withQueryString();

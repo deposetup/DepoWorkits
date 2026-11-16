@@ -44,7 +44,7 @@
 @forelse($kalemler as $k)
 <tr><td><input type="checkbox" class="sec" name="secili[]" value="{{ $k->id }}" onclick="say()"></td>
 <td>{{ $adlar[$k->gtin] ?? '—' }}</td>
-<td class="font-monospace small">{{ \App\Http\Controllers\StokController::karekod($k) }}</td>
+<td class="font-monospace small">{{ str_replace("\x1d", '', \App\Http\Controllers\StokController::karekodHam($k)) }}</td>
 <td>{{ $k->bn ?: '—' }}</td><td>{{ $k->skt?->format('d.m.Y') ?? '—' }}</td><td>@if($k->lokasyon === $redOdasi)<span class="badge text-bg-danger">{{ $k->lokasyon }}</span>@else{{ $k->lokasyon ?: '—' }}@endif</td></tr>
 @empty<tr><td colspan="6" class="text-muted">Bu durumda ürün yok.</td></tr>@endforelse
 </tbody></table>
