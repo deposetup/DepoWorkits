@@ -32,7 +32,7 @@
   ] : [
     ['Mal Kabul', 'Gelen ürünü kabul et', 'bi-check2-square', route('islem', 'kabul')],
     ['PTS Sorgu', 'Paketleri sorgula, XML yükle', 'bi-search', route('pts')],
-    ['Satış', 'Ürün satış bildirimi', 'bi-cart-check', route('islem', 'satis')],
+    ...((auth()->user()->tenant?->satisYapabilir() ?? true) ? [['Satış', 'Ürün satış bildirimi', 'bi-cart-check', route('islem', 'satis')]] : [['Hastane Sarf', 'Ürün sarf bildirimi', 'bi-hospital', route('islem', 'sarf')]]),
     ['Barkod Bazlı Stok', 'GTIN bazında adet, parti, SKT', 'bi-upc', route('stok.barkod')],
     ['Stok Listesi', 'Karekodlu stok, Excel', 'bi-upc-scan', route('stok.liste')],
     ['Durum Sorgu', 'Ürünün İTS durumu', 'bi-shield-check', route('durum')],

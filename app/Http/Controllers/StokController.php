@@ -102,6 +102,7 @@ class StokController extends Controller
         $tid = $request->user()->tenant_id;
         $durum = $request->query('durum', 'stokta');
         abort_unless(in_array($durum, ['stokta', 'satis', 'sarf', 'devir', 'deaktive'], true), 404);
+        abort_if($durum === 'satis' && ! $request->user()->tenant?->satisYapabilir(), 404);
         $ara = trim((string) $request->query('ara', ''));
         $adlar = $this->adlar($its);
         StokKalemi::redOdasinaAl($tid);
@@ -238,6 +239,7 @@ class StokController extends Controller
             'aciklama' => 'nullable|string|max:255',
         ], ['secili.required' => 'Önce listeden ürün seçin.']);
         abort_if(in_array($v['tur'], ['sarf', 'sarf_iptal'], true) && ! $request->user()->tenant->sarfYapabilir(), 403, 'Ecza depoları sarf bildirimi yapamaz.');
+        abort_if(in_array($v['tur'], ['satis', 'satis_iptal'], true) && ! $request->user()->tenant->satisYapabilir(), 403, 'Hastaneler satış yapamaz; yalnızca sarf ve iade bildirir.');
         abort_if(in_array($v['tur'], ['devir', 'devir_iptal'], true) && ! $request->user()->tenant->devirYapabilir(), 403, 'Ecza depoları ve hastaneler Mal Devir kullanmaz.');
         if (in_array($v['tur'], ['satis', 'iade', 'devir'], true)) {
             $request->validate(['karsi_gln' => 'required|digits:13']);

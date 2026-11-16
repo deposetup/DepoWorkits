@@ -43,6 +43,12 @@ class Tenant extends Model
         return $this->tur !== 'depo';
     }
 
+    /** Hastaneler (sarf merkezleri) satış yapmaz; yalnızca sarf ve iade bildirir. */
+    public function satisYapabilir(): bool
+    {
+        return $this->tur !== 'hastane';
+    }
+
     /** Mal Devir / Mal Devir İptal şubeli müşteriler içindir; ecza depoları ve hastaneler kullanmaz. */
     public function devirYapabilir(): bool
     {

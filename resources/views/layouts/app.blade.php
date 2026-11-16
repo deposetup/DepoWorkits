@@ -63,9 +63,11 @@
         ['Manuel Ekle', 'bi-plus-square', route('manuel.ekle'), ['manuel.*']],
       ]],
       ['Satış & Çıkış', 'bi-box-arrow-up', null, [
-        ['Satış', 'bi-cart-check', route('islem', 'satis'), ['islem:satis']],
-        ['Satış İptal', 'bi-cart-x', route('islem', 'satis_iptal'), ['islem:satis_iptal']],
-        ['PTS Gönderimleri', 'bi-send', route('pts.gonderimler'), ['pts.gonderimler']],
+        ...(($u->tenant?->satisYapabilir() ?? true) ? [
+          ['Satış', 'bi-cart-check', route('islem', 'satis'), ['islem:satis']],
+          ['Satış İptal', 'bi-cart-x', route('islem', 'satis_iptal'), ['islem:satis_iptal']],
+          ['PTS Gönderimleri', 'bi-send', route('pts.gonderimler'), ['pts.gonderimler']],
+        ] : []),
         ...(($u->tenant?->devirYapabilir() ?? true) ? [
           ['Mal Devir', 'bi-arrow-left-right', route('islem', 'devir'), ['islem:devir']],
           ['Mal Devir İptal', 'bi-x-circle', route('islem', 'devir_iptal'), ['islem:devir_iptal']],

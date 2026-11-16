@@ -60,6 +60,22 @@ class DepoSarfTest extends TestCase
         $this->actingAs($u->fresh())->get('/islem/sarf')->assertForbidden();
     }
 
+    public function test_hastane_satis_yapamaz_sarf_ve_iade_yapar(): void
+    {
+        $h = $this->user('hastane');
+        $this->actingAs($h)->post('/islem/kabul', ['kodlar' => self::KOD]);
+        $this->actingAs($h)->get('/')->assertOk()->assertDontSee('Satış İptal')->assertDontSee('PTS Gönderimleri');
+        $this->actingAs($h)->get('/islem/satis')->assertForbidden();
+        $this->actingAs($h)->get('/islem/satis_iptal')->assertForbidden();
+        $this->actingAs($h)->post('/islem/satis', ['kodlar' => self::KOD, 'karsi_gln' => '8680001000012'])->assertForbidden();
+        $this->actingAs($h)->post('/stok/toplu', ['tur' => 'satis', 'secili' => [\App\Models\StokKalemi::first()->id], 'karsi_gln' => '8680001000012'])->assertForbidden();
+        $this->assertSame('stokta', \App\Models\StokKalemi::first()->durum);
+        $this->actingAs($h)->get('/stok/liste?durum=satis')->assertNotFound();
+        $this->actingAs($h)->get('/stok/liste')->assertOk()->assertDontSee('Satıldı')->assertSee('Hastane Sarf');
+        $this->actingAs($h)->get('/islem/iade')->assertOk();
+        $this->actingAs($h)->get('/analiz')->assertOk()->assertDontSee('Satış İptal');
+    }
+
     public function test_depo_ve_hastane_mal_devir_gormez_eczane_kullanir(): void
     {
         $u = $this->user('depo');

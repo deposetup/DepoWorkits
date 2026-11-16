@@ -4,11 +4,12 @@
 @php
   $sarfVar = auth()->user()->tenant?->sarfYapabilir() ?? true;
   $devirVar = auth()->user()->tenant?->devirYapabilir() ?? true;
+  $satisVar = auth()->user()->tenant?->satisYapabilir() ?? true;
   $sekmeler = array_filter(['stokta' => ['Stokta', 'bi-box-seam'], 'satis' => ['Satıldı', 'bi-cart-check'], 'devir' => ['Devredildi', 'bi-arrow-left-right'], 'deaktive' => ['Deaktive', 'bi-slash-circle'], 'sarf' => ['Sarf', 'bi-hospital']],
-    fn ($k) => ($sarfVar || $k !== 'sarf') && ($devirVar || $k !== 'devir'), ARRAY_FILTER_USE_KEY);
+    fn ($k) => ($sarfVar || $k !== 'sarf') && ($devirVar || $k !== 'devir') && ($satisVar || $k !== 'satis'), ARRAY_FILTER_USE_KEY);
   $islemler = array_values(match ($durum) {
     'stokta' => array_filter([
-      ['satis', 'Satış', 'bi-cart-check', 'success'],
+      $satisVar ? ['satis', 'Satış', 'bi-cart-check', 'success'] : null,
       $sarfVar ? ['sarf', 'Hastane Sarf', 'bi-hospital', 'info'] : null,
       $devirVar ? ['devir', 'Mal Devir', 'bi-arrow-left-right', 'primary'] : null,
       ['iade', 'Ürün İade', 'bi-arrow-return-left', 'warning'],
