@@ -47,7 +47,7 @@ class DepoSarfTest extends TestCase
             $u = $this->user($tur);
             $this->actingAs($u)->get('/')->assertSee('Hastane Sarf');
             $this->actingAs($u)->post('/islem/kabul', ['kodlar' => self::KOD]);
-            $this->actingAs($u)->post('/islem/sarf', ['kodlar' => self::KOD])->assertOk()->assertSee('Başarılı');
+            $this->actingAs($u)->post('/islem/sarf', ['kodlar' => self::KOD])->assertOk()->assertSee('Başarılı')->assertDontSee('(01)', false)->assertSee('ÖRNEK İLAÇ');
         }
     }
 
