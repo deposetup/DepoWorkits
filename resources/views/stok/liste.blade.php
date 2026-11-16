@@ -41,7 +41,7 @@
   .sl-tablo th { font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; color:#5b6b8c; background:#f4f6fa; white-space:nowrap; }
   .sl-tablo tbody tr { cursor:pointer; }
   .sl-tablo tbody tr:has(.sec:checked) { background:#e8f3ff; }
-  .islem-btn { opacity:.55; } .islem-btn.active { opacity:1; box-shadow:0 0 0 .2rem rgba(11,36,71,.15); }
+  .islem-btn { font-weight:600; } .islem-btn.active { box-shadow:0 0 0 .2rem rgba(11,36,71,.25); transform:translateY(-1px); }
   .sl-alt { position:sticky; bottom:0; z-index:1020; margin-top:1rem; }
 </style>
 
@@ -90,7 +90,7 @@
       <input type="hidden" name="tur" id="tur" value="{{ $islemler[0][0] }}">
       <div class="d-flex flex-wrap gap-2 mb-3">
         @foreach($islemler as $i => [$kod, $ad, $ikon, $renk])
-        <button type="button" class="btn btn-{{ $renk }} islem-btn {{ $i ? '' : 'active' }}" data-tur="{{ $kod }}" data-ad="{{ $ad }}" data-renk="{{ $renk }}" aria-pressed="{{ $i ? 'false' : 'true' }}"><i class="bi {{ $ikon }} me-1"></i>{{ $ad }}</button>
+        <button type="button" class="btn {{ $i ? 'btn-outline-' : 'btn-' }}{{ $renk }} islem-btn {{ $i ? '' : 'active' }}" data-tur="{{ $kod }}" data-ad="{{ $ad }}" data-renk="{{ $renk }}" data-ikon="{{ $ikon }}" aria-pressed="{{ $i ? 'false' : 'true' }}"><i class="bi {{ $i ? $ikon : 'bi-check-circle-fill' }} me-1"></i>{{ $ad }}</button>
         @endforeach
       </div>
       <div id="glnAlan">@include('cari._secici', ['hedef' => 'karsi_gln_input'])<input id="karsi_gln_input" name="karsi_gln" class="form-control form-control-sm" maxlength="13" placeholder="Karşı paydaş GLN (13 hane)"></div>
@@ -163,7 +163,9 @@ document.querySelectorAll('.sl-tablo tbody tr[data-gtin]').forEach(r=>r.addEvent
 document.querySelectorAll('.sec').forEach(c=>c.addEventListener('change',say));
 function islemSec(b){
  document.getElementById('tur').value=b.dataset.tur;
- document.querySelectorAll('.islem-btn').forEach(x=>{const a=x===b;x.classList.toggle('active',a);x.setAttribute('aria-pressed',a)});
+ document.querySelectorAll('.islem-btn').forEach(x=>{const a=x===b,r=x.dataset.renk;
+  x.classList.toggle('active',a);x.classList.toggle('btn-'+r,a);x.classList.toggle('btn-outline-'+r,!a);
+  x.setAttribute('aria-pressed',a);x.querySelector('i').className='bi me-1 '+(a?'bi-check-circle-fill':x.dataset.ikon)});
  const u=document.getElementById('uygula');u.className='btn px-4 btn-'+b.dataset.renk;document.getElementById('uygulaAd').textContent=b.dataset.ad+' Bildir';
  alanlar()}
 document.querySelectorAll('.islem-btn').forEach(b=>b.addEventListener('click',()=>islemSec(b)));
