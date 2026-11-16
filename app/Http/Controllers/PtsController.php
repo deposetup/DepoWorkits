@@ -206,7 +206,8 @@ class PtsController extends Controller
                     return response()->json($ilerleme + ['hata' => $e->getMessage()], 500);
                 }
                 foreach ($sonuc['satirlar'] as $s) {
-                    if ($s['durum'] === 'tamam') {
+                    // Daha önce işlenmiş (zaten stokta) ürün tekrar denemede hata sayılmaz.
+                    if ($s['durum'] === 'tamam' || ($s['mesaj'] ?? '') === 'Ürün zaten stokta.') {
                         $ilerleme['basarili']++;
                     } else {
                         $ilerleme['hatali']++;
