@@ -23,6 +23,20 @@ class StokListeTest extends TestCase
         return $u;
     }
 
+    public function test_liste_skt_lokasyon_ve_ilac_siralanir(): void
+    {
+        $u = $this->kurulum();
+        $tid = $u->tenant_id;
+        StokKalemi::create(['tenant_id' => $tid, 'gtin' => '08699999999991', 'sn' => 'B1', 'bn' => 'L2', 'skt' => now()->addYears(3), 'durum' => 'stokta', 'lokasyon' => 'Raf A']);
+        foreach (['skt', 'lokasyon', 'ilac'] as $alan) {
+            foreach (['asc', 'desc'] as $yon) {
+                $this->actingAs($u)->get("/stok/liste?sirala=$alan&yon=$yon")->assertOk();
+            }
+        }
+        $this->actingAs($u)->get('/stok/liste?sirala=skt&yon=desc')->assertOk()->assertSeeInOrder(['21B1', '21A1']);
+        $this->actingAs($u)->get('/stok/liste?sirala=skt&yon=asc')->assertOk()->assertSeeInOrder(['21A1', '21B1']);
+    }
+
     public function test_liste_karekodu_gosterir_ve_toplu_satis_yapar(): void
     {
         $u = $this->kurulum();

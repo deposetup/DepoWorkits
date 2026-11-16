@@ -11,7 +11,7 @@
     <a class="btn btn-sm {{ $durum === $d ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('stok.liste', ['durum' => $d]) }}">{{ $ad }}</a>
     @endforeach
   </div>
-  <form class="d-flex gap-2" method="get"><input type="hidden" name="durum" value="{{ $durum }}">
+  <form class="d-flex gap-2" method="get"><input type="hidden" name="durum" value="{{ $durum }}">@if($sirala)<input type="hidden" name="sirala" value="{{ $sirala }}"><input type="hidden" name="yon" value="{{ $yon }}">@endif
     @if($lokasyonlar || $lokasyon !== '')<select name="lokasyon" class="form-select form-select-sm" onchange="this.form.submit()"><option value="">Tüm lokasyonlar</option><option value="-" @selected($lokasyon === '-')>Lokasyonsuz</option>@foreach($lokasyonlar as $l)<option @selected($lokasyon === $l)>{{ $l }}</option>@endforeach</select>@endif
     <input name="ara" value="{{ $ara }}" class="form-control form-control-sm" placeholder="İlaç adı, GTIN, seri veya parti"><button class="btn btn-sm btn-outline-secondary">Ara</button></form>
   <span class="text-muted small">{{ $kalemler->total() }} ürün</span>
@@ -40,7 +40,14 @@
 
 <table class="table table-sm bg-white align-middle"><thead><tr>
   <th><input type="checkbox" id="hepsi" onclick="document.querySelectorAll('.sec').forEach(c=>c.checked=this.checked);say()"></th>
-  <th>İlaç</th><th>Karekod</th><th>Parti</th><th>SKT</th><th>Lokasyon</th></tr></thead><tbody>
+  @php
+  $bas = function ($alan, $ad) use ($sirala, $yon) {
+    $yeni = $sirala === $alan && $yon === 'asc' ? 'desc' : 'asc';
+    $ok = $sirala === $alan ? ($yon === 'asc' ? ' <i class="bi bi-sort-up"></i>' : ' <i class="bi bi-sort-down"></i>') : ' <i class="bi bi-arrow-down-up text-muted small"></i>';
+    return '<a class="text-decoration-none text-reset" href="'.e(request()->fullUrlWithQuery(['sirala' => $alan, 'yon' => $yeni, 'page' => null])).'">'.$ad.$ok.'</a>';
+  };
+@endphp
+  <th>{!! $bas('ilac', 'İlaç') !!}</th><th>Karekod</th><th>Parti</th><th>{!! $bas('skt', 'SKT') !!}</th><th>{!! $bas('lokasyon', 'Lokasyon') !!}</th></tr></thead><tbody>
 @forelse($kalemler as $k)
 <tr><td><input type="checkbox" class="sec" name="secili[]" value="{{ $k->id }}" onclick="say()"></td>
 <td>{{ $adlar[$k->gtin] ?? '—' }}</td>

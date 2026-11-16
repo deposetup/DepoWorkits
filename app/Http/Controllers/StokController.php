@@ -116,7 +116,30 @@ class StokController extends Controller
             $q->where(fn ($w) => $w->where('gtin', 'like', "%$ara%")->orWhere('sn', 'like', "%$ara%")
                 ->orWhere('bn', 'like', "%$ara%")->orWhereIn('gtin', $gtinler));
         }
-        $q->orderBy('gtin')->orderBy('skt')->orderBy('sn');
+        $sirala = (string) $request->query('sirala', '');
+        $yon = $request->query('yon') === 'desc' ? 'desc' : 'asc';
+        if ($sirala === 'ilac') {
+            $gtinler = (clone $q)->reorder()->distinct()->pluck('gtin')->all();
+            usort($gtinler, fn ($a, $b) => strcoll(mb_strtolower($adlar[$a] ?? '~'), mb_strtolower($adlar[$b] ?? '~')) ?: strcmp($a, $b));
+            if ($yon === 'desc') {
+                $gtinler = array_reverse($gtinler);
+            }
+            if ($gtinler) {
+                $vaka = 'case gtin';
+                foreach ($gtinler as $i => $g) {
+                    $vaka .= ' when ? then '.$i;
+                }
+                $q->orderByRaw($vaka.' end', $gtinler);
+            }
+            $q->orderBy('skt')->orderBy('sn');
+        } elseif ($sirala === 'skt') {
+            $q->orderByRaw('skt is null')->orderBy('skt', $yon)->orderBy('gtin')->orderBy('sn');
+        } elseif ($sirala === 'lokasyon' && StokKalemi::lokasyonVar()) {
+            $q->orderByRaw('lokasyon is null')->orderBy('lokasyon', $yon)->orderBy('gtin')->orderBy('skt')->orderBy('sn');
+        } else {
+            $sirala = '';
+            $q->orderBy('gtin')->orderBy('skt')->orderBy('sn');
+        }
         if ($request->boolean('excel')) {
             $ad = ['stokta' => 'stok', 'satis' => 'satildi', 'sarf' => 'sarf', 'devir' => 'devredildi', 'deaktive' => 'deaktive'][$durum];
 
@@ -129,7 +152,7 @@ class StokController extends Controller
 
         return view('stok.liste', [
             'kalemler' => $kalemler, 'adlar' => $adlar, 'ara' => $ara, 'durum' => $durum,
-            'lokasyon' => $lokasyon, 'lokasyonlar' => StokKalemi::lokasyonlar($tid), 'redOdasi' => StokKalemi::RED_ODASI,
+            'sirala' => $sirala, 'yon' => $yon, 'lokasyon' => $lokasyon, 'lokasyonlar' => StokKalemi::lokasyonlar($tid), 'redOdasi' => StokKalemi::RED_ODASI,
             'sebepler' => StokServisi::DEAKTIVE_SEBEPLER,
         ]);
     }
