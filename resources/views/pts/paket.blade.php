@@ -77,10 +77,11 @@
 
 <div class="d-flex justify-content-between align-items-center mb-2"><h6 class="mb-0">{{ count($urunler) }} ürün bulundu</h6><a href="{{ route('pts.excel', $paket) }}" class="btn btn-success btn-sm"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a></div>
 @php($grup = collect($urunler)->groupBy('gtin'))
-<table class="table table-sm bg-white"><thead><tr><th>GTIN</th><th>Parti</th><th>SKT</th><th class="text-end">Adet</th></tr></thead><tbody>
+@php($receteler = \App\Models\IlacRecete::tipler($grup->keys()))
+<table class="table table-sm bg-white"><thead><tr><th>GTIN</th><th>Reçete</th><th>Parti</th><th>SKT</th><th class="text-end">Adet</th></tr></thead><tbody>
 @foreach($grup as $gtin => $l)
 @foreach($l->groupBy(fn ($u) => ($u['bn'] ?? '').'|'.($u['xd'] ?? '')) as $alt)
-<tr><td class="font-monospace">{{ $gtin }}</td><td>{{ $alt[0]['bn'] ?? '—' }}</td><td>{{ $alt[0]['xd'] ?? '—' }}</td><td class="text-end">{{ count($alt) }}</td></tr>
+<tr><td class="font-monospace">{{ $gtin }}</td><td>{!! \App\Models\IlacRecete::rozet($receteler[$gtin] ?? null) !!}</td><td>{{ $alt[0]['bn'] ?? '—' }}</td><td>{{ $alt[0]['xd'] ?? '—' }}</td><td class="text-end">{{ count($alt) }}</td></tr>
 @endforeach
 @endforeach
 </tbody></table>

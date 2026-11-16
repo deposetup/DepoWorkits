@@ -88,12 +88,15 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::get('/musteriler', [TenantController::class, 'index'])->name('tenants.index');
         Route::post('/musteriler', [TenantController::class, 'store'])->name('tenants.store');
         Route::get('/talepler', [\App\Http\Controllers\Admin\TalepController::class, 'index'])->name('talepler');
+        Route::get('/ilac-recete', [\App\Http\Controllers\Admin\IlacReceteController::class, 'index'])->name('ilac-recete');
+        Route::post('/ilac-recete', [\App\Http\Controllers\Admin\IlacReceteController::class, 'yukle'])->name('ilac-recete.yukle');
         Route::get('/kullanicilar', [\App\Http\Controllers\Admin\YoneticiController::class, 'index'])->name('yoneticiler');
         Route::post('/kullanicilar', [\App\Http\Controllers\Admin\YoneticiController::class, 'store'])->name('yoneticiler.store');
         Route::post('/kullanicilar/{user}/sifre', [\App\Http\Controllers\Admin\YoneticiController::class, 'sifreDegistir'])->name('yoneticiler.sifre');
         Route::post('/kullanicilar/{user}/aktif', [\App\Http\Controllers\Admin\YoneticiController::class, 'aktifToggle'])->name('yoneticiler.aktif');
         Route::post('/talepler/{talep}/durum', [\App\Http\Controllers\Admin\TalepController::class, 'durum'])->name('talepler.durum');
         Route::get('/paydas-degisimleri', [\App\Http\Controllers\Admin\PaydasDegisimController::class, 'index'])->name('paydas-degisimleri');
+        Route::post('/paydas-degisimleri/test-mail', [\App\Http\Controllers\Admin\PaydasDegisimController::class, 'testMail'])->middleware('throttle:3,1')->name('paydas-degisimleri.test-mail');
         Route::get('/musteriler/{tenant}/stok-csv', [\App\Http\Controllers\Admin\StokCsvController::class, 'form'])->name('stok-csv');
         Route::post('/musteriler/{tenant}/stok-csv', [\App\Http\Controllers\Admin\StokCsvController::class, 'yukle'])->name('stok-csv.yukle');
         Route::get('/giris-kayitlari', [\App\Http\Controllers\Admin\GirisKayitController::class, 'index'])->name('giris-kayitlari');

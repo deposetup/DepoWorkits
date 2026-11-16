@@ -44,10 +44,11 @@
   $iptalTuru = $tur === 'satis' ? 'satis_iptal' : 'devir_iptal';
   $ilacAdlari = \App\Support\IlacAdlari::harita();
   $basarili = collect($sonuc['satirlar'])->where('durum', 'tamam')->pluck('kod')->values();
+  $receteler = \App\Models\IlacRecete::tipler($tumSatirlar->map(fn ($x) => \App\Support\IlacAdlari::gtinBul($x['kod'])));
 @endphp
 <table class="table table-sm mb-0 align-middle">
 @foreach($tumSatirlar as $s)
-<tr class="{{ $s['durum'] === 'tamam' ? 'table-success' : 'table-danger' }}"><td class="font-monospace small">{{ \Illuminate\Support\Str::limit(\App\Support\IlacAdlari::parantezsiz($s['kod']), 60) }}</td><td>{{ $ilacAdlari[\App\Support\IlacAdlari::gtinBul($s['kod'])] ?? '—' }}</td><td>{{ $s['durum'] === 'tamam' ? 'Başarılı' : $s['mesaj'] }}</td>
+<tr class="{{ $s['durum'] === 'tamam' ? 'table-success' : 'table-danger' }}"><td class="font-monospace small">{{ \Illuminate\Support\Str::limit(\App\Support\IlacAdlari::parantezsiz($s['kod']), 60) }}</td><td>{{ $ilacAdlari[\App\Support\IlacAdlari::gtinBul($s['kod'])] ?? '—' }}</td><td>{!! \App\Models\IlacRecete::rozet($receteler[\App\Support\IlacAdlari::gtinBul($s['kod'])] ?? null) !!}</td><td>{{ $s['durum'] === 'tamam' ? 'Başarılı' : $s['mesaj'] }}</td>
 @if($geriAlinabilir)<td class="text-end">@if($s['durum'] === 'tamam')
   <form method="post" action="{{ route('islem.calistir', $iptalTuru) }}" onsubmit="return confirm('Bu ürünün {{ $tur === 'satis' ? 'satışı' : 'devri' }} İTS\'te iptal edilecek. Emin misiniz?')">@csrf<input type="hidden" name="kodlar" value="{{ $s['kod'] }}"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-arrow-counterclockwise me-1"></i>{{ $tur === 'satis' ? 'Satışı geri al' : 'Devri geri al' }}</button></form>
 @endif</td>@endif

@@ -25,4 +25,25 @@ class PaydasDegisimController extends Controller
 
         return view('admin.paydas-degisimleri', ['kayitlar' => $kayitlar, 'olaylar' => self::OLAYLAR, 'f' => $v, 'izlenen' => $izlenen, 'sonKontrol' => $sonKontrol, 'alici' => config('its.bildirim_eposta'), 'mailAyarli' => ! in_array(config('mail.default'), ['log', 'array'], true)]);
     }
+
+    /** Mail ayarlarını denemek için bildirim adresine test e-postası yollar. */
+    public function testMail(Request $request)
+    {
+        if (in_array(config('mail.default'), ['log', 'array'], true)) {
+            return back()->with('hata', 'E-posta ayarı yapılmamış (MAIL_MAILER='.config('mail.default').'). Canlı .env dosyasında SMTP bilgilerini girin.');
+        }
+        $alici = config('its.bildirim_eposta');
+        try {
+            \Illuminate\Support\Facades\Mail::raw("Bu bir test e-postasıdır. DepoWork İTS paydaş değişikliği bildirimleri bu ayarlarla gönderilecek.\n\nGönderen yönetici: ".$request->user()->email, function ($m) use ($alici) {
+                $m->to($alici)->subject('DepoWork İTS test e-postası');
+            });
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Test e-postası gönderilemedi: '.$e->getMessage());
+
+            return back()->with('hata', 'Test e-postası gönderilemedi: '.\Illuminate\Support\Str::limit($e->getMessage(), 300));
+        }
+        \App\Models\AuditLog::kaydet('mail_test', ['alici' => $alici]);
+
+        return back()->with('ok', 'Test e-postası '.$alici.' adresine gönderildi. Gelen kutusunu (ve spam klasörünü) kontrol edin.');
+    }
 }

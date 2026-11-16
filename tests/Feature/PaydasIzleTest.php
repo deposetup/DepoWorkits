@@ -67,4 +67,20 @@ class PaydasIzleTest extends TestCase
         $u = User::factory()->create(['tenant_id' => $t->id, 'rol' => 'tenant_admin']);
         $this->actingAs($u)->get('/yonetim/paydas-degisimleri')->assertStatus(403);
     }
+
+    public function test_test_maili_ayar_yoksa_uyarir_varsa_gonderir(): void
+    {
+        $admin = User::factory()->create(['rol' => 'super_admin', 'tenant_id' => null]);
+
+        config(['mail.default' => 'log']);
+        $this->actingAs($admin)->post('/yonetim/paydas-degisimleri/test-mail')->assertSessionHas('hata');
+
+        config(['mail.default' => 'array']);
+        \Illuminate\Support\Facades\Mail::fake();
+        config(['mail.default' => 'smtp']);
+        $this->actingAs($admin)->post('/yonetim/paydas-degisimleri/test-mail')->assertSessionHas('ok');
+
+        $musteri = User::factory()->create(['tenant_id' => \App\Models\Tenant::create(['unvan' => 'T', 'gln' => '8680001000077', 'lisans_baslangic' => now()->subDay(), 'lisans_bitis' => now()->addYear(), 'kvkk_onay_tarihi' => now()])->id, 'rol' => 'kullanici']);
+        $this->actingAs($musteri)->post('/yonetim/paydas-degisimleri/test-mail')->assertForbidden();
+    }
 }
