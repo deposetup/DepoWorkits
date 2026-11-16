@@ -25,6 +25,15 @@ class Gs1Parser
             }, $kod);
         }
         $out = ['gtin' => null, 'seri' => null, 'lot' => null, 'skt' => null];
+
+        // GS ayracı kaybolmuş (Excel/metin kopyası) ham karekod: alanlar mantıklı biçimde yeniden ayrıştırılır.
+        if (! str_contains($kod, self::GS) && preg_match('/^01(\d{14})(.+)$/s', $kod, $m)) {
+            $cozum = self::gsSiz($m[2], []);
+            if ($cozum !== null && count($cozum) >= 2) {
+                return ['gtin' => $m[1], 'seri' => $cozum['21'] ?? null, 'lot' => $cozum['10'] ?? null,
+                    'skt' => isset($cozum['17']) ? self::tarih($cozum['17']) : null];
+            }
+        }
         $i = 0;
         $n = strlen($kod);
 
@@ -55,6 +64,42 @@ class Gs1Parser
         }
 
         return $out;
+    }
+
+    /**
+     * GS ayracı olmayan 10/17/21 dizisini çözer. En çok alan veren, eşitlikte en kısa değişken alanlı çözümü seçer.
+     *
+     * @param  array<string,bool>  $kullanilan
+     * @return array<string,string>|null
+     */
+    private static function gsSiz(string $s, array $kullanilan): ?array
+    {
+        if ($s === '') {
+            return [];
+        }
+        $ai = substr($s, 0, 2);
+        if (! in_array($ai, ['10', '17', '21'], true) || isset($kullanilan[$ai])) {
+            return null;
+        }
+        $kullanilan[$ai] = true;
+        if ($ai === '17') {
+            $v = substr($s, 2, 6);
+            if (strlen($v) !== 6 || ! ctype_digit($v) || (int) substr($v, 2, 2) < 1 || (int) substr($v, 2, 2) > 12 || (int) substr($v, 4, 2) > 31) {
+                return null;
+            }
+            $alt = self::gsSiz(substr($s, 8), $kullanilan);
+
+            return $alt === null ? null : [$ai => $v] + $alt;
+        }
+        $en = null;
+        for ($l = 1, $son = min(20, strlen($s) - 2); $l <= $son; $l++) {
+            $alt = self::gsSiz(substr($s, 2 + $l), $kullanilan);
+            if ($alt !== null && ($en === null || count($alt) + 1 > count($en))) {
+                $en = [$ai => substr($s, 2, $l)] + $alt;
+            }
+        }
+
+        return $en;
     }
 
     private static function sabit(string $s, int &$i, int $len): string
