@@ -60,7 +60,7 @@ class DepoSarfTest extends TestCase
         $this->actingAs($u->fresh())->get('/islem/sarf')->assertForbidden();
     }
 
-    public function test_depo_mal_devir_gormez_ve_kullanamaz_hastane_kullanir(): void
+    public function test_depo_ve_hastane_mal_devir_gormez_eczane_kullanir(): void
     {
         $u = $this->user('depo');
         $this->actingAs($u)->get('/')->assertOk()->assertDontSee('Mal Devir');
@@ -75,14 +75,20 @@ class DepoSarfTest extends TestCase
         \App\Models\StokKalemi::query()->delete();
         \App\Models\Tenant::query()->delete();
         $h = $this->user('hastane');
-        $this->actingAs($h)->get('/')->assertSee('Mal Devir');
-        $this->actingAs($h)->get('/islem/devir')->assertOk();
+        $this->actingAs($h)->get('/')->assertDontSee('Mal Devir');
+        $this->actingAs($h)->get('/islem/devir')->assertForbidden();
+        $this->actingAs($h)->get('/islem/devir_iptal')->assertForbidden();
+
+        \App\Models\Tenant::query()->delete();
+        $e = $this->user('eczane');
+        $this->actingAs($e)->get('/')->assertSee('Mal Devir');
+        $this->actingAs($e)->get('/islem/devir')->assertOk();
     }
 
     public function test_analiz_depoda_sarf_ve_devir_alanlarini_gostermez(): void
     {
         $this->actingAs($this->user('depo'))->get('/analiz')->assertOk()->assertDontSee('Hastane Sarf')->assertDontSee('Sarf İptal')->assertDontSee('Mal Devir')->assertSee('Mal Kabul')->assertSee('Satış');
         \App\Models\Tenant::query()->delete();
-        $this->actingAs($this->user('hastane'))->get('/analiz')->assertOk()->assertSee('Hastane Sarf')->assertSee('Mal Devir');
+        $this->actingAs($this->user('hastane'))->get('/analiz')->assertOk()->assertSee('Hastane Sarf')->assertDontSee('Mal Devir');
     }
 }

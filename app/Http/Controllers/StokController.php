@@ -212,7 +212,7 @@ class StokController extends Controller
             'aciklama' => 'nullable|string|max:255',
         ], ['secili.required' => 'Önce listeden ürün seçin.']);
         abort_if(in_array($v['tur'], ['sarf', 'sarf_iptal'], true) && ! $request->user()->tenant->sarfYapabilir(), 403, 'Ecza depoları sarf bildirimi yapamaz.');
-        abort_if(in_array($v['tur'], ['devir', 'devir_iptal'], true) && ! $request->user()->tenant->devirYapabilir(), 403, 'Ecza depoları Mal Devir kullanmaz.');
+        abort_if(in_array($v['tur'], ['devir', 'devir_iptal'], true) && ! $request->user()->tenant->devirYapabilir(), 403, 'Ecza depoları ve hastaneler Mal Devir kullanmaz.');
         if (in_array($v['tur'], ['satis', 'iade', 'devir'], true)) {
             $request->validate(['karsi_gln' => 'required|digits:13']);
         }

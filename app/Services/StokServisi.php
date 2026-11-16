@@ -80,7 +80,7 @@ class StokServisi
         }
 
         if (in_array($tur, ['devir', 'devir_iptal'], true) && ! $tenant->devirYapabilir()) {
-            throw new InvalidArgumentException('Ecza depoları Mal Devir kullanmaz.');
+            throw new InvalidArgumentException('Ecza depoları ve hastaneler Mal Devir kullanmaz.');
         }
 
         $satirlar = [];

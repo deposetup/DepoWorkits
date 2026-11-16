@@ -77,7 +77,7 @@ class IslemController extends Controller
         }
         if (in_array($tur, ['devir', 'devir_iptal'], true)) {
             $tenant = auth()->user()->tenant;
-            abort_if($tenant && ! $tenant->devirYapabilir(), 403, 'Ecza depoları Mal Devir kullanmaz.');
+            abort_if($tenant && ! $tenant->devirYapabilir(), 403, 'Ecza depoları ve hastaneler Mal Devir kullanmaz.');
         }
     }
 }
