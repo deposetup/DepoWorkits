@@ -177,10 +177,11 @@ class StokController extends Controller
                 $q->lazy(1000)->map(fn ($k) => [$adlar[$k->gtin] ?? '', $receteHarita[\App\Models\IlacRecete::anahtar($k->gtin) ?? ''] ?? '', $k->gtin, $k->sn, $k->bn, $k->skt?->format('d.m.Y'), $k->lokasyon ?? '', self::karekodHam($k)]),
                 'Stok');
         }
-        $kalemler = $q->paginate(100)->withQueryString();
+        $sayfa = in_array((int) $request->query('sayfa'), [100, 300, 600], true) ? (int) $request->query('sayfa') : 100;
+        $kalemler = $q->paginate($sayfa)->withQueryString();
 
         return view('stok.liste', [
-            'kalemler' => $kalemler, 'adlar' => $adlar, 'ara' => $ara, 'durum' => $durum, 'receteHarita' => $receteHarita,
+            'sayfa' => $sayfa, 'kalemler' => $kalemler, 'adlar' => $adlar, 'ara' => $ara, 'durum' => $durum, 'receteHarita' => $receteHarita,
             'sayilar' => StokKalemi::where('tenant_id', $tid)->selectRaw('durum, count(*) as adet')->groupBy('durum')->pluck('adet', 'durum')->all(),
             'sirala' => $sirala, 'yon' => $yon, 'lokasyon' => $lokasyon, 'lokasyonlar' => StokKalemi::lokasyonlar($tid), 'redOdasi' => StokKalemi::RED_ODASI,
             'sebepler' => StokServisi::DEAKTIVE_SEBEPLER,
@@ -266,8 +267,12 @@ class StokController extends Controller
             'sebep' => 'nullable|in:'.implode(',', array_keys(StokServisi::DEAKTIVE_SEBEPLER)),
             'aciklama' => 'nullable|string|max:255',
         ], ['secili.required' => 'Önce listeden ürün seçin.']);
-        if (count($v['secili']) > 100) {
-            return back()->withErrors(['secili' => 'Tek seferde en fazla 100 ürün için bildirim yapılabilir; seçiminizi 100 ve altına indirin.']);
+        $sarfMi = in_array($v['tur'], ['sarf', 'sarf_iptal'], true);
+        $azami = $sarfMi ? StokServisi::SARF_AZAMI : 100;
+        if (count($v['secili']) > $azami) {
+            $mesaj = 'Tek seferde en fazla '.$azami.' ürün için bildirim yapılabilir; seçiminizi '.$azami.' ve altına indirin.';
+
+            return $request->expectsJson() ? response()->json(['message' => $mesaj], 422) : back()->withErrors(['secili' => $mesaj]);
         }
         abort_if(in_array($v['tur'], ['sarf', 'sarf_iptal'], true) && ! $request->user()->tenant->sarfYapabilir(), 403, 'Ecza depoları sarf bildirimi yapamaz.');
         abort_if(in_array($v['tur'], ['satis', 'satis_iptal'], true) && ! $request->user()->tenant->satisYapabilir(), 403, 'Hastaneler satış yapamaz; yalnızca sarf ve iade bildirir.');
@@ -283,6 +288,10 @@ class StokController extends Controller
             ->map(fn ($k) => ['kod' => self::karekod($k), 'gtin' => $k->gtin, 'sn' => $k->sn, 'bn' => $k->bn, 'xd' => $k->skt?->toDateString()])
             ->all();
         $sonuc = $servis->kalemleriIsle($request->user(), $v['tur'], $kalemler, $v['sebep'] ?? null, $v['aciklama'] ?? null, $v['karsi_gln'] ?? null);
+
+        if ($request->expectsJson()) {
+            return response()->json(['satirlar' => $sonuc['satirlar'], 'bildirim' => $sonuc['bildirim']]);
+        }
 
         return view('islem.form', [
             'tur' => $v['tur'], 'baslik' => StokServisi::TURLER[$v['tur']][2], 'sebepler' => StokServisi::DEAKTIVE_SEBEPLER, 'sonuc' => $sonuc,

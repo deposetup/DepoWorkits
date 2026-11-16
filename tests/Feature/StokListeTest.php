@@ -37,10 +37,47 @@ class StokListeTest extends TestCase
         $this->actingAs($u)->get('/stok/liste?sirala=skt&yon=asc')->assertOk()->assertSeeInOrder(['21A1', '21B1']);
     }
 
-    public function test_toplu_bildirim_100_urunle_sinirlidir(): void
+    public function test_toplu_bildirim_sinirlari(): void
     {
         $u = $this->kurulum();
-        $this->actingAs($u)->from('/stok/liste')->post('/stok/toplu', ['tur' => 'sarf', 'secili' => range(1, 101)])->assertSessionHasErrors('secili');
+        // sarf için 600, diğer işlemler için 100
+        $this->actingAs($u)->from('/stok/liste')->post('/stok/toplu', ['tur' => 'sarf', 'secili' => range(1, 601)])->assertSessionHasErrors('secili');
+        $this->actingAs($u)->from('/stok/liste')->post('/stok/toplu', ['tur' => 'satis', 'secili' => range(1, 101), 'karsi_gln' => '8680001000011'])->assertSessionHasErrors('secili');
+        $this->actingAs($u)->postJson('/stok/toplu', ['tur' => 'sarf', 'secili' => range(1, 601)])->assertStatus(422)->assertJsonPath('message', fn ($m) => str_contains($m, '600'));
+    }
+
+    public function test_sarf_json_yaniti_doner_ve_its_e_200_luk_gruplar_gider(): void
+    {
+        $u = $this->kurulum();
+        $u->tenant->update(['tur' => 'hastane']);
+        StokKalemi::query()->delete();
+        $ids = [];
+        for ($i = 1; $i <= 450; $i++) {
+            $ids[] = StokKalemi::create(['tenant_id' => $u->tenant_id, 'gtin' => '08699999999990', 'sn' => 'S'.$i, 'bn' => 'L1', 'skt' => now()->addYear(), 'durum' => 'stokta'])->id;
+        }
+        $mock = new class extends \App\Services\Its\MockItsClient {
+            public array $gruplar = [];
+
+            public function hastaneSarf(\App\Models\Tenant $tenant, array $urunler): \App\Services\Its\ItsSonuc
+            {
+                $this->gruplar[] = count($urunler);
+
+                return parent::hastaneSarf($tenant, $urunler);
+            }
+        };
+        $this->app->instance(\App\Services\Its\ItsClient::class, $mock);
+
+        $r = $this->actingAs($u)->postJson('/stok/toplu', ['tur' => 'sarf', 'secili' => $ids])->assertOk()->assertJsonStructure(['satirlar', 'bildirim']);
+        $this->assertSame([200, 200, 50], $mock->gruplar);
+        $this->assertCount(450, $r->json('satirlar'));
+        $this->assertSame(450, StokKalemi::where('durum', 'sarf')->count());
+    }
+
+    public function test_liste_sayfa_boyutu_secilebilir(): void
+    {
+        $u = $this->kurulum();
+        $this->actingAs($u)->get('/stok/liste?sayfa=600')->assertOk()->assertSee('Sayfa başına')->assertSee('en fazla 600');
+        $this->actingAs($u)->get('/stok/liste?sayfa=7')->assertOk();
     }
 
     public function test_liste_karekodu_gosterir_ve_toplu_satis_yapar(): void

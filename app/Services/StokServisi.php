@@ -16,6 +16,12 @@ use InvalidArgumentException;
  */
 class StokServisi
 {
+    /** Hastane sarf bildirimlerinde İTS'e tek istekte gönderilen ürün sayısı. */
+    public const SARF_GRUP = 200;
+
+    /** Sarf için tek seferde seçilebilecek en fazla ürün. */
+    public const SARF_AZAMI = 600;
+
     /** tür => [gereken mevcut durum, yeni durum] */
     public const TURLER = [
         'kabul' => [null, 'stokta', 'Mal Kabul'],
@@ -118,7 +124,7 @@ class StokServisi
         $bildirim = null;
         $basariliKalemler = [];
         // İTS tek istekte çok ürün kabul etmeyebilir; büyük listeler parçalara bölünür.
-        foreach (array_chunk($gonderilecek, 100) as $parca) {
+        foreach (array_chunk($gonderilecek, in_array($tur, ['sarf', 'sarf_iptal'], true) ? self::SARF_GRUP : 100) as $parca) {
             $sonuc = match ($tur) {
                 'kabul' => $this->its->malKabul($tenant, $parca),
                 'sarf' => $this->its->hastaneSarf($tenant, $parca),
