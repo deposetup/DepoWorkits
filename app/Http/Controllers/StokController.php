@@ -34,7 +34,19 @@ class StokController extends Controller
             $q->where('gtin', 'like', '%'.preg_replace('/\D/', '', $ara).'%');
         }
 
-        return view('stok.index', ['satirlar' => $q->get(), 'adlar' => $this->adlar($its), 'ara' => $ara]);
+        $adlar = $this->adlar($its);
+        $sirala = in_array($request->query('sirala'), ['ad', 'adet', 'gtin', 'skt'], true) ? $request->query('sirala') : 'gtin';
+        $yon = $request->query('yon') === 'desc' ? 'desc' : 'asc';
+        $turkce = fn (string $a): string => mb_strtolower(strtr($a, ['I' => 'ı', 'İ' => 'i']), 'UTF-8');
+        $anahtar = match ($sirala) {
+            'ad' => fn ($r) => $turkce((string) ($adlar[$r->gtin] ?? '')),
+            'adet' => fn ($r) => (int) $r->adet,
+            'skt' => fn ($r) => (string) ($r->en_yakin_skt ?? '9999-12-31'),
+            default => fn ($r) => (string) $r->gtin,
+        };
+        $satirlar = $q->get()->sortBy($anahtar, SORT_NATURAL, $yon === 'desc')->values();
+
+        return view('stok.index', ['satirlar' => $satirlar, 'adlar' => $adlar, 'ara' => $ara, 'sirala' => $sirala, 'yon' => $yon]);
     }
 
     /** GTIN (barkod) bazlı stok: ürün başına adet ve parti/SKT kırılımı; Excel çıktısı. */
@@ -76,7 +88,18 @@ class StokController extends Controller
             'partiler' => $liste,
         ])->values();
 
-        return view('stok.barkod', ['urunler' => $urunler, 'ara' => $ara, 'toplam' => $urunler->sum('adet')]);
+        $sirala = in_array($request->query('sirala'), ['ad', 'adet', 'skt', 'gtin'], true) ? $request->query('sirala') : 'gtin';
+        $yon = $request->query('yon') === 'desc' ? 'desc' : 'asc';
+        $turkce = fn (string $a): string => mb_strtolower(strtr($a, ['I' => 'ı', 'İ' => 'i']), 'UTF-8');
+        $anahtar = match ($sirala) {
+            'ad' => fn ($u) => $turkce((string) ($u->ad ?? '')),
+            'adet' => fn ($u) => (int) $u->adet,
+            'skt' => fn ($u) => $u->en_yakin_skt?->format('Y-m-d') ?? '9999-12-31',
+            default => fn ($u) => (string) $u->gtin,
+        };
+        $urunler = $urunler->sortBy($anahtar, SORT_NATURAL, $yon === 'desc')->values();
+
+        return view('stok.barkod', ['urunler' => $urunler, 'ara' => $ara, 'toplam' => $urunler->sum('adet'), 'sirala' => $sirala, 'yon' => $yon]);
     }
 
     /** Karekod metni (okunabilir GS1 biçimi). */

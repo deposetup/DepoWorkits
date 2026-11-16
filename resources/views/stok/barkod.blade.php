@@ -7,13 +7,22 @@
 </div>
 <div class="alert alert-info small">Bu liste DepoWork İTS üzerinden yapılan bildirimlere ve içe aktarılan ürünlere göre hesaplanır; Bakanlık portalındaki stok ekranının birebir kopyası değildir. Sistem dışında girilmiş ürünler için <a href="{{ route('stok.ice-aktar') }}">Stok İçe Aktar</a> ekranını kullanın.</div>
 <form class="mb-3 d-flex gap-2" method="get">
+  <input type="hidden" name="sirala" value="{{ $sirala }}"><input type="hidden" name="yon" value="{{ $yon }}">
   <input name="ara" value="{{ $ara }}" class="form-control w-auto" style="min-width:18rem" placeholder="GTIN veya ilaç adı ara">
   <button class="btn btn-outline-secondary">Ara</button>
   @if($ara !== '')<a class="btn btn-link" href="{{ route('stok.barkod') }}">Temizle</a>@endif
 </form>
 <div class="d-flex gap-3 mb-2 small text-muted"><span>Ürün çeşidi: <strong>{{ $urunler->count() }}</strong></span><span>Toplam adet: <strong>{{ $toplam }}</strong></span></div>
 <div class="table-responsive"><table class="table table-sm bg-white align-middle">
-<thead><tr><th>GTIN</th><th>İlaç</th><th class="text-end">Adet</th><th>Parti</th><th>En Yakın SKT</th><th></th></tr></thead><tbody>
+@php
+  $baslik = function (string $alan, string $ad, string $sinif = '') use ($sirala, $yon) {
+      $aktif = $sirala === $alan;
+      $url = request()->fullUrlWithQuery(['sirala' => $alan, 'yon' => $aktif && $yon === 'asc' ? 'desc' : 'asc']);
+      $ok = $aktif ? ($yon === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up text-muted';
+      return '<th class="'.$sinif.'"><a href="'.e($url).'" class="text-decoration-none text-dark text-nowrap">'.e($ad).' <i class="bi '.$ok.'"></i></a></th>';
+  };
+@endphp
+<thead><tr>{!! $baslik('gtin', 'GTIN') !!}{!! $baslik('ad', 'İlaç') !!}{!! $baslik('adet', 'Adet', 'text-end') !!}<th>Parti</th>{!! $baslik('skt', 'En Yakın SKT') !!}<th></th></tr></thead><tbody>
 @forelse($urunler as $i => $u)
 @php
   $gun = $u->en_yakin_skt ? (int) now()->startOfDay()->diffInDays($u->en_yakin_skt->startOfDay(), false) : null;

@@ -136,6 +136,7 @@
       @else
         @php $yeniTalep = \Illuminate\Support\Facades\Schema::hasTable('destek_talepleri') ? \App\Models\DestekTalebi::where('durum', 'yeni')->count() : 0; @endphp
         <a class="yan-link {{ request()->routeIs('admin.tenants.*', 'admin.kullanici.*') ? 'aktif' : '' }}" href="{{ route('admin.tenants.index') }}"><i class="bi bi-people"></i>Müşteriler</a>
+        <a class="yan-link {{ request()->routeIs('admin.yoneticiler*') ? 'aktif' : '' }}" href="{{ route('admin.yoneticiler') }}"><i class="bi bi-shield-lock"></i>Kullanıcılar</a>
         <a class="yan-link {{ request()->routeIs('admin.talepler*') ? 'aktif' : '' }}" href="{{ route('admin.talepler') }}"><i class="bi bi-life-preserver"></i>Destek Talepleri @if($yeniTalep)<span class="badge text-bg-warning ms-auto">{{ $yeniTalep }}</span>@endif</a>
         <a class="yan-link {{ request()->routeIs('admin.paydas-degisimleri') ? 'aktif' : '' }}" href="{{ route('admin.paydas-degisimleri') }}"><i class="bi bi-bell"></i>Paydaş Değişimleri</a>
         <a class="yan-link {{ request()->routeIs('admin.giris-kayitlari') ? 'aktif' : '' }}" href="{{ route('admin.giris-kayitlari') }}"><i class="bi bi-clock-history"></i>Giriş Kayıtları</a>

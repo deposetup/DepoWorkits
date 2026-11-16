@@ -15,7 +15,15 @@ class EnsureLicenseActive
     public function handle(Request $request, Closure $next, string $mod = 'tam'): Response
     {
         $user = $request->user();
-        if (! $user || $user->superAdminMi()) {
+        if (! $user) {
+            return $next($request);
+        }
+        if ($user->superAdminMi()) {
+            // Yönetici hesabı bir müşteriye bağlı değildir; PTS, stok, İTS gibi müşteri sayfaları tenant ister.
+            if (! $user->tenant_id && ! $request->routeIs('home')) {
+                return redirect()->route('admin.tenants.index')->with('hata', 'Bu sayfa bir müşteri hesabı gerektirir. Müşteriler listesinden ilgili müşteri için "Müşteri gözü" ile girin.');
+            }
+
             return $next($request);
         }
 
