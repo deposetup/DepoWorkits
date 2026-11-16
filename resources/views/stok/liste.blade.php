@@ -54,6 +54,19 @@
   <div class="col-auto small text-muted">Bu sayfadaki ürünler seçilir; başka sayfa için ayrıca uygulayın.</div>
 </div></div>
 
+@php
+  $sayfaIlaclar = $kalemler->getCollection()->pluck('gtin')->unique()->values();
+@endphp
+<div class="card mb-2 border-success"><div class="card-body py-2 d-flex flex-wrap gap-2 align-items-center">
+  <i class="bi bi-magic text-success"></i><strong class="small">Adede göre otomatik seç</strong>
+  @if($sayfaIlaclar->count() > 1)
+  <select id="otoIlac" class="form-select form-select-sm w-auto" style="max-width:320px">@foreach($sayfaIlaclar as $g)<option value="{{ $g }}">{{ $adlar[$g] ?? $g }}</option>@endforeach</select>
+  @endif
+  <input type="number" id="otoAdet" min="1" max="1000" class="form-control form-control-sm" style="width:110px" placeholder="Adet">
+  <button type="button" class="btn btn-sm btn-success" id="otoSec"><i class="bi bi-check2-all me-1"></i>SKT'si en yakın olanlardan seç</button>
+  <button type="button" class="btn btn-sm btn-outline-secondary" id="otoTemizle">Seçimi temizle</button>
+  <span class="small text-muted" id="otoMesaj">Önce ilaç adını aratın, adedi yazın; SKT'si en yakın partilerden başlayarak o kadar ürün işaretlenir (SKT'si geçmişler atlanır). Sonra yukarıdan bildirimi seçip uygulayın.</span>
+</div></div>
 <table class="table table-sm bg-white align-middle"><thead><tr>
   <th><input type="checkbox" id="hepsi" onclick="document.querySelectorAll('.sec').forEach(c=>c.checked=this.checked);say()"></th>
   @php
@@ -65,7 +78,7 @@
 @endphp
   <th>{!! $bas('ilac', 'İlaç') !!}</th><th>Karekod</th><th>Parti</th><th>{!! $bas('skt', 'SKT') !!}</th><th>{!! $bas('lokasyon', 'Lokasyon') !!}</th></tr></thead><tbody>
 @forelse($kalemler as $k)
-<tr><td><input type="checkbox" class="sec" name="secili[]" value="{{ $k->id }}" onclick="say()"></td>
+<tr data-gtin="{{ $k->gtin }}" data-skt="{{ $k->skt?->toDateString() }}"><td><input type="checkbox" class="sec" name="secili[]" value="{{ $k->id }}" onclick="say()"></td>
 <td>{{ $adlar[$k->gtin] ?? '—' }}</td>
 <td class="font-monospace small">{{ str_replace("\x1d", '', \App\Http\Controllers\StokController::karekodHam($k)) }}</td>
 <td>{{ $k->bn ?: '—' }}</td><td>{{ $k->skt?->format('d.m.Y') ?? '—' }}</td><td>@if($k->lokasyon === $redOdasi)<span class="badge text-bg-danger">{{ $k->lokasyon }}</span>@else{{ $k->lokasyon ?: '—' }}@endif</td></tr>
@@ -80,6 +93,23 @@ document.querySelectorAll('.islem-btn').forEach(b=>b.addEventListener('click',fu
  document.querySelectorAll('.islem-btn').forEach(x=>{const a=x===b;x.classList.toggle('active',a);x.classList.toggle('opacity-50',!a);x.setAttribute('aria-pressed',a)});
  const u=document.getElementById('uygula');u.className='btn btn-'+b.dataset.renk;document.getElementById('uygulaAd').textContent=b.dataset.ad+' Bildir';
  alanlar()}));
+document.getElementById('otoTemizle').addEventListener('click',function(){document.querySelectorAll('.sec').forEach(c=>c.checked=false);say();document.getElementById('otoMesaj').textContent='Seçim temizlendi.'});
+document.getElementById('otoSec').addEventListener('click',function(){
+ const n=parseInt(document.getElementById('otoAdet').value,10),m=document.getElementById('otoMesaj');
+ if(!n||n<1){m.textContent='Geçerli bir adet girin.';return}
+ const ilacSel=document.getElementById('otoIlac');
+ const bugun=new Date().toISOString().slice(0,10);
+ let satirlar=[...document.querySelectorAll('tbody tr[data-gtin]')];
+ if(ilacSel)satirlar=satirlar.filter(r=>r.dataset.gtin===ilacSel.value);
+ satirlar=satirlar.filter(r=>!r.dataset.skt||r.dataset.skt>=bugun);
+ satirlar.sort((a,b)=>(a.dataset.skt||'9999').localeCompare(b.dataset.skt||'9999'));
+ document.querySelectorAll('.sec').forEach(c=>c.checked=false);
+ const secilen=satirlar.slice(0,n);
+ secilen.forEach(r=>r.querySelector('.sec').checked=true);
+ say();
+ const partiler=new Set(secilen.map(r=>r.children[3].textContent.trim()));
+ m.textContent=secilen.length<n?('Uyarı: yalnızca '+secilen.length+' uygun ürün bulundu ve işaretlendi (istenen '+n+').'):(secilen.length+' ürün işaretlendi ('+[...partiler].join(', ')+' partisinden).');
+});
 function alanlar(){const t=document.getElementById('tur').value;
  document.getElementById('glnAlan').classList.toggle('d-none',!['satis','iade','devir'].includes(t));
  document.getElementById('sebepAlan').classList.toggle('d-none',!['deaktive','deaktive_iptal'].includes(t))}
