@@ -148,7 +148,7 @@ class StokController extends Controller
                 $q->lazy(1000)->map(fn ($k) => [$adlar[$k->gtin] ?? '', $k->gtin, $k->sn, $k->bn, $k->skt?->format('d.m.Y'), $k->lokasyon ?? '', self::karekodHam($k)]),
                 'Stok');
         }
-        $kalemler = $q->paginate($ara !== '' ? 1000 : 200)->withQueryString();
+        $kalemler = $q->paginate(100)->withQueryString();
 
         return view('stok.liste', [
             'kalemler' => $kalemler, 'adlar' => $adlar, 'ara' => $ara, 'durum' => $durum,
