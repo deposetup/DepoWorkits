@@ -101,10 +101,10 @@
       <div class="d-flex flex-column gap-2">
         @if($sayfaIlaclar->count() > 1)<select id="otoIlac" class="form-select form-select-sm">@foreach($sayfaIlaclar as $ad => $adet)<option value="{{ $ad }}">{{ $ad }} ({{ $adet }} ürün)</option>@endforeach</select>@endif
         <div class="input-group input-group-sm">
-          <input type="number" id="otoAdet" min="1" max="1000" class="form-control" placeholder="Adet girin">
+          <input type="number" id="otoAdet" min="1" max="100" class="form-control" placeholder="Adet (en fazla 100)">
           <button type="button" class="btn btn-success" id="otoSec"><i class="bi bi-magic me-1"></i>SKT'si yakın olanları seç</button>
         </div>
-        <div class="small text-muted" id="otoMesaj">Adede göre otomatik seç: önce ilacı aratın, adedi yazın. SKT'si en yakın partiden başlanır, süresi geçenler atlanır.</div>
+        <div class="small text-muted" id="otoMesaj">Adede göre otomatik seç (en fazla 100): önce ilacı aratın, adedi yazın. SKT'si en yakın partiden başlanır, süresi geçenler atlanır.</div>
       </div>
     </div>
   </div>
@@ -173,6 +173,7 @@ document.getElementById('otoTemizle').addEventListener('click',function(){docume
 document.getElementById('otoSec').addEventListener('click',function(){
  const n=parseInt(document.getElementById('otoAdet').value,10),m=document.getElementById('otoMesaj');
  if(!n||n<1){m.textContent='Geçerli bir adet girin.';return}
+ if(n>100){document.getElementById('otoAdet').value=100;m.textContent='Tek seferde en fazla 100 ürün seçilebilir; adet 100 olarak ayarlandı, tekrar basın.';return}
  const ilacSel=document.getElementById('otoIlac');
  const bugun=new Date().toISOString().slice(0,10);
  let satirlar=[...document.querySelectorAll('tbody tr[data-gtin]')];

@@ -37,6 +37,12 @@ class StokListeTest extends TestCase
         $this->actingAs($u)->get('/stok/liste?sirala=skt&yon=asc')->assertOk()->assertSeeInOrder(['21A1', '21B1']);
     }
 
+    public function test_toplu_bildirim_100_urunle_sinirlidir(): void
+    {
+        $u = $this->kurulum();
+        $this->actingAs($u)->from('/stok/liste')->post('/stok/toplu', ['tur' => 'sarf', 'secili' => range(1, 101)])->assertSessionHasErrors('secili');
+    }
+
     public function test_liste_karekodu_gosterir_ve_toplu_satis_yapar(): void
     {
         $u = $this->kurulum();

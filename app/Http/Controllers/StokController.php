@@ -238,6 +238,9 @@ class StokController extends Controller
             'sebep' => 'nullable|in:'.implode(',', array_keys(StokServisi::DEAKTIVE_SEBEPLER)),
             'aciklama' => 'nullable|string|max:255',
         ], ['secili.required' => 'Önce listeden ürün seçin.']);
+        if (count($v['secili']) > 100) {
+            return back()->withErrors(['secili' => 'Tek seferde en fazla 100 ürün için bildirim yapılabilir; seçiminizi 100 ve altına indirin.']);
+        }
         abort_if(in_array($v['tur'], ['sarf', 'sarf_iptal'], true) && ! $request->user()->tenant->sarfYapabilir(), 403, 'Ecza depoları sarf bildirimi yapamaz.');
         abort_if(in_array($v['tur'], ['satis', 'satis_iptal'], true) && ! $request->user()->tenant->satisYapabilir(), 403, 'Hastaneler satış yapamaz; yalnızca sarf ve iade bildirir.');
         abort_if(in_array($v['tur'], ['devir', 'devir_iptal'], true) && ! $request->user()->tenant->devirYapabilir(), 403, 'Ecza depoları ve hastaneler Mal Devir kullanmaz.');
