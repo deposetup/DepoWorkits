@@ -68,6 +68,23 @@ class IslemController extends Controller
         ]);
     }
 
+    /** Sonuç ekranındaki satırları Excel olarak indirir (başarısızlar üstte). */
+    public function sonucExcel(Request $request)
+    {
+        abort_unless($request->user()->tenant_id, 403);
+        $v = $request->validate(['veri' => 'required|string|max:2000000', 'baslik' => 'nullable|string|max:60']);
+        $satirlar = json_decode($v['veri'], true);
+        abort_unless(is_array($satirlar), 422);
+        $adlar = \App\Support\IlacAdlari::harita();
+        $sirali = collect($satirlar)->filter(fn ($s) => is_array($s) && isset($s['kod']))->sortBy(fn ($s) => ($s['durum'] ?? '') === 'tamam' ? 1 : 0)->values();
+
+        return \App\Support\XlsxYazici::indir('sonuc-'.now()->format('Ymd-His').'.xlsx', ['Sıra', 'İlaç', 'Karekod', 'Sonuç', 'Mesaj'],
+            $sirali->map(fn ($s, $i) => [
+                $i + 1, $adlar[\App\Support\IlacAdlari::gtinBul((string) $s['kod'])] ?? '', \App\Support\IlacAdlari::parantezsiz((string) $s['kod']),
+                ($s['durum'] ?? '') === 'tamam' ? 'Başarılı' : 'Başarısız', ($s['durum'] ?? '') === 'tamam' ? '' : (string) ($s['mesaj'] ?? ''),
+            ])->all(), mb_substr($v['baslik'] ?? 'Sonuç', 0, 31));
+    }
+
     /** Ecza depolarında Hastane Sarf / Sarf İptal kapalıdır (depolar sarf yapamaz). */
     private function sarfYetkisi(string $tur): void
     {

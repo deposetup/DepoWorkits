@@ -78,6 +78,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::get('/stok/ice-aktar', [\App\Http\Controllers\StokAktarController::class, 'form'])->name('stok.ice-aktar');
         Route::post('/stok/ice-aktar/csv', [\App\Http\Controllers\StokAktarController::class, 'csv'])->name('stok.ice-aktar.csv');
         Route::post('/stok/ice-aktar', [\App\Http\Controllers\StokAktarController::class, 'calistir'])->name('stok.ice-aktar.calistir');
+        Route::post('/islem-sonuc/excel', [IslemController::class, 'sonucExcel'])->name('islem.sonuc-excel');
         Route::get('/islem/{tur}', [IslemController::class, 'form'])->name('islem');
         Route::post('/islem/{tur}', [IslemController::class, 'calistir'])->name('islem.calistir');
     });

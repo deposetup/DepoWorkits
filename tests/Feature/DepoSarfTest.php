@@ -60,6 +60,18 @@ class DepoSarfTest extends TestCase
         $this->actingAs($u->fresh())->get('/islem/sarf')->assertForbidden();
     }
 
+    public function test_sonuc_ekraninda_basarisizlar_ustte_ve_excel_vardir(): void
+    {
+        $h = $this->user('hastane');
+        $this->actingAs($h)->post('/islem/kabul', ['kodlar' => self::KOD]);
+        $kotu = '010869961765015317301231'."10LOT9\x1D".'21YOKSERI';
+        $r = $this->actingAs($h)->post('/islem/sarf', ['kodlar' => self::KOD."\n".$kotu]);
+        $r->assertOk()->assertSee('1 başarısız')->assertSee('1 başarılı')->assertSee('islem-sonuc/excel', false);
+        $r->assertSeeInOrder(['YOKSERI', 'SN1'], false);
+        $x = $this->actingAs($h)->post('/islem-sonuc/excel', ['veri' => json_encode([['kod' => self::KOD, 'durum' => 'tamam'], ['kod' => $kotu, 'durum' => 'hata', 'mesaj' => 'x']])]);
+        $x->assertOk();
+    }
+
     public function test_hastane_satis_yapamaz_sarf_ve_iade_yapar(): void
     {
         $h = $this->user('hastane');

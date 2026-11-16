@@ -26,7 +26,19 @@
   <button class="btn btn-primary mt-3">Gönder</button>
 </form>
 @isset($sonuc)
-<div class="card"><div class="card-header">Sonuç @if($sonuc['bildirim'])<small class="text-muted">Bildirim No: {{ $sonuc['bildirim'] }}</small>@endif</div>
+@php
+  $tumSatirlar = collect($sonuc['satirlar'])->sortBy(fn ($x) => $x['durum'] === 'tamam' ? 1 : 0)->values();
+  $hataSayi = $tumSatirlar->where('durum', '!=', 'tamam')->count();
+  $okSayi = $tumSatirlar->count() - $hataSayi;
+@endphp
+<div class="card"><div class="card-header d-flex flex-wrap align-items-center gap-2">
+  <span class="fw-semibold">Sonuç</span>@if($sonuc['bildirim'])<small class="text-muted">Bildirim No: {{ $sonuc['bildirim'] }}</small>@endif
+  <span class="badge text-bg-success">{{ $okSayi }} başarılı</span>@if($hataSayi)<span class="badge text-bg-danger">{{ $hataSayi }} başarısız</span>@endif
+  <form method="post" action="{{ route('islem.sonuc-excel') }}" class="ms-auto">@csrf
+    <input type="hidden" name="veri" value="{{ json_encode($sonuc['satirlar'], JSON_UNESCAPED_UNICODE) }}"><input type="hidden" name="baslik" value="{{ $baslik }}">
+    <button class="btn btn-sm btn-success"><i class="bi bi-file-earmark-excel me-1"></i>Excel</button></form>
+</div>
+@if($hataSayi)<div class="alert alert-danger rounded-0 mb-0 py-2 small"><i class="bi bi-exclamation-triangle me-1"></i><b>{{ $hataSayi }} ürün için bildirim yapılamadı.</b> Başarısız satırlar aşağıda en üstte listelenmiştir.</div>@endif
 @php
   $geriAlinabilir = in_array($tur, ['satis', 'devir'], true);
   $iptalTuru = $tur === 'satis' ? 'satis_iptal' : 'devir_iptal';
@@ -34,7 +46,7 @@
   $basarili = collect($sonuc['satirlar'])->where('durum', 'tamam')->pluck('kod')->values();
 @endphp
 <table class="table table-sm mb-0 align-middle">
-@foreach($sonuc['satirlar'] as $s)
+@foreach($tumSatirlar as $s)
 <tr class="{{ $s['durum'] === 'tamam' ? 'table-success' : 'table-danger' }}"><td class="font-monospace small">{{ \Illuminate\Support\Str::limit(\App\Support\IlacAdlari::parantezsiz($s['kod']), 60) }}</td><td>{{ $ilacAdlari[\App\Support\IlacAdlari::gtinBul($s['kod'])] ?? '—' }}</td><td>{{ $s['durum'] === 'tamam' ? 'Başarılı' : $s['mesaj'] }}</td>
 @if($geriAlinabilir)<td class="text-end">@if($s['durum'] === 'tamam')
   <form method="post" action="{{ route('islem.calistir', $iptalTuru) }}" onsubmit="return confirm('Bu ürünün {{ $tur === 'satis' ? 'satışı' : 'devri' }} İTS\'te iptal edilecek. Emin misiniz?')">@csrf<input type="hidden" name="kodlar" value="{{ $s['kod'] }}"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-arrow-counterclockwise me-1"></i>{{ $tur === 'satis' ? 'Satışı geri al' : 'Devri geri al' }}</button></form>
