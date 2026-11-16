@@ -35,18 +35,21 @@ class StokController extends Controller
         }
 
         $adlar = $this->adlar($its);
-        $sirala = in_array($request->query('sirala'), ['ad', 'adet', 'gtin', 'skt'], true) ? $request->query('sirala') : 'gtin';
+        $tum = $q->get();
+        $receteler = \App\Models\IlacRecete::tipler($tum->pluck('gtin'));
+        $sirala = in_array($request->query('sirala'), ['ad', 'adet', 'gtin', 'skt', 'recete'], true) ? $request->query('sirala') : 'gtin';
         $yon = $request->query('yon') === 'desc' ? 'desc' : 'asc';
         $turkce = fn (string $a): string => mb_strtolower(strtr($a, ['I' => 'ı', 'İ' => 'i']), 'UTF-8');
         $anahtar = match ($sirala) {
             'ad' => fn ($r) => $turkce((string) ($adlar[$r->gtin] ?? '')),
             'adet' => fn ($r) => (int) $r->adet,
             'skt' => fn ($r) => (string) ($r->en_yakin_skt ?? '9999-12-31'),
+            'recete' => fn ($r) => $turkce((string) ($receteler[$r->gtin] ?? '~')),
             default => fn ($r) => (string) $r->gtin,
         };
-        $satirlar = $q->get()->sortBy($anahtar, SORT_NATURAL, $yon === 'desc')->values();
+        $satirlar = $tum->sortBy($anahtar, SORT_NATURAL, $yon === 'desc')->values();
 
-        return view('stok.index', ['satirlar' => $satirlar, 'adlar' => $adlar, 'ara' => $ara, 'sirala' => $sirala, 'yon' => $yon]);
+        return view('stok.index', ['satirlar' => $satirlar, 'adlar' => $adlar, 'ara' => $ara, 'sirala' => $sirala, 'yon' => $yon, 'receteler' => $receteler]);
     }
 
     /** GTIN (barkod) bazlı stok: ürün başına adet ve parti/SKT kırılımı; Excel çıktısı. */
@@ -164,18 +167,20 @@ class StokController extends Controller
             $sirala = '';
             $q->orderBy('gtin')->orderBy('skt')->orderBy('sn');
         }
+        $receteHarita = \App\Models\IlacRecete::tipler((clone $q)->reorder()->distinct()->pluck('gtin'));
+        $receteHarita = collect($receteHarita)->mapWithKeys(fn ($tip, $g) => [\App\Models\IlacRecete::anahtar($g) => $tip])->all();
         if ($request->boolean('excel')) {
             $ad = ['stokta' => 'stok', 'satis' => 'satildi', 'sarf' => 'sarf', 'devir' => 'devredildi', 'deaktive' => 'deaktive'][$durum];
 
             return \App\Support\XlsxYazici::indir($ad.'-listesi-'.now()->format('Ymd-His').'.xlsx',
-                ['İlaç', 'GTIN', 'Seri No', 'Parti', 'SKT', 'Lokasyon', 'Karekod'],
-                $q->lazy(1000)->map(fn ($k) => [$adlar[$k->gtin] ?? '', $k->gtin, $k->sn, $k->bn, $k->skt?->format('d.m.Y'), $k->lokasyon ?? '', self::karekodHam($k)]),
+                ['İlaç', 'Reçete', 'GTIN', 'Seri No', 'Parti', 'SKT', 'Lokasyon', 'Karekod'],
+                $q->lazy(1000)->map(fn ($k) => [$adlar[$k->gtin] ?? '', $receteHarita[\App\Models\IlacRecete::anahtar($k->gtin) ?? ''] ?? '', $k->gtin, $k->sn, $k->bn, $k->skt?->format('d.m.Y'), $k->lokasyon ?? '', self::karekodHam($k)]),
                 'Stok');
         }
         $kalemler = $q->paginate(100)->withQueryString();
 
         return view('stok.liste', [
-            'kalemler' => $kalemler, 'adlar' => $adlar, 'ara' => $ara, 'durum' => $durum,
+            'kalemler' => $kalemler, 'adlar' => $adlar, 'ara' => $ara, 'durum' => $durum, 'receteHarita' => $receteHarita,
             'sayilar' => StokKalemi::where('tenant_id', $tid)->selectRaw('durum, count(*) as adet')->groupBy('durum')->pluck('adet', 'durum')->all(),
             'sirala' => $sirala, 'yon' => $yon, 'lokasyon' => $lokasyon, 'lokasyonlar' => StokKalemi::lokasyonlar($tid), 'redOdasi' => StokKalemi::RED_ODASI,
             'sebepler' => StokServisi::DEAKTIVE_SEBEPLER,

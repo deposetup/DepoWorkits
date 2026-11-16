@@ -124,7 +124,7 @@
 <div class="table-responsive"><table class="table table-hover table-sm sl-tablo align-middle mb-0">
 <thead><tr>
   <th style="width:2.5rem" class="ps-3"><input class="form-check-input" type="checkbox" id="hepsi" title="Sayfadakilerin tümünü seç"></th>
-  <th>{!! $bas('ilac', 'İlaç') !!}</th><th>Karekod</th><th>Parti</th><th>{!! $bas('skt', 'SKT') !!}</th><th>{!! $bas('lokasyon', 'Lokasyon') !!}</th></tr></thead>
+  <th>{!! $bas('ilac', 'İlaç') !!}</th><th>Reçete</th><th>Karekod</th><th>{!! $bas('skt', 'SKT') !!}</th><th>{!! $bas('lokasyon', 'Lokasyon') !!}</th></tr></thead>
 <tbody>
 @forelse($kalemler as $k)
 @php
@@ -133,8 +133,8 @@
 <tr data-gtin="{{ $k->gtin }}" data-ad="{{ $adOf($k->gtin) }}" data-skt="{{ $k->skt?->toDateString() }}" data-parti="{{ $k->bn }}">
   <td class="ps-3"><input class="form-check-input sec" type="checkbox" name="secili[]" value="{{ $k->id }}"></td>
   <td><div class="fw-semibold">{{ $adlar[$k->gtin] ?? '—' }}</div><div class="small text-muted font-monospace">{{ $k->gtin }}</div></td>
+  <td>{!! \App\Models\IlacRecete::rozet($receteHarita[\App\Models\IlacRecete::anahtar($k->gtin) ?? ''] ?? null, true) !!}</td>
   <td class="font-monospace small text-break" style="max-width:300px">{{ str_replace("\x1d", '', \App\Http\Controllers\StokController::karekodHam($k)) }}</td>
-  <td>{{ $k->bn ?: '—' }}</td>
   <td class="text-nowrap">@if($k->skt){{ $k->skt->format('d.m.Y') }}
     @if($kalan < 0)<span class="badge text-bg-danger ms-1">Süresi geçti</span>@elseif($kalan <= 90)<span class="badge text-bg-warning ms-1">{{ $kalan }} gün</span>@endif
     @else—@endif</td>

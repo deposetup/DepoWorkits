@@ -56,4 +56,35 @@ class StokSiralamaTest extends TestCase
         $this->actingAs($u)->get('/stok/barkod?sirala=skt&yon=desc')->assertOk();
         $this->actingAs($u)->get('/stok/barkod?sirala=zzz&yon=x')->assertOk();
     }
+
+    public function test_stok_ozeti_ve_listesinde_recete_tipi_eslesir(): void
+    {
+        $u = $this->hazirla();
+        \App\Models\IlacRecete::create(['gtin' => '08680000000011', 'ad' => 'ZETA', 'recete_tipi' => 'Kırmızı']);
+        \App\Models\IlacRecete::create(['gtin' => '08680000000028', 'ad' => 'ALFA', 'recete_tipi' => 'Yeşil']);
+        \App\Models\IlacRecete::create(['gtin' => '08680000000035', 'ad' => 'MAVI', 'recete_tipi' => 'Beyaz']);
+
+        // 13 haneli GTIN ile saklanan stok, 14 haneli kayıtla eşleşir
+        $this->actingAs($u)->get('/stok')->assertOk()->assertSee('Reçete')->assertSee('Kırmızı')->assertSee('Yeşil')->assertSee('Beyaz');
+        $this->actingAs($u)->get('/stok/liste')->assertOk()->assertSee('Reçete')->assertSee('Kırmızı')->assertSee('Yeşil')->assertSee('Beyaz');
+        // reçeteye göre sıralama
+        $this->actingAs($u)->get('/stok?sirala=recete&yon=asc')->assertOk()->assertSeeInOrder(['Beyaz', 'Kırmızı', 'Yeşil']);
+        $this->actingAs($u)->get('/stok?sirala=recete&yon=desc')->assertOk()->assertSeeInOrder(['Yeşil', 'Kırmızı', 'Beyaz']);
+    }
+
+    public function test_recete_listesi_yuklenmemisse_stok_sayfalari_bozulmaz(): void
+    {
+        $u = $this->hazirla();
+        $this->actingAs($u)->get('/stok')->assertOk()->assertDontSee('Kırmızı');
+        $this->actingAs($u)->get('/stok/liste')->assertOk();
+        $this->actingAs($u)->get('/stok/liste?excel=1')->assertOk();
+    }
+
+    public function test_stok_listesinde_parti_sutunu_gizli(): void
+    {
+        $u = $this->hazirla();
+        $r = $this->actingAs($u)->get('/stok/liste')->assertOk();
+        $this->assertStringNotContainsString('<th>Parti</th>', $r->getContent());
+        $r->assertSee('Karekod')->assertSee('SKT');
+    }
 }

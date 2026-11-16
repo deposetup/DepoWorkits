@@ -59,9 +59,24 @@ class IlacRecete extends Model
         return $sonuc;
     }
 
-    /** Kırmızı / Yeşil ise renkli rozet HTML'i; diğer tiplerde boş. */
-    public static function rozet(?string $tip): string
+    /** Stok ekranlarında gösterilen tüm tiplerin rozet sınıfı. */
+    public const TUMU = ['Kırmızı' => 'text-bg-danger', 'Yeşil' => 'text-bg-success', 'Turuncu' => 'text-bg-warning', 'Mor' => 'text-bg-secondary', 'Beyaz' => 'text-bg-light border'];
+
+    /**
+     * Varsayılan: yalnızca Kırmızı / Yeşil için renkli "… Reçete" rozeti (işlem sonuçlarında).
+     * $hepsi = true: stok ekranları için tüm tiplerin kısa rozeti (Beyaz, Turuncu, Mor dahil).
+     */
+    public static function rozet(?string $tip, bool $hepsi = false): string
     {
+        if ($hepsi) {
+            if ($tip === null || $tip === '') {
+                return '';
+            }
+            $sinif = self::TUMU[$tip] ?? 'text-bg-light border';
+            $stil = $tip === 'Mor' ? ' style="background:#7c4dbd!important"' : '';
+
+            return '<span class="badge '.$sinif.'"'.$stil.'>'.e($tip).'</span>';
+        }
         $renk = self::GOSTERILEN[$tip ?? ''] ?? null;
 
         return $renk ? '<span class="badge text-bg-'.$renk.'">'.e($tip).' Reçete</span>' : '';
