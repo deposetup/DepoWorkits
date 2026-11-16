@@ -20,7 +20,8 @@
     'devir' => [['devir_iptal', 'Mal Devir İptal', 'bi-x-circle', 'danger']],
     default => [['sarf_iptal', 'Sarf İptal', 'bi-arrow-counterclockwise', 'danger']],
   });
-  $sayfaIlaclar = $kalemler->getCollection()->pluck('gtin')->unique()->values();
+  $adOf = fn ($g) => $adlar[$g] ?? $g;
+  $sayfaIlaclar = $kalemler->getCollection()->groupBy(fn ($k) => $adOf($k->gtin))->map->count()->sortKeys();
   $bugun = now()->startOfDay();
   $bas = function ($alan, $ad) use ($sirala, $yon) {
     $yeni = $sirala === $alan && $yon === 'asc' ? 'desc' : 'asc';
@@ -98,7 +99,7 @@
     <div class="col-lg-4">
       <div class="sl-baslik"><span class="badge text-bg-dark me-1">2</span>Hızlı seçim (SKT'ye göre)</div>
       <div class="d-flex flex-column gap-2">
-        @if($sayfaIlaclar->count() > 1)<select id="otoIlac" class="form-select form-select-sm">@foreach($sayfaIlaclar as $g)<option value="{{ $g }}">{{ $adlar[$g] ?? $g }}</option>@endforeach</select>@endif
+        @if($sayfaIlaclar->count() > 1)<select id="otoIlac" class="form-select form-select-sm">@foreach($sayfaIlaclar as $ad => $adet)<option value="{{ $ad }}">{{ $ad }} ({{ $adet }} ürün)</option>@endforeach</select>@endif
         <div class="input-group input-group-sm">
           <input type="number" id="otoAdet" min="1" max="1000" class="form-control" placeholder="Adet girin">
           <button type="button" class="btn btn-success" id="otoSec"><i class="bi bi-magic me-1"></i>SKT'si yakın olanları seç</button>
@@ -129,7 +130,7 @@
 @php
   $kalan = $k->skt ? (int) $bugun->diffInDays($k->skt->copy()->startOfDay(), false) : null;
 @endphp
-<tr data-gtin="{{ $k->gtin }}" data-skt="{{ $k->skt?->toDateString() }}" data-parti="{{ $k->bn }}">
+<tr data-gtin="{{ $k->gtin }}" data-ad="{{ $adOf($k->gtin) }}" data-skt="{{ $k->skt?->toDateString() }}" data-parti="{{ $k->bn }}">
   <td class="ps-3"><input class="form-check-input sec" type="checkbox" name="secili[]" value="{{ $k->id }}"></td>
   <td><div class="fw-semibold">{{ $adlar[$k->gtin] ?? '—' }}</div><div class="small text-muted font-monospace">{{ $k->gtin }}</div></td>
   <td class="font-monospace small text-break" style="max-width:300px">{{ str_replace("\x1d", '', \App\Http\Controllers\StokController::karekodHam($k)) }}</td>
@@ -173,7 +174,7 @@ document.getElementById('otoSec').addEventListener('click',function(){
  const ilacSel=document.getElementById('otoIlac');
  const bugun=new Date().toISOString().slice(0,10);
  let satirlar=[...document.querySelectorAll('tbody tr[data-gtin]')];
- if(ilacSel)satirlar=satirlar.filter(r=>r.dataset.gtin===ilacSel.value);
+ if(ilacSel)satirlar=satirlar.filter(r=>r.dataset.ad===ilacSel.value);
  satirlar=satirlar.filter(r=>!r.dataset.skt||r.dataset.skt>=bugun);
  satirlar.sort((a,b)=>(a.dataset.skt||'9999').localeCompare(b.dataset.skt||'9999'));
  document.querySelectorAll('.sec').forEach(c=>c.checked=false);
