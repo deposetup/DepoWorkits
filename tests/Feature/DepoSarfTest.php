@@ -72,6 +72,13 @@ class DepoSarfTest extends TestCase
         $x->assertOk();
     }
 
+    public function test_analiz_saatleri_istanbul_saatiyle_gosterilir(): void
+    {
+        $h = $this->user('hastane');
+        \App\Models\Hareket::create(['tenant_id' => $h->tenant_id, 'tur' => 'sarf', 'gtin' => '08699617650153', 'sn' => 'Z1', 'basarili' => true, 'created_at' => '2026-11-16 04:51:00']);
+        $this->actingAs($h)->get('/analiz')->assertOk()->assertSee('16.11.2026 07:51');
+    }
+
     public function test_hastane_satis_yapamaz_sarf_ve_iade_yapar(): void
     {
         $h = $this->user('hastane');

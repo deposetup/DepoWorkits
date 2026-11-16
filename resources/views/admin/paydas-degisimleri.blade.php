@@ -3,7 +3,7 @@
 @section('icerik')
 <h4>Paydaş Değişimleri <small class="text-muted">Depolar</small></h4>
 @if(! $kayitlar)<div class="alert alert-warning">İzleme tabloları henüz oluşturulmadı (migration çalıştırılmalı).</div>@else
-<div class="alert alert-secondary small">İTS depo listesi hafta içi her gün <b>12:00 ve 17:00</b>'de karşılaştırılır. Şu an izlenen depo: <b>{{ number_format($izlenen, 0, ',', '.') }}</b>. Son kontrol: <b>{{ $sonKontrol ? \Illuminate\Support\Carbon::parse($sonKontrol)->format('d.m.Y H:i') : 'henüz yapılmadı' }}</b>.
+<div class="alert alert-secondary small">İTS depo listesi hafta içi her gün <b>12:00 ve 17:00</b>'de karşılaştırılır. Şu an izlenen depo: <b>{{ number_format($izlenen, 0, ',', '.') }}</b>. Son kontrol: <b>{{ $sonKontrol ? \Illuminate\Support\Carbon::parse($sonKontrol)->timezone('Europe/Istanbul')->format('d.m.Y H:i') : 'henüz yapılmadı' }}</b>.
 Bildirim adresi: <b>{{ $alici }}</b>.
 @unless($mailAyarli)<br><span class="text-danger">E-posta ayarı yapılmadı: değişiklikler yalnızca bu sayfada görünür, e-posta ayarlanınca bekleyenler tek postada gider.</span>@endunless</div>
 <form method="get" class="row g-2 mb-3">
@@ -14,7 +14,7 @@ Bildirim adresi: <b>{{ $alici }}</b>.
 <table class="table table-sm bg-white align-middle">
 <thead><tr><th>Tespit</th><th>Depo</th><th>GLN</th><th>İl</th><th>Olay</th><th>E-posta</th></tr></thead><tbody>
 @forelse($kayitlar as $d)
-<tr><td class="text-nowrap">{{ \Illuminate\Support\Carbon::parse($d->created_at)->format('d.m.Y H:i') }}</td><td>{{ $d->unvan }}</td><td class="font-monospace">{{ $d->gln }}</td><td>{{ $d->il ?: '—' }}</td>
+<tr><td class="text-nowrap">{{ \Illuminate\Support\Carbon::parse($d->created_at)->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</td><td>{{ $d->unvan }}</td><td class="font-monospace">{{ $d->gln }}</td><td>{{ $d->il ?: '—' }}</td>
 <td><span class="badge text-bg-{{ $olaylar[$d->olay][1] ?? 'secondary' }}">{{ $olaylar[$d->olay][0] ?? $d->olay }}</span></td>
 <td class="small">{{ $d->bildirildi_at ? 'Gönderildi' : 'Bekliyor' }}</td></tr>
 @empty<tr><td colspan="6" class="text-muted">Henüz değişiklik tespit edilmedi.</td></tr>@endforelse

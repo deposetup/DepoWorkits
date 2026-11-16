@@ -10,7 +10,7 @@
 <table class="table table-sm bg-white align-middle">
 <thead><tr><th>Tarih</th><th>Müşteri</th><th>Konu</th><th>Mesaj</th><th>Telefon</th><th>Durum</th><th></th></tr></thead><tbody>
 @forelse($talepler as $t)
-<tr><td class="text-nowrap">{{ $t->created_at->format('d.m.Y H:i') }}</td><td>{{ $tenantlar[$t->tenant_id] ?? '—' }}</td><td>{{ $konular[$t->konu] ?? $t->konu }}</td>
+<tr><td class="text-nowrap">{{ $t->created_at->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</td><td>{{ $tenantlar[$t->tenant_id] ?? '—' }}</td><td>{{ $konular[$t->konu] ?? $t->konu }}</td>
 <td style="white-space:pre-line;max-width:340px">{{ $t->mesaj ?? '—' }}</td><td>{{ $t->telefon ?? '—' }}</td>
 <td><span class="badge text-bg-{{ ['yeni' => 'warning', 'islemde' => 'info', 'kapandi' => 'secondary'][$t->durum] ?? 'secondary' }}">{{ ['yeni' => 'Yeni', 'islemde' => 'İşlemde', 'kapandi' => 'Kapandı'][$t->durum] ?? $t->durum }}</span></td>
 <td><form method="post" action="{{ route('admin.talepler.durum', $t) }}" class="d-flex gap-1">@csrf

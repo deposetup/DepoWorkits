@@ -7,7 +7,7 @@
     <div class="d-flex align-items-center gap-2 mb-2"><span class="ikon-yuvarlak"><i class="bi bi-plug"></i></span><h6 class="mb-0">Bağlantı Durumu</h6></div>
     <p class="text-muted small">İTS kullanıcı adı ve şifreniz DepoWork ekibi tarafından tanımlanır ve şifreli saklanır; bu ekrandan görüntülenemez veya değiştirilemez. Sürücü: <code>{{ $surucu }}</code>{{ $surucu === 'mock' ? ' (gerçek İTS\'e bağlanmaz, deneme verisi kullanılır)' : '' }}</p>
     <div class="mb-3">Kimlik durumu: {!! $kayitli ? '<span class="badge text-bg-success">Tanımlı</span>' : '<span class="badge text-bg-warning">Tanımlı değil, sağdaki formla bize yazın</span>' !!}
-      @if($guncelleme)<div class="text-muted small mt-1">Son güncelleme: {{ $guncelleme->format('d.m.Y H:i') }}</div>@endif</div>
+      @if($guncelleme)<div class="text-muted small mt-1">Son güncelleme: {{ $guncelleme->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</div>@endif</div>
     @if($kayitli)<form method="post" action="{{ route('ayarlar.its.test') }}">@csrf<button class="btn btn-primary"><i class="bi bi-plug me-1"></i>Bağlantıyı Sına</button></form>@endif
   </div></div></div>
 
@@ -52,7 +52,7 @@
     @foreach($talepler as $x)
       <div class="d-flex justify-content-between align-items-center small py-1 border-bottom">
         <span><i class="bi bi-chat-left-text me-1 text-muted"></i>{{ $konular[$x->konu] ?? $x->konu }}</span>
-        <span class="text-nowrap"><span class="text-muted me-2">{{ $x->created_at->format('d.m.Y H:i') }}</span><span class="badge text-bg-{{ ['yeni' => 'secondary', 'islemde' => 'info', 'kapandi' => 'success'][$x->durum] ?? 'secondary' }}">{{ ['yeni' => 'İletildi', 'islemde' => 'İşlemde', 'kapandi' => 'Tamamlandı'][$x->durum] ?? $x->durum }}</span></span>
+        <span class="text-nowrap"><span class="text-muted me-2">{{ $x->created_at->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</span><span class="badge text-bg-{{ ['yeni' => 'secondary', 'islemde' => 'info', 'kapandi' => 'success'][$x->durum] ?? 'secondary' }}">{{ ['yeni' => 'İletildi', 'islemde' => 'İşlemde', 'kapandi' => 'Tamamlandı'][$x->durum] ?? $x->durum }}</span></span>
       </div>
     @endforeach
     @endif

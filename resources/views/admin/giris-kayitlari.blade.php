@@ -12,7 +12,7 @@
 <table class="table table-sm bg-white align-middle">
 <thead><tr><th>Giriş Zamanı</th><th>Müşteri</th><th>Kullanıcı</th><th>Yöntem</th><th>Yazılan</th><th>Sonuç</th><th>IP</th><th>Tarayıcı</th></tr></thead><tbody>
 @forelse($kayitlar as $k)
-<tr class="{{ $k->basarili ? '' : 'table-danger' }}"><td class="text-nowrap">{{ $k->created_at->format('d.m.Y H:i:s') }}</td><td>{{ $k->tenant->unvan ?? '—' }}</td><td>{{ $k->user->name ?? '—' }}</td>
+<tr class="{{ $k->basarili ? '' : 'table-danger' }}"><td class="text-nowrap">{{ $k->created_at->timezone('Europe/Istanbul')->format('d.m.Y H:i:s') }}</td><td>{{ $k->tenant->unvan ?? '—' }}</td><td>{{ $k->user->name ?? '—' }}</td>
 <td>{{ $k->yontem === 'gln' ? 'GLN' : 'E-posta' }}</td><td class="font-monospace small">{{ $k->kimlik }}</td>
 <td>{!! $k->basarili ? '<span class="badge text-bg-success">Başarılı</span>' : '<span class="badge text-bg-danger">Başarısız</span>' !!}</td>
 <td class="small">{{ $k->ip }}</td><td class="small text-muted" title="{{ $k->tarayici }}">{{ \Illuminate\Support\Str::limit($k->tarayici, 40) }}</td></tr>

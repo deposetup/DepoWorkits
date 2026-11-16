@@ -15,7 +15,7 @@
 @forelse($kayitlar as $k)
 @php $rozet = ['bekliyor' => 'warning', 'gonderiliyor' => 'info', 'gonderildi' => 'success', 'hata' => 'danger', 'vazgecildi' => 'secondary'][$k->durum] ?? 'secondary'; $ad = ['bekliyor' => 'Onay bekliyor', 'gonderiliyor' => 'Gönderiliyor', 'gonderildi' => 'Gönderildi', 'hata' => 'Hata', 'vazgecildi' => 'İptal'][$k->durum] ?? $k->durum; @endphp
 <tr class="{{ (int) $yeniId === $k->id ? 'table-primary' : '' }}">
-<td class="text-nowrap">{{ $k->created_at->format('d.m.Y H:i') }}@if($k->kaynak_id)<div class="small text-muted">#{{ $k->kaynak_id }} yeniden</div>@endif</td>
+<td class="text-nowrap">{{ $k->created_at->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}@if($k->kaynak_id)<div class="small text-muted">#{{ $k->kaynak_id }} yeniden</div>@endif</td>
 <td><span class="font-monospace">{{ $k->alici_gln }}</span>@if($k->alici_unvan)<div class="small text-muted">{{ $k->alici_unvan }}</div>@endif</td>
 <td>{{ $k->adet }}</td><td>{{ $k->bildirim_id ?? '—' }}</td><td>{{ $k->belge_no ?? '—' }}</td>
 <td><span class="badge text-bg-{{ $rozet }}">{{ $ad }}</span>@if($k->hata)<div class="small text-danger">{{ \Illuminate\Support\Str::limit($k->hata, 120) }}</div>@endif</td>

@@ -89,7 +89,7 @@
   @endforeach
   @if($tenant)
   <div class="col-sm-6 col-xl-3"><div class="hizli {{ $gun <= 7 ? 'border-danger' : '' }}"><span class="ikon"><i class="bi bi-hourglass-split"></i></span><span><strong>Kalan Süre: {{ $gun }} gün</strong><small>Bitiş: {{ $tenant->lisans_bitis->format('d.m.Y') }}@if(! $tenant->lisansAktifMi()) · Lisans süresi doldu @endif</small></span></div></div>
-  <div class="col-sm-6 col-xl-3"><div class="hizli"><span class="ikon"><i class="bi bi-shield-check"></i></span><span><strong>KVKK Onay Tarihi</strong><small>{{ $tenant->kvkk_onay_tarihi?->format('d.m.Y H:i') ?? '—' }}</small></span></div></div>
+  <div class="col-sm-6 col-xl-3"><div class="hizli"><span class="ikon"><i class="bi bi-shield-check"></i></span><span><strong>KVKK Onay Tarihi</strong><small>{{ $tenant->kvkk_onay_tarihi?->timezone('Europe/Istanbul')?->format('d.m.Y H:i') ?? '—' }}</small></span></div></div>
   @endif
 </div>
 @endsection

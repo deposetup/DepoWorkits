@@ -10,7 +10,7 @@
 @forelse($cariler as $c)
 <tr><td>{{ $c->unvan }}</td><td class="font-monospace">{{ $c->gln }}</td><td>{{ $tipler[$c->tip] ?? '—' }}</td><td>{{ $c->il }} {{ $c->ilce ? '/ '.$c->ilce : '' }}</td><td>{{ $c->telefon ?: '—' }}</td><td class="small">{{ $c->eposta ?: '—' }}</td>
 <td>@if($c->aktif)<span class="badge text-bg-success">Aktif</span>@else<span class="badge text-bg-secondary">Pasif</span>@endif <span class="badge text-bg-primary"><i class="bi bi-person-check"></i> Cari ekli</span></td>
-<td class="small text-nowrap">{{ $c->created_at->format('d.m.Y') }}</td>
+<td class="small text-nowrap">{{ $c->created_at->timezone('Europe/Istanbul')->format('d.m.Y') }}</td>
 <td class="text-nowrap"><a href="{{ route('cari.duzelt', $c) }}" class="btn btn-sm btn-outline-primary" title="Düzelt"><i class="bi bi-pencil"></i> Düzelt</a> <form class="d-inline" method="post" action="{{ route('cari.sil', $c) }}" onsubmit="return confirm('{{ addslashes($c->unvan) }} cariden çıkarılacak. Geçmiş işlemler etkilenmez. Emin misiniz?')">@csrf<button class="btn btn-sm btn-outline-danger" title="Cariden çıkar"><i class="bi bi-x-lg"></i></button></form></td></tr>
 @empty<tr><td colspan="9" class="text-muted">Henüz cari eklenmedi. <a href="{{ route('paydaslar') }}">Paydaşlar</a> ekranından cari ekleyin.</td></tr>@endforelse
 </tbody></table>

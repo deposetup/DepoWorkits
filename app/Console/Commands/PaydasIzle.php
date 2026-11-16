@@ -95,7 +95,7 @@ class PaydasIzle extends Command
 
             return;
         }
-        $satirlar = $bekleyen->map(fn ($d) => '• '.(self::OLAYLAR[$d->olay] ?? $d->olay).': '.$d->unvan.' (GLN '.$d->gln.($d->il ? ', '.$d->il : '').') - '.\Illuminate\Support\Carbon::parse($d->created_at)->format('d.m.Y H:i'))->implode("\n");
+        $satirlar = $bekleyen->map(fn ($d) => '• '.(self::OLAYLAR[$d->olay] ?? $d->olay).': '.$d->unvan.' (GLN '.$d->gln.($d->il ? ', '.$d->il : '').') - '.\Illuminate\Support\Carbon::parse($d->created_at)->timezone('Europe/Istanbul')->format('d.m.Y H:i'))->implode("\n");
         try {
             Mail::raw("İTS ".ucfirst($tip)." paydaş listesinde değişiklik tespit edildi:\n\n".$satirlar."\n\nDepoWork İTS", function ($m) use ($bekleyen, $tip) {
                 $m->to(config('its.bildirim_eposta'))->subject('İTS '.ucfirst($tip).' listesi değişti ('.$bekleyen->count().' kayıt)');

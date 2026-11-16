@@ -6,7 +6,7 @@
 <table class="table table-sm bg-white">
 <thead><tr><th>Ad</th><th>E-posta</th><th>Rol</th><th>Son Giriş</th><th>Durum</th><th></th></tr></thead><tbody>
 @forelse($kullanicilar as $k)
-<tr><td>{{ $k->name }}</td><td>{{ $k->email ?? '—' }}</td><td>{{ $k->rol }}</td><td>{{ $k->son_giris ? \Illuminate\Support\Carbon::parse($k->son_giris)->format('d.m.Y H:i') : '—' }}</td>
+<tr><td>{{ $k->name }}</td><td>{{ $k->email ?? '—' }}</td><td>{{ $k->rol }}</td><td>{{ $k->son_giris ? \Illuminate\Support\Carbon::parse($k->son_giris)->timezone('Europe/Istanbul')->format('d.m.Y H:i') : '—' }}</td>
 <td>{!! $k->aktif ? '<span class="badge text-bg-success">Aktif</span>' : '<span class="badge text-bg-secondary">Pasif</span>' !!}</td>
 <td class="text-nowrap"><button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#sf{{ $k->id }}"><i class="bi bi-key me-1"></i>Şifre Değiştir</button>
 <form method="post" action="{{ route('admin.kullanici.aktif', [$tenant, $k]) }}" class="d-inline">@csrf<button class="btn btn-sm btn-outline-secondary">{{ $k->aktif ? 'Pasifleştir' : 'Aktifleştir' }}</button></form></td></tr>
