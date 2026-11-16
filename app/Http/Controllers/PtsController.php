@@ -58,12 +58,34 @@ class PtsController extends Controller
     public function al(Request $request, ItsClient $its)
     {
         $v = $request->validate(['transfer_id' => 'required|digits_between:1,20']);
-        $tenant = $request->user()->tenant;
         try {
-            $r = $its->ptsPaketAl($tenant, $v['transfer_id']);
+            $paket = $this->paketiIndir($request, $its, $v['transfer_id']);
         } catch (\Throwable $e) {
             return redirect()->route('pts')->withErrors(['pts' => $e->getMessage()]);
         }
+
+        return redirect()->route('pts.paket', $paket);
+    }
+
+    /** Sorgu listesindeki bir paketin kutu (ürün) sayısını döner; paket daha önce indirilmediyse indirip saklar. */
+    public function say(Request $request, ItsClient $its)
+    {
+        $v = $request->validate(['transfer_id' => 'required|digits_between:1,20']);
+        set_time_limit(120);
+        $paket = PtsPaketi::where(['tenant_id' => $request->user()->tenant_id, 'transfer_id' => $v['transfer_id']])->first();
+        try {
+            $paket ??= $this->paketiIndir($request, $its, $v['transfer_id']);
+        } catch (\Throwable $e) {
+            return response()->json(['mesaj' => $e->getMessage()], 500);
+        }
+
+        return response()->json(['transfer_id' => $v['transfer_id'], 'adet' => (int) $paket->urun_sayisi]);
+    }
+
+    private function paketiIndir(Request $request, ItsClient $its, string $transferId): PtsPaketi
+    {
+        $tenant = $request->user()->tenant;
+        $r = $its->ptsPaketAl($tenant, $transferId);
 
         $adet = 0; $kaynak = $belge = null;
         foreach ($r['xmller'] as $xml) {
@@ -76,13 +98,12 @@ class PtsController extends Controller
                 // önizlemede hata olarak gösterilir
             }
         }
-        $paket = PtsPaketi::updateOrCreate(
-            ['tenant_id' => $tenant->id, 'transfer_id' => $v['transfer_id']],
+
+        return PtsPaketi::updateOrCreate(
+            ['tenant_id' => $tenant->id, 'transfer_id' => $transferId],
             ['kaynak_gln' => $kaynak && preg_match('/^\d{13}$/', $kaynak) ? $kaynak : null, 'belge_no' => $belge ? mb_substr($belge, 0, 40) : null,
              'urun_sayisi' => $adet, 'md5_uyumlu' => $r['md5_uyumlu'], 'xml' => json_encode($r['xmller'], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)]
         );
-
-        return redirect()->route('pts.paket', $paket);
     }
 
     /** Elle yüklenen XML/ZIP dosyasını PTS paketi gibi içeri alır (İTS'e hiçbir şey göndermez). */
@@ -136,7 +157,7 @@ class PtsController extends Controller
         abort_unless($paket->tenant_id === $request->user()->tenant_id, 404);
         [$urunler, $yapi, $hatalar] = $this->oku($paket);
 
-        return view('pts.paket', ['paket' => $paket, 'urunler' => $urunler, 'yapi' => $yapi, 'hatalar' => $hatalar, 'sonuc' => null]);
+        return view('pts.paket', ['paket' => $paket, 'urunler' => $urunler, 'yapi' => $yapi, 'hatalar' => $hatalar]);
     }
 
     /** Paketteki her ürünü (karekod bilgisiyle) Excel'e aktarır. */
@@ -151,19 +172,62 @@ class PtsController extends Controller
             'PTS Paketi');
     }
 
+    /** Her adımda işlenen ürün sayısı; nginx/PHP zaman aşımına takılmamak için Mal Alım parça parça yapılır. */
+    private const MAL_ALIM_ADIM = 200;
+
+    /**
+     * Mal Alım'ı bir parça işler ve ilerlemeyi JSON döner. Ekran bitene kadar tekrar çağırır.
+     * `basla=1` ilerlemeyi sıfırlar; hata olursa aynı parça yeniden denenir.
+     */
     public function malAlim(Request $request, PtsPaketi $paket, StokServisi $servis)
     {
         abort_unless($paket->tenant_id === $request->user()->tenant_id, 404);
-        [$urunler, $yapi, $hatalar] = $this->oku($paket);
-        $kalemler = array_map(fn ($u) => $u + ['kod' => $u['gtin'].' / '.$u['sn']], $urunler);
+        set_time_limit(120);
 
-        $sonuc = $servis->kalemleriIsle($request->user(), 'kabul', $kalemler);
-        $hepsiTamam = $sonuc['satirlar'] && collect($sonuc['satirlar'])->every(fn ($s) => $s['durum'] === 'tamam');
-        if ($hepsiTamam) {
-            $paket->update(['durum' => 'mal_alindi']);
+        $kilit = \Illuminate\Support\Facades\Cache::lock('pts-mal-alim-'.$paket->id, 120);
+        if (! $kilit->get()) {
+            return response()->json(['mesaj' => 'Bu paket için işlem zaten sürüyor.'], 409);
         }
+        try {
+            [$urunler] = $this->oku($paket);
+            $ilerleme = $paket->ilerleme;
+            if ($request->boolean('basla') || ! is_array($ilerleme) || ($ilerleme['toplam'] ?? 0) !== count($urunler)) {
+                $ilerleme = ['toplam' => count($urunler), 'islenen' => 0, 'basarili' => 0, 'hatali' => 0, 'hatalar' => [], 'bildirim' => null, 'bitti' => false];
+            }
 
-        return view('pts.paket', ['paket' => $paket, 'urunler' => $urunler, 'yapi' => $yapi, 'hatalar' => $hatalar, 'sonuc' => $sonuc]);
+            if (! $ilerleme['bitti']) {
+                $parca = array_slice($urunler, $ilerleme['islenen'], self::MAL_ALIM_ADIM);
+                $kalemler = array_map(fn ($u) => $u + ['kod' => $u['gtin'].' / '.$u['sn']], $parca);
+                try {
+                    $sonuc = $servis->kalemleriIsle($request->user(), 'kabul', $kalemler);
+                } catch (\Throwable $e) {
+                    $paket->update(['ilerleme' => $ilerleme]);
+
+                    return response()->json($ilerleme + ['hata' => $e->getMessage()], 500);
+                }
+                foreach ($sonuc['satirlar'] as $s) {
+                    if ($s['durum'] === 'tamam') {
+                        $ilerleme['basarili']++;
+                    } else {
+                        $ilerleme['hatali']++;
+                        if (count($ilerleme['hatalar']) < 200) { $ilerleme['hatalar'][] = ['kod' => $s['kod'], 'mesaj' => $s['mesaj']]; }
+                    }
+                }
+                $ilerleme['bildirim'] = $sonuc['bildirim'] ?? $ilerleme['bildirim'];
+                $ilerleme['islenen'] += count($parca);
+                $ilerleme['bitti'] = $ilerleme['islenen'] >= $ilerleme['toplam'];
+            }
+
+            $paket->ilerleme = $ilerleme;
+            if ($ilerleme['bitti'] && $ilerleme['toplam'] > 0 && $ilerleme['hatali'] === 0) {
+                $paket->durum = 'mal_alindi';
+            }
+            $paket->save();
+
+            return response()->json($ilerleme);
+        } finally {
+            $kilit->release();
+        }
     }
 
     /** @return array{0:array,1:array,2:array} ürünler, yapı özeti, okuma hataları */

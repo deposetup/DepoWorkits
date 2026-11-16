@@ -56,9 +56,20 @@ class PtsPaketTest extends TestCase
         $this->assertSame('8680001000022', $p->kaynak_gln);
 
         $this->actingAs($u)->get("/pts/paket/{$p->id}")->assertOk()->assertSee('2 ürün bulundu')->assertSee('LOT77');
-        $this->actingAs($u)->post("/pts/paket/{$p->id}/mal-alim")->assertOk()->assertSee('Başarılı');
+        $this->actingAs($u)->postJson("/pts/paket/{$p->id}/mal-alim", ['basla' => 1])->assertOk()
+            ->assertJson(['toplam' => 2, 'islenen' => 2, 'basarili' => 2, 'hatali' => 0, 'bitti' => true]);
         $this->assertSame(2, StokKalemi::where('durum', 'stokta')->count());
         $this->assertSame('mal_alindi', $p->fresh()->durum);
+    }
+
+    public function test_sorgu_listesinde_kutu_sayisi_endpointi_adet_doner(): void
+    {
+        $u = $this->user();
+        $this->actingAs($u)->get('/pts?baslangic='.now()->toDateString().'&bitis='.now()->toDateString())->assertOk()->assertSee('Toplam kutu')->assertSee('data-transfer="100004870"', false);
+        $this->actingAs($u)->postJson('/pts/say', ['transfer_id' => '100004870'])->assertOk()->assertJson(['transfer_id' => '100004870', 'adet' => 2]);
+        $this->assertSame(1, PtsPaketi::count());
+        $this->actingAs($u)->postJson('/pts/say', ['transfer_id' => '100004870'])->assertOk()->assertJson(['adet' => 2]);
+        $this->assertSame(1, PtsPaketi::count());
     }
 
     public function test_baska_musterinin_paketi_gorulmez(): void

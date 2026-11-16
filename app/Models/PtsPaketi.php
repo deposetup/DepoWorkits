@@ -12,6 +12,6 @@ class PtsPaketi extends Model
 
     protected function casts(): array
     {
-        return ['md5_uyumlu' => 'boolean'];
+        return ['md5_uyumlu' => 'boolean', 'ilerleme' => 'array'];
     }
 }

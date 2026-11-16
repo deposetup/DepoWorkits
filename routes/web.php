@@ -53,6 +53,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::get('/pts', [PtsController::class, 'index'])->name('pts');
         Route::post('/pts/yukle', [PtsController::class, 'yukle'])->name('pts.yukle');
         Route::post('/pts/al', [PtsController::class, 'al'])->name('pts.al');
+        Route::post('/pts/say', [PtsController::class, 'say'])->name('pts.say');
         Route::get('/pts/paket/{paket}', [PtsController::class, 'paket'])->name('pts.paket');
         Route::get('/pts/paket/{paket}/excel', [PtsController::class, 'excel'])->name('pts.excel');
         Route::post('/pts/paket/{paket}/mal-alim', [PtsController::class, 'malAlim'])->name('pts.mal-alim');

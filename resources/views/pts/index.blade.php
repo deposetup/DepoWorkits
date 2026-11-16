@@ -20,11 +20,39 @@
 </div></div>
 @php $cariAdlari = \App\Models\Cari::adlar(auth()->user()->tenant_id); @endphp
 @if(is_array($sonuc))
-<div class="mb-2 text-end"><a href="{{ request()->fullUrlWithQuery(['excel' => 1]) }}" class="btn btn-success btn-sm"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a></div>
-<table class="table table-sm bg-white"><thead><tr><th>Transfer No</th><th>Gönderen GLN</th><th>Alıcı GLN</th><th>Tarih</th><th>Durum</th><th></th></tr></thead><tbody>
-@forelse($sonuc as $r)<tr><td>{{ $r['transferId'] }}</td><td>{{ $r['gonderen'] }}@if($ad = ($cariAdlari[$r['gonderen']] ?? null))<div class="small text-primary"><i class="bi bi-person-check"></i> {{ $ad }}</div>@elseif($pd = ($paydasAdlari[$r['gonderen']] ?? null))<div class="small text-danger" title="Bu GLN cari olarak eklenmemiş"><i class="bi bi-person-exclamation"></i> {{ $pd['unvan'] }} <span class="text-muted">({{ \App\Http\Controllers\PaydasController::TIPLER[$pd['tip']] ?? $pd['tip'] }}, cari değil)</span></div>@else<div class="small text-danger"><i class="bi bi-question-circle"></i> Cari değil, paydaş listesinde bulunamadı</div>@endif</td><td>{{ $r['alici'] ?? '' }}@if($ad2 = ($cariAdlari[$r['alici'] ?? ''] ?? null))<div class="small text-primary"><i class="bi bi-person-check"></i> {{ $ad2 }}</div>@endif</td><td>{{ $r['tarih'] ? \Illuminate\Support\Carbon::parse($r['tarih'])->format('d.m.Y H:i') : '' }}</td><td>{{ $r['alindi'] === null ? '—' : ($r['alindi'] ? 'Alındı' : 'Alınmadı') }}</td><td><form method="post" action="{{ route('pts.al') }}">@csrf<input type="hidden" name="transfer_id" value="{{ $r['transferId'] }}"><button class="btn btn-sm btn-outline-primary">Paketi Al</button></form></td></tr>
-@empty<tr><td colspan="6" class="text-muted">Kayıt yok.</td></tr>@endforelse</tbody></table>
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <div id="kutuOzet" class="small @if(! count($sonuc)) d-none @endif"><span class="badge text-bg-primary fs-6"><i class="bi bi-box-seam me-1"></i>Toplam kutu: <span id="kutuToplam">0</span></span>
+    <span id="kutuDurum" class="text-muted ms-2"></span></div>
+  <a href="{{ request()->fullUrlWithQuery(['excel' => 1]) }}" class="btn btn-success btn-sm"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a></div>
+<table class="table table-sm bg-white"><thead><tr><th>Transfer No</th><th>Gönderen GLN</th><th>Alıcı GLN</th><th>Tarih</th><th>Durum</th><th class="text-end">Kutu</th><th></th></tr></thead><tbody>
+@forelse($sonuc as $r)<tr data-transfer="{{ $r['transferId'] }}"><td>{{ $r['transferId'] }}</td><td>{{ $r['gonderen'] }}@if($ad = ($cariAdlari[$r['gonderen']] ?? null))<div class="small text-primary"><i class="bi bi-person-check"></i> {{ $ad }}</div>@elseif($pd = ($paydasAdlari[$r['gonderen']] ?? null))<div class="small text-danger" title="Bu GLN cari olarak eklenmemiş"><i class="bi bi-person-exclamation"></i> {{ $pd['unvan'] }} <span class="text-muted">({{ \App\Http\Controllers\PaydasController::TIPLER[$pd['tip']] ?? $pd['tip'] }}, cari değil)</span></div>@else<div class="small text-danger"><i class="bi bi-question-circle"></i> Cari değil, paydaş listesinde bulunamadı</div>@endif</td><td>{{ $r['alici'] ?? '' }}@if($ad2 = ($cariAdlari[$r['alici'] ?? ''] ?? null))<div class="small text-primary"><i class="bi bi-person-check"></i> {{ $ad2 }}</div>@endif</td><td>{{ $r['tarih'] ? \Illuminate\Support\Carbon::parse($r['tarih'])->format('d.m.Y H:i') : '' }}</td><td>{{ $r['alindi'] === null ? '—' : ($r['alindi'] ? 'Alındı' : 'Alınmadı') }}</td><td class="text-end kutu-adet text-muted">…</td><td><form method="post" action="{{ route('pts.al') }}">@csrf<input type="hidden" name="transfer_id" value="{{ $r['transferId'] }}"><button class="btn btn-sm btn-outline-primary">Paketi Al</button></form></td></tr>
+@empty<tr><td colspan="7" class="text-muted">Kayıt yok.</td></tr>@endforelse</tbody></table>
 <p class="small text-muted">Tarih aralığı en fazla 31 gün. "Alındı" bilgisi yalnızca "Sadece alınmayanlar" seçiliyken kesindir. Not: PTS paketi almak mal kabul sayılmaz; ürünler için ayrıca Mal Kabul bildirimi gerekir.</p>
+@endif
+@if(is_array($sonuc) && count($sonuc))
+<script>
+// Liste geldikten sonra paketler sırayla indirilip içindeki kutu (ürün) sayısı satır satır eklenir.
+(async function () {
+  const satirlar = [...document.querySelectorAll('tr[data-transfer]')];
+  const toplamEl = document.getElementById('kutuToplam'), durum = document.getElementById('kutuDurum');
+  const url = @json(route('pts.say')), token = @json(csrf_token());
+  let toplam = 0, biten = 0, hatali = 0;
+  for (const tr of satirlar) {
+    const hucre = tr.querySelector('.kutu-adet');
+    durum.textContent = 'Kutular sayılıyor… ' + biten + ' / ' + satirlar.length + ' paket';
+    hucre.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    try {
+      const r = await fetch(url, {method: 'POST', headers: {'X-CSRF-TOKEN': token, 'Accept': 'application/json', 'Content-Type': 'application/json'}, body: JSON.stringify({transfer_id: tr.dataset.transfer})});
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.mesaj || ('HTTP ' + r.status));
+      toplam += d.adet; hucre.classList.remove('text-muted'); hucre.textContent = d.adet.toLocaleString('tr-TR');
+      toplamEl.textContent = toplam.toLocaleString('tr-TR');
+    } catch (e) { hatali++; hucre.innerHTML = '<span class="text-danger" title="' + String(e.message).replace(/"/g, '&quot;') + '">hata</span>'; }
+    biten++;
+  }
+  durum.textContent = hatali ? ('Tamamlandı, ' + hatali + ' pakette sayım yapılamadı.') : ('Tamamlandı: ' + satirlar.length + ' paket.');
+})();
+</script>
 @endif
 <script>
 // Başlangıç tarihi seçilince bitiş, aynı ayın son günü olur (bu ay ise bugün).
