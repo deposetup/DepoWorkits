@@ -48,7 +48,8 @@
   <div class="col-auto"><button class="btn btn-dark" id="uygula"><i class="bi bi-send-check me-1"></i><span id="uygulaAd">Seçilenlere Uygula</span> (<span id="sayi">0</span>)</button></div>
   @if($durum === 'stokta' && \App\Models\StokKalemi::lokasyonVar())
   <div class="col-auto d-flex gap-1"><input name="lokasyon" list="lokOneri" class="form-control form-control-sm" placeholder="Reyon / raf (örn. Reyon A Raf 3)" maxlength="80" form="toplu"><datalist id="lokOneri">@foreach($lokasyonlar as $l)<option value="{{ $l }}">@endforeach</datalist>
-    <button class="btn btn-sm btn-outline-primary text-nowrap" formaction="{{ route('stok.lokasyon') }}" data-yerel="1"><i class="bi bi-geo-alt me-1"></i>Lokasyon Ata</button></div>
+    <button class="btn btn-sm btn-outline-primary text-nowrap" formaction="{{ route('stok.lokasyon') }}" data-yerel="1"><i class="bi bi-geo-alt me-1"></i>Lokasyon Ata</button>
+    <button class="btn btn-sm btn-warning text-nowrap" formaction="{{ route('stok.lokasyon') }}" name="lokasyon" value="{{ \App\Models\StokKalemi::KARANTINA_ODASI }}" data-yerel="1"><i class="bi bi-shield-exclamation me-1"></i>Karantinaya Al</button></div>
   @endif
   <div class="col-auto small text-muted">Bu sayfadaki ürünler seçilir; başka sayfa için ayrıca uygulayın.</div>
 </div></div>

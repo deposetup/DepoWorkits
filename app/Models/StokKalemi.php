@@ -11,6 +11,8 @@ class StokKalemi extends Model
 
     public const RED_ODASI = 'Red Odası';
 
+    public const KARANTINA_ODASI = 'Karantina Odası';
+
     /** Migration henüz çalışmadıysa lokasyon özellikleri sessizce devre dışı kalır. */
     public static function lokasyonVar(): bool
     {

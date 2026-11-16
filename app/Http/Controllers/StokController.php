@@ -160,24 +160,49 @@ class StokController extends Controller
     /** Red Odası: SKT'si geçmiş, stoktaki ürünlerin ilaç ve parti bazlı dökümü. */
     public function redOdasi(Request $request, ItsClient $its)
     {
+        return $this->oda($request, $its, StokKalemi::RED_ODASI, 'red-odasi');
+    }
+
+    /** Karantina Odası: kullanıcının elle karantinaya aldığı stoktaki ürünler. */
+    public function karantinaOdasi(Request $request, ItsClient $its)
+    {
+        return $this->oda($request, $its, StokKalemi::KARANTINA_ODASI, 'karantina-odasi');
+    }
+
+    private function oda(Request $request, ItsClient $its, string $oda, string $dosya)
+    {
         $tid = $request->user()->tenant_id;
         abort_unless($tid, 403);
         StokKalemi::redOdasinaAl($tid);
         $adlar = $this->adlar($its);
         $partiler = collect();
         if (StokKalemi::lokasyonVar()) {
-            $partiler = StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')->where('lokasyon', StokKalemi::RED_ODASI)
+            $partiler = StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')->where('lokasyon', $oda)
                 ->selectRaw('gtin, bn, skt, count(*) as adet')->groupBy('gtin', 'bn', 'skt')->orderBy('gtin')->orderBy('skt')->get();
         }
 
         if ($request->boolean('excel')) {
-            return \App\Support\XlsxYazici::indir('red-odasi-'.now()->format('Ymd-His').'.xlsx', ['İlaç', 'GTIN', 'Parti', 'SKT', 'Adet'],
-                $partiler->map(fn ($p) => [$adlar[$p->gtin] ?? '', $p->gtin, $p->bn, $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '', (int) $p->adet])->all(), 'Red Odası');
+            return \App\Support\XlsxYazici::indir($dosya.'-'.now()->format('Ymd-His').'.xlsx', ['İlaç', 'GTIN', 'Parti', 'SKT', 'Adet'],
+                $partiler->map(fn ($p) => [$adlar[$p->gtin] ?? '', $p->gtin, $p->bn, $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '', (int) $p->adet])->all(), $oda);
         }
 
         $urunler = $partiler->groupBy('gtin')->map(fn ($l, $gtin) => (object) ['gtin' => $gtin, 'ad' => $adlar[$gtin] ?? null, 'adet' => $l->sum('adet'), 'partiler' => $l])->values();
 
-        return view('stok.red-odasi', ['urunler' => $urunler, 'toplam' => $urunler->sum('adet'), 'hazir' => StokKalemi::lokasyonVar()]);
+        return view('stok.red-odasi', ['urunler' => $urunler, 'toplam' => $urunler->sum('adet'), 'hazir' => StokKalemi::lokasyonVar(),
+            'oda' => $oda, 'karantina' => $oda === StokKalemi::KARANTINA_ODASI]);
+    }
+
+    /** Reyon - Raf: tüm lokasyonların stoktaki adet özeti. */
+    public function reyonRaf(Request $request)
+    {
+        $tid = $request->user()->tenant_id;
+        abort_unless($tid, 403);
+        StokKalemi::redOdasinaAl($tid);
+        $hazir = StokKalemi::lokasyonVar();
+        $satirlar = $hazir ? StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')
+            ->selectRaw('lokasyon, count(*) as adet, count(distinct gtin) as cesit')->groupBy('lokasyon')->orderBy('lokasyon')->get() : collect();
+
+        return view('stok.reyon-raf', ['satirlar' => $satirlar, 'hazir' => $hazir]);
     }
 
     /** Seçili stok kalemlerine lokasyon (reyon/raf) atar; yalnızca yerel kayıttır, İTS'e bildirilmez. */

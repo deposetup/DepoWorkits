@@ -32,7 +32,10 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
     Route::middleware('lisans:salt_okunur')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('home');
         Route::get('/stok', [StokController::class, 'index'])->name('stok');
-        Route::get('/stok/red-odasi', [StokController::class, 'redOdasi'])->name('stok.red-odasi');
+        Route::get('/reyon-raf', [StokController::class, 'reyonRaf'])->name('stok.reyon-raf');
+        Route::get('/reyon-raf/red-odasi', [StokController::class, 'redOdasi'])->name('stok.red-odasi');
+        Route::get('/reyon-raf/karantina-odasi', [StokController::class, 'karantinaOdasi'])->name('stok.karantina');
+        Route::redirect('/stok/red-odasi', '/reyon-raf/red-odasi');
         Route::get('/stok/barkod', [StokController::class, 'barkod'])->name('stok.barkod');
         Route::view('/karekod-olustur', 'stok.karekod-olustur')->name('karekod.olustur');
         Route::get('/kritik-miad', [StokController::class, 'kritikMiad'])->name('kritik-miad');

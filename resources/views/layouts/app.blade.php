@@ -84,8 +84,12 @@
         ['Stok Listesi (Karekod)', 'bi-upc-scan', route('stok.liste'), ['stok.liste']],
         ['Stok İçe Aktar (İTS Doğrulamalı)', 'bi-cloud-download', route('stok.ice-aktar'), ['stok.ice-aktar*']],
         ['Kritik / Miad', 'bi-exclamation-triangle', route('kritik-miad'), ['kritik-miad']],
-        ['Red Odası', 'bi-archive', route('stok.red-odasi'), ['stok.red-odasi']],
         ['Karekod Oluşturucu', 'bi-qr-code', route('karekod.olustur'), ['karekod.olustur']],
+      ]],
+      ['Reyon - Raf', 'bi-grid-3x3-gap', null, [
+        ['Reyon - Raf Özeti', 'bi-geo-alt', route('stok.reyon-raf'), ['stok.reyon-raf']],
+        ['Red Odası', 'bi-archive', route('stok.red-odasi'), ['stok.red-odasi']],
+        ['Karantina Odası', 'bi-shield-exclamation', route('stok.karantina'), ['stok.karantina']],
       ]],
       ['Sorgular', 'bi-patch-question', null, [
         ['Durum Sorgu', 'bi-shield-check', route('durum'), ['durum*']],

@@ -40,6 +40,18 @@ class LokasyonTest extends TestCase
         $this->assertNull(StokKalemi::where('tenant_id', $b->tenant_id)->first()->lokasyon); // başka müşteriye dokunulmaz
     }
 
+    public function test_karantina_odasi_ve_reyon_raf_ozeti(): void
+    {
+        $u = $this->user();
+        $k = $this->kalem($u, '1', now()->addYear()->toDateString(), 'Reyon A');
+        $this->actingAs($u)->post(route('stok.lokasyon'), ['secili' => [$k->id], 'lokasyon' => StokKalemi::KARANTINA_ODASI])->assertSessionHasNoErrors();
+        $this->assertSame('Karantina Odası', $k->fresh()->lokasyon);
+        $this->actingAs($u)->get(route('stok.karantina'))->assertOk()->assertSee('Karantina Odası')->assertSee('08699617650153');
+        $this->actingAs($u)->get(route('stok.reyon-raf'))->assertOk()->assertSee('Karantina Odası');
+        $this->actingAs($u)->get('/stok/red-odasi')->assertRedirect('/reyon-raf/red-odasi');
+        $this->actingAs($u)->get('/')->assertSee('Reyon - Raf');
+    }
+
     public function test_toplu_lokasyon_atama_skt_gecenleri_red_odasinda_birakir(): void
     {
         $u = $this->user();
