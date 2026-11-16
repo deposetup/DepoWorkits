@@ -152,6 +152,7 @@ class StokController extends Controller
 
         return view('stok.liste', [
             'kalemler' => $kalemler, 'adlar' => $adlar, 'ara' => $ara, 'durum' => $durum,
+            'sayilar' => StokKalemi::where('tenant_id', $tid)->selectRaw('durum, count(*) as adet')->groupBy('durum')->pluck('adet', 'durum')->all(),
             'sirala' => $sirala, 'yon' => $yon, 'lokasyon' => $lokasyon, 'lokasyonlar' => StokKalemi::lokasyonlar($tid), 'redOdasi' => StokKalemi::RED_ODASI,
             'sebepler' => StokServisi::DEAKTIVE_SEBEPLER,
         ]);

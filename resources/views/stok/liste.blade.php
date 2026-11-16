@@ -1,99 +1,171 @@
 @extends('layouts.app')
 @section('baslik', 'Stok Listesi')
 @section('icerik')
-<h4>Stok Listesi (Karekod)</h4>
-<div class="alert alert-secondary small">Liste, bu portal üzerinden yapılan bildirimlerden (Mal Alım/Kabul vb.) oluşan stoktur. İTS stok sorgusu sunmadığı için İTS'teki tüm kayıtlar burada görünmez.</div>
-@if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
-<div class="mb-3 d-flex gap-2 align-items-center flex-wrap">
-  <div class="btn-group">
-    @php $sarfVar = auth()->user()->tenant?->sarfYapabilir() ?? true; $devirVar = auth()->user()->tenant?->devirYapabilir() ?? true; @endphp
-    @foreach(array_filter(['stokta' => 'Stokta', 'satis' => 'Satıldı (alıcı bekliyor)', 'devir' => 'Devredildi', 'deaktive' => 'Deaktive', 'sarf' => 'Sarf'], fn ($k) => ($sarfVar || $k !== 'sarf') && ($devirVar || $k !== 'devir'), ARRAY_FILTER_USE_KEY) as $d => $ad)
-    <a class="btn btn-sm {{ $durum === $d ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('stok.liste', ['durum' => $d]) }}">{{ $ad }}</a>
-    @endforeach
+@php
+  $sarfVar = auth()->user()->tenant?->sarfYapabilir() ?? true;
+  $devirVar = auth()->user()->tenant?->devirYapabilir() ?? true;
+  $sekmeler = array_filter(['stokta' => ['Stokta', 'bi-box-seam'], 'satis' => ['Satıldı', 'bi-cart-check'], 'devir' => ['Devredildi', 'bi-arrow-left-right'], 'deaktive' => ['Deaktive', 'bi-slash-circle'], 'sarf' => ['Sarf', 'bi-hospital']],
+    fn ($k) => ($sarfVar || $k !== 'sarf') && ($devirVar || $k !== 'devir'), ARRAY_FILTER_USE_KEY);
+  $islemler = array_values(match ($durum) {
+    'stokta' => array_filter([
+      ['satis', 'Satış', 'bi-cart-check', 'success'],
+      $sarfVar ? ['sarf', 'Hastane Sarf', 'bi-hospital', 'info'] : null,
+      $devirVar ? ['devir', 'Mal Devir', 'bi-arrow-left-right', 'primary'] : null,
+      ['iade', 'Ürün İade', 'bi-arrow-return-left', 'warning'],
+      ['deaktive', 'Deaktive', 'bi-slash-circle', 'dark'],
+    ]),
+    'satis' => [['satis_iptal', 'Satış İptal', 'bi-cart-x', 'danger']],
+    'deaktive' => [['deaktive_iptal', 'Deaktivasyon İptal', 'bi-check-circle', 'danger']],
+    'devir' => [['devir_iptal', 'Mal Devir İptal', 'bi-x-circle', 'danger']],
+    default => [['sarf_iptal', 'Sarf İptal', 'bi-arrow-counterclockwise', 'danger']],
+  });
+  $sayfaIlaclar = $kalemler->getCollection()->pluck('gtin')->unique()->values();
+  $bugun = now()->startOfDay();
+  $bas = function ($alan, $ad) use ($sirala, $yon) {
+    $yeni = $sirala === $alan && $yon === 'asc' ? 'desc' : 'asc';
+    $ok = $sirala === $alan ? ($yon === 'asc' ? ' <i class="bi bi-sort-up text-primary"></i>' : ' <i class="bi bi-sort-down text-primary"></i>') : ' <i class="bi bi-arrow-down-up text-muted small"></i>';
+    return '<a class="text-decoration-none text-reset text-nowrap" href="'.e(request()->fullUrlWithQuery(['sirala' => $alan, 'yon' => $yeni, 'page' => null])).'">'.$ad.$ok.'</a>';
+  };
+  $lokVar = $durum === 'stokta' && \App\Models\StokKalemi::lokasyonVar();
+@endphp
+<style>
+  .sl-sekme { display:flex; gap:.25rem; border-bottom:1px solid #dfe5f0; margin-bottom:1rem; overflow-x:auto; }
+  .sl-sekme a { padding:.6rem 1rem; text-decoration:none; color:#5b6b8c; font-weight:500; border-bottom:3px solid transparent; white-space:nowrap; }
+  .sl-sekme a:hover { color:var(--lacivert); background:#eef2fa; }
+  .sl-sekme a.aktif { color:var(--lacivert); border-bottom-color:var(--lacivert2); font-weight:700; }
+  .sl-sekme .badge { font-weight:600; }
+  .sl-kart { border:1px solid #e3e8f2; border-radius:.75rem; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .sl-baslik { font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:#6b7a99; font-weight:700; margin-bottom:.5rem; }
+  .sl-tablo th { font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; color:#5b6b8c; background:#f4f6fa; white-space:nowrap; }
+  .sl-tablo tbody tr { cursor:pointer; }
+  .sl-tablo tbody tr:has(.sec:checked) { background:#e8f3ff; }
+  .islem-btn { opacity:.55; } .islem-btn.active { opacity:1; box-shadow:0 0 0 .2rem rgba(11,36,71,.15); }
+  .sl-alt { position:sticky; bottom:0; z-index:1020; margin-top:1rem; }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h4 class="mb-1"><i class="bi bi-upc-scan me-2"></i>Stok Listesi (Karekod)</h4>
+    <div class="text-muted small">Portal üzerinden yapılan bildirimlerle oluşan ürün bazlı stok. İTS stok sorgusu sunmadığı için İTS'teki tüm kayıtlar burada görünmez.</div>
   </div>
-  <form class="d-flex gap-2" method="get"><input type="hidden" name="durum" value="{{ $durum }}">@if($sirala)<input type="hidden" name="sirala" value="{{ $sirala }}"><input type="hidden" name="yon" value="{{ $yon }}">@endif
-    @if($lokasyonlar || $lokasyon !== '')<select name="lokasyon" class="form-select form-select-sm" onchange="this.form.submit()"><option value="">Tüm lokasyonlar</option><option value="-" @selected($lokasyon === '-')>Lokasyonsuz</option>@foreach($lokasyonlar as $l)<option @selected($lokasyon === $l)>{{ $l }}</option>@endforeach</select>@endif
-    <input name="ara" value="{{ $ara }}" class="form-control form-control-sm" placeholder="İlaç adı, GTIN, seri veya parti"><button class="btn btn-sm btn-outline-secondary">Ara</button></form>
-  <span class="text-muted small">{{ $kalemler->total() }} ürün</span>
-  <a href="{{ request()->fullUrlWithQuery(['excel' => 1, 'page' => null]) }}" class="btn btn-success btn-sm"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+  <a href="{{ request()->fullUrlWithQuery(['excel' => 1, 'page' => null]) }}" class="btn btn-outline-success"><i class="bi bi-file-earmark-excel me-1"></i>Excel'e Aktar</a>
+</div>
+@if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
+
+<nav class="sl-sekme">
+  @foreach($sekmeler as $d => [$ad, $ikon])
+  <a class="{{ $durum === $d ? 'aktif' : '' }}" href="{{ route('stok.liste', ['durum' => $d]) }}"><i class="bi {{ $ikon }} me-1"></i>{{ $ad }} <span class="badge rounded-pill {{ $durum === $d ? 'text-bg-primary' : 'text-bg-light border' }}">{{ number_format($sayilar[$d] ?? 0, 0, ',', '.') }}</span></a>
+  @endforeach
+</nav>
+
+<div class="sl-kart p-3 mb-3">
+  <form class="row g-2 align-items-end" method="get">
+    <input type="hidden" name="durum" value="{{ $durum }}">@if($sirala)<input type="hidden" name="sirala" value="{{ $sirala }}"><input type="hidden" name="yon" value="{{ $yon }}">@endif
+    <div class="col-lg-6">
+      <label class="form-label small text-muted mb-1">Ara</label>
+      <div class="input-group"><span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+        <input name="ara" value="{{ $ara }}" class="form-control" placeholder="İlaç adı, GTIN, seri no veya parti no" autofocus></div>
+    </div>
+    @if($lokasyonlar || $lokasyon !== '')
+    <div class="col-lg-3 col-md-6">
+      <label class="form-label small text-muted mb-1">Lokasyon</label>
+      <select name="lokasyon" class="form-select" onchange="this.form.submit()"><option value="">Tüm lokasyonlar</option><option value="-" @selected($lokasyon === '-')>Lokasyonsuz</option>@foreach($lokasyonlar as $l)<option @selected($lokasyon === $l)>{{ $l }}</option>@endforeach</select>
+    </div>
+    @endif
+    <div class="col-auto d-flex gap-2">
+      <button class="btn btn-primary"><i class="bi bi-funnel me-1"></i>Filtrele</button>
+      @if($ara !== '' || $lokasyon !== '')<a class="btn btn-outline-secondary" href="{{ route('stok.liste', ['durum' => $durum]) }}">Temizle</a>@endif
+    </div>
+    <div class="col text-end text-muted small align-self-center"><strong class="text-dark">{{ number_format($kalemler->total(), 0, ',', '.') }}</strong> ürün listeleniyor</div>
+  </form>
 </div>
 
 <form method="post" action="{{ route('stok.toplu') }}" id="toplu" onsubmit="return topluOnay(event)">@csrf
-<div class="card mb-3"><div class="card-body py-2 row g-2 align-items-center">
-  @php
-    $islemler = match ($durum) {
-      'stokta' => array_filter([
-        ['satis', 'Satış', 'bi-cart-check', 'success'],
-        $sarfVar ? ['sarf', 'Hastane Sarf', 'bi-hospital', 'info'] : null,
-        $devirVar ? ['devir', 'Mal Devir', 'bi-arrow-left-right', 'primary'] : null,
-        ['iade', 'Ürün İade', 'bi-arrow-return-left', 'warning'],
-        ['deaktive', 'Deaktive', 'bi-slash-circle', 'dark'],
-      ]),
-      'satis' => [['satis_iptal', 'Satış İptal', 'bi-cart-x', 'danger']],
-      'deaktive' => [['deaktive_iptal', 'Deaktivasyon İptal', 'bi-check-circle', 'danger']],
-      'devir' => [['devir_iptal', 'Mal Devir İptal', 'bi-x-circle', 'danger']],
-      default => [['sarf_iptal', 'Sarf İptal', 'bi-arrow-counterclockwise', 'danger']],
-    };
-    $islemler = array_values($islemler);
-  @endphp
-  <div class="col-12"><div class="small text-muted mb-1">Yapılacak bildirimi seçin:</div>
-    <input type="hidden" name="tur" id="tur" value="{{ $islemler[0][0] }}">
-    <div class="d-flex flex-wrap gap-2" id="islemBtn">
-    @foreach($islemler as $i => [$kod, $ad, $ikon, $renk])
-      <button type="button" class="btn btn-{{ $renk }} islem-btn {{ $i ? 'opacity-50' : 'active' }}" data-tur="{{ $kod }}" data-ad="{{ $ad }}" data-renk="{{ $renk }}" aria-pressed="{{ $i ? 'false' : 'true' }}"><i class="bi {{ $ikon }} me-1"></i>{{ $ad }}</button>
-    @endforeach
-    </div></div>
-  <div class="col-md-4" id="glnAlan">@include('cari._secici', ['hedef' => 'karsi_gln_input'])<input id="karsi_gln_input" name="karsi_gln" class="form-control form-control-sm" maxlength="13" placeholder="Karşı paydaş GLN (13 hane)"></div>
-  <div class="col-md-3 d-none" id="sebepAlan"><select name="sebep" class="form-select form-select-sm"><option value="">Sebep seçin</option>@foreach($sebepler as $k => $ad)<option value="{{ $k }}">{{ $k }} - {{ $ad }}</option>@endforeach</select></div>
-  <div class="col-auto"><button class="btn btn-dark" id="uygula"><i class="bi bi-send-check me-1"></i><span id="uygulaAd">Seçilenlere Uygula</span> (<span id="sayi">0</span>)</button></div>
-  @if($durum === 'stokta' && \App\Models\StokKalemi::lokasyonVar())
-  <div class="col-auto d-flex gap-1"><input name="lokasyon" list="lokOneri" class="form-control form-control-sm" placeholder="Reyon / raf (örn. Reyon A Raf 3)" maxlength="80" form="toplu"><datalist id="lokOneri">@foreach($lokasyonlar as $l)<option value="{{ $l }}">@endforeach</datalist>
+<div class="sl-kart p-3 mb-3">
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="sl-baslik"><span class="badge text-bg-dark me-1">1</span>Bildirim türü</div>
+      <input type="hidden" name="tur" id="tur" value="{{ $islemler[0][0] }}">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        @foreach($islemler as $i => [$kod, $ad, $ikon, $renk])
+        <button type="button" class="btn btn-{{ $renk }} islem-btn {{ $i ? '' : 'active' }}" data-tur="{{ $kod }}" data-ad="{{ $ad }}" data-renk="{{ $renk }}" aria-pressed="{{ $i ? 'false' : 'true' }}"><i class="bi {{ $ikon }} me-1"></i>{{ $ad }}</button>
+        @endforeach
+      </div>
+      <div id="glnAlan">@include('cari._secici', ['hedef' => 'karsi_gln_input'])<input id="karsi_gln_input" name="karsi_gln" class="form-control form-control-sm" maxlength="13" placeholder="Karşı paydaş GLN (13 hane)"></div>
+      <div id="sebepAlan" class="d-none"><select name="sebep" class="form-select form-select-sm"><option value="">Sebep seçin</option>@foreach($sebepler as $k => $ad)<option value="{{ $k }}">{{ $k }} - {{ $ad }}</option>@endforeach</select></div>
+    </div>
+    <div class="col-lg-4">
+      <div class="sl-baslik"><span class="badge text-bg-dark me-1">2</span>Hızlı seçim (SKT'ye göre)</div>
+      <div class="d-flex flex-column gap-2">
+        @if($sayfaIlaclar->count() > 1)<select id="otoIlac" class="form-select form-select-sm">@foreach($sayfaIlaclar as $g)<option value="{{ $g }}">{{ $adlar[$g] ?? $g }}</option>@endforeach</select>@endif
+        <div class="input-group input-group-sm">
+          <input type="number" id="otoAdet" min="1" max="1000" class="form-control" placeholder="Adet girin">
+          <button type="button" class="btn btn-success" id="otoSec"><i class="bi bi-magic me-1"></i>SKT'si yakın olanları seç</button>
+        </div>
+        <div class="small text-muted" id="otoMesaj">Adede göre otomatik seç: önce ilacı aratın, adedi yazın. SKT'si en yakın partiden başlanır, süresi geçenler atlanır.</div>
+      </div>
+    </div>
+  </div>
+  @if($lokVar)
+  <hr class="my-3">
+  <div class="sl-baslik"><i class="bi bi-geo-alt me-1"></i>Lokasyon (yalnızca yerel kayıt, İTS'e bildirilmez)</div>
+  <div class="d-flex flex-wrap gap-2">
+    <input name="lokasyon" list="lokOneri" class="form-control form-control-sm" style="max-width:280px" placeholder="Reyon / raf (örn. Reyon A Raf 3)" maxlength="80">
+    <datalist id="lokOneri">@foreach($lokasyonlar as $l)<option value="{{ $l }}">@endforeach</datalist>
     <button class="btn btn-sm btn-outline-primary text-nowrap" formaction="{{ route('stok.lokasyon') }}" data-yerel="1"><i class="bi bi-geo-alt me-1"></i>Lokasyon Ata</button>
-    <button class="btn btn-sm btn-warning text-nowrap" formaction="{{ route('stok.lokasyon') }}" name="lokasyon" value="{{ \App\Models\StokKalemi::KARANTINA_ODASI }}" data-yerel="1"><i class="bi bi-shield-exclamation me-1"></i>Karantinaya Al</button></div>
+    <button class="btn btn-sm btn-warning text-nowrap" formaction="{{ route('stok.lokasyon') }}" name="lokasyon" value="{{ \App\Models\StokKalemi::KARANTINA_ODASI }}" data-yerel="1"><i class="bi bi-shield-exclamation me-1"></i>Karantinaya Al</button>
+  </div>
   @endif
-  <div class="col-auto small text-muted">Bu sayfadaki ürünler seçilir; başka sayfa için ayrıca uygulayın.</div>
-</div></div>
+</div>
 
-@php
-  $sayfaIlaclar = $kalemler->getCollection()->pluck('gtin')->unique()->values();
-@endphp
-<div class="card mb-2 border-success"><div class="card-body py-2 d-flex flex-wrap gap-2 align-items-center">
-  <i class="bi bi-magic text-success"></i><strong class="small">Adede göre otomatik seç</strong>
-  @if($sayfaIlaclar->count() > 1)
-  <select id="otoIlac" class="form-select form-select-sm w-auto" style="max-width:320px">@foreach($sayfaIlaclar as $g)<option value="{{ $g }}">{{ $adlar[$g] ?? $g }}</option>@endforeach</select>
-  @endif
-  <input type="number" id="otoAdet" min="1" max="1000" class="form-control form-control-sm" style="width:110px" placeholder="Adet">
-  <button type="button" class="btn btn-sm btn-success" id="otoSec"><i class="bi bi-check2-all me-1"></i>SKT'si en yakın olanlardan seç</button>
-  <button type="button" class="btn btn-sm btn-outline-secondary" id="otoTemizle">Seçimi temizle</button>
-  <span class="small text-muted" id="otoMesaj">Önce ilaç adını aratın, adedi yazın; SKT'si en yakın partilerden başlayarak o kadar ürün işaretlenir (SKT'si geçmişler atlanır). Sonra yukarıdan bildirimi seçip uygulayın.</span>
-</div></div>
-<table class="table table-sm bg-white align-middle"><thead><tr>
-  <th><input type="checkbox" id="hepsi" onclick="document.querySelectorAll('.sec').forEach(c=>c.checked=this.checked);say()"></th>
-  @php
-  $bas = function ($alan, $ad) use ($sirala, $yon) {
-    $yeni = $sirala === $alan && $yon === 'asc' ? 'desc' : 'asc';
-    $ok = $sirala === $alan ? ($yon === 'asc' ? ' <i class="bi bi-sort-up"></i>' : ' <i class="bi bi-sort-down"></i>') : ' <i class="bi bi-arrow-down-up text-muted small"></i>';
-    return '<a class="text-decoration-none text-reset" href="'.e(request()->fullUrlWithQuery(['sirala' => $alan, 'yon' => $yeni, 'page' => null])).'">'.$ad.$ok.'</a>';
-  };
-@endphp
-  <th>{!! $bas('ilac', 'İlaç') !!}</th><th>Karekod</th><th>Parti</th><th>{!! $bas('skt', 'SKT') !!}</th><th>{!! $bas('lokasyon', 'Lokasyon') !!}</th></tr></thead><tbody>
+<div class="sl-kart overflow-hidden">
+<div class="table-responsive"><table class="table table-hover table-sm sl-tablo align-middle mb-0">
+<thead><tr>
+  <th style="width:2.5rem" class="ps-3"><input class="form-check-input" type="checkbox" id="hepsi" title="Sayfadakilerin tümünü seç"></th>
+  <th>{!! $bas('ilac', 'İlaç') !!}</th><th>Karekod</th><th>Parti</th><th>{!! $bas('skt', 'SKT') !!}</th><th>{!! $bas('lokasyon', 'Lokasyon') !!}</th></tr></thead>
+<tbody>
 @forelse($kalemler as $k)
-<tr data-gtin="{{ $k->gtin }}" data-skt="{{ $k->skt?->toDateString() }}"><td><input type="checkbox" class="sec" name="secili[]" value="{{ $k->id }}" onclick="say()"></td>
-<td>{{ $adlar[$k->gtin] ?? '—' }}</td>
-<td class="font-monospace small">{{ str_replace("\x1d", '', \App\Http\Controllers\StokController::karekodHam($k)) }}</td>
-<td>{{ $k->bn ?: '—' }}</td><td>{{ $k->skt?->format('d.m.Y') ?? '—' }}</td><td>@if($k->lokasyon === $redOdasi)<span class="badge text-bg-danger">{{ $k->lokasyon }}</span>@else{{ $k->lokasyon ?: '—' }}@endif</td></tr>
-@empty<tr><td colspan="6" class="text-muted">Bu durumda ürün yok.</td></tr>@endforelse
-</tbody></table>
+@php
+  $kalan = $k->skt ? (int) $bugun->diffInDays($k->skt->copy()->startOfDay(), false) : null;
+@endphp
+<tr data-gtin="{{ $k->gtin }}" data-skt="{{ $k->skt?->toDateString() }}" data-parti="{{ $k->bn }}">
+  <td class="ps-3"><input class="form-check-input sec" type="checkbox" name="secili[]" value="{{ $k->id }}"></td>
+  <td><div class="fw-semibold">{{ $adlar[$k->gtin] ?? '—' }}</div><div class="small text-muted font-monospace">{{ $k->gtin }}</div></td>
+  <td class="font-monospace small text-break" style="max-width:300px">{{ str_replace("\x1d", '', \App\Http\Controllers\StokController::karekodHam($k)) }}</td>
+  <td>{{ $k->bn ?: '—' }}</td>
+  <td class="text-nowrap">@if($k->skt){{ $k->skt->format('d.m.Y') }}
+    @if($kalan < 0)<span class="badge text-bg-danger ms-1">Süresi geçti</span>@elseif($kalan <= 90)<span class="badge text-bg-warning ms-1">{{ $kalan }} gün</span>@endif
+    @else—@endif</td>
+  <td>@if($k->lokasyon === $redOdasi)<span class="badge text-bg-danger">{{ $k->lokasyon }}</span>@elseif($k->lokasyon === \App\Models\StokKalemi::KARANTINA_ODASI)<span class="badge text-bg-warning">{{ $k->lokasyon }}</span>@elseif($k->lokasyon)<span class="badge text-bg-light border">{{ $k->lokasyon }}</span>@else<span class="text-muted">—</span>@endif</td>
+</tr>
+@empty
+<tr><td colspan="6" class="text-center text-muted py-5"><i class="bi bi-inbox fs-2 d-block mb-2"></i>Bu görünümde ürün yok.</td></tr>
+@endforelse
+</tbody></table></div>
+</div>
+
+<div class="sl-alt"><div class="sl-kart p-2 px-3 d-flex flex-wrap align-items-center gap-3 shadow">
+  <div><i class="bi bi-check2-square me-1"></i><strong id="sayi">0</strong> ürün seçildi</div>
+  <button type="button" class="btn btn-sm btn-link text-decoration-none" id="otoTemizle">Seçimi temizle</button>
+  <div class="ms-auto d-flex align-items-center gap-2"><span class="small text-muted d-none d-md-inline">Seçimler yalnızca bu sayfadaki ürünleri kapsar.</span>
+    <button class="btn btn-dark px-4" id="uygula"><i class="bi bi-send-check me-1"></i><span id="uygulaAd">Bildir</span></button></div>
+</div></div>
 </form>
-{{ $kalemler->links() }}
+<div class="mt-3">{{ $kalemler->links() }}</div>
+
 <script>
 function say(){document.getElementById('sayi').textContent=document.querySelectorAll('.sec:checked').length}
-document.querySelectorAll('.islem-btn').forEach(b=>b.addEventListener('click',function(){
+document.getElementById('hepsi').addEventListener('click',function(){document.querySelectorAll('.sec').forEach(c=>c.checked=this.checked);say()});
+document.querySelectorAll('.sl-tablo tbody tr[data-gtin]').forEach(r=>r.addEventListener('click',function(e){
+ if(e.target.closest('a,input,button'))return;const c=r.querySelector('.sec');c.checked=!c.checked;say()}));
+document.querySelectorAll('.sec').forEach(c=>c.addEventListener('change',say));
+function islemSec(b){
  document.getElementById('tur').value=b.dataset.tur;
- document.querySelectorAll('.islem-btn').forEach(x=>{const a=x===b;x.classList.toggle('active',a);x.classList.toggle('opacity-50',!a);x.setAttribute('aria-pressed',a)});
- const u=document.getElementById('uygula');u.className='btn btn-'+b.dataset.renk;document.getElementById('uygulaAd').textContent=b.dataset.ad+' Bildir';
- alanlar()}));
-document.getElementById('otoTemizle').addEventListener('click',function(){document.querySelectorAll('.sec').forEach(c=>c.checked=false);say();document.getElementById('otoMesaj').textContent='Seçim temizlendi.'});
+ document.querySelectorAll('.islem-btn').forEach(x=>{const a=x===b;x.classList.toggle('active',a);x.setAttribute('aria-pressed',a)});
+ const u=document.getElementById('uygula');u.className='btn px-4 btn-'+b.dataset.renk;document.getElementById('uygulaAd').textContent=b.dataset.ad+' Bildir';
+ alanlar()}
+document.querySelectorAll('.islem-btn').forEach(b=>b.addEventListener('click',()=>islemSec(b)));
+document.getElementById('otoTemizle').addEventListener('click',function(){document.querySelectorAll('.sec').forEach(c=>c.checked=false);document.getElementById('hepsi').checked=false;say();document.getElementById('otoMesaj').textContent='Seçim temizlendi.'});
 document.getElementById('otoSec').addEventListener('click',function(){
  const n=parseInt(document.getElementById('otoAdet').value,10),m=document.getElementById('otoMesaj');
  if(!n||n<1){m.textContent='Geçerli bir adet girin.';return}
@@ -107,7 +179,7 @@ document.getElementById('otoSec').addEventListener('click',function(){
  const secilen=satirlar.slice(0,n);
  secilen.forEach(r=>r.querySelector('.sec').checked=true);
  say();
- const partiler=new Set(secilen.map(r=>r.children[3].textContent.trim()));
+ const partiler=new Set(secilen.map(r=>r.dataset.parti||'—'));
  m.textContent=secilen.length<n?('Uyarı: yalnızca '+secilen.length+' uygun ürün bulundu ve işaretlendi (istenen '+n+').'):(secilen.length+' ürün işaretlendi ('+[...partiler].join(', ')+' partisinden).');
 });
 function alanlar(){const t=document.getElementById('tur').value;
@@ -118,7 +190,6 @@ function topluOnay(e){const n=document.querySelectorAll('.sec:checked').length;
  if(e&&e.submitter&&e.submitter.dataset.yerel)return true;
  const t=document.querySelector('.islem-btn.active');
  return confirm(n+' ürün için "'+t.dataset.ad+'" bildirimi İTS\'e gönderilecek. Onaylıyor musunuz?')}
-alanlar();
-(function(){const b=document.querySelector('.islem-btn.active');if(b){const u=document.getElementById('uygula');u.className='btn btn-'+b.dataset.renk;document.getElementById('uygulaAd').textContent=b.dataset.ad+' Bildir'}})();
+alanlar();islemSec(document.querySelector('.islem-btn.active'));
 </script>
 @endsection
