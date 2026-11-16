@@ -177,7 +177,7 @@ class StokController extends Controller
                 $q->lazy(1000)->map(fn ($k) => [$adlar[$k->gtin] ?? '', $receteHarita[\App\Models\IlacRecete::anahtar($k->gtin) ?? ''] ?? '', $k->gtin, $k->sn, $k->bn, $k->skt?->format('d.m.Y'), $k->lokasyon ?? '', self::karekodHam($k)]),
                 'Stok');
         }
-        $sayfa = in_array((int) $request->query('sayfa'), [100, 300, 600], true) ? (int) $request->query('sayfa') : 100;
+        $sayfa = in_array((int) $request->query('sayfa'), [100, 300, 600, 1000], true) ? (int) $request->query('sayfa') : 100;
         $kalemler = $q->paginate($sayfa)->withQueryString();
 
         return view('stok.liste', [

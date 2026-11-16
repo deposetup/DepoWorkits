@@ -20,7 +20,7 @@ class StokServisi
     public const SARF_GRUP = 200;
 
     /** Sarf için tek seferde seçilebilecek en fazla ürün. */
-    public const SARF_AZAMI = 600;
+    public const SARF_AZAMI = 1000;
 
     /** tür => [gereken mevcut durum, yeni durum] */
     public const TURLER = [

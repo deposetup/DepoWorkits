@@ -41,9 +41,9 @@ class StokListeTest extends TestCase
     {
         $u = $this->kurulum();
         // sarf için 600, diğer işlemler için 100
-        $this->actingAs($u)->from('/stok/liste')->post('/stok/toplu', ['tur' => 'sarf', 'secili' => range(1, 601)])->assertSessionHasErrors('secili');
+        $this->actingAs($u)->from('/stok/liste')->post('/stok/toplu', ['tur' => 'sarf', 'secili' => range(1, 1001)])->assertSessionHasErrors('secili');
         $this->actingAs($u)->from('/stok/liste')->post('/stok/toplu', ['tur' => 'satis', 'secili' => range(1, 101), 'karsi_gln' => '8680001000011'])->assertSessionHasErrors('secili');
-        $this->actingAs($u)->postJson('/stok/toplu', ['tur' => 'sarf', 'secili' => range(1, 601)])->assertStatus(422)->assertJsonPath('message', fn ($m) => str_contains($m, '600'));
+        $this->actingAs($u)->postJson('/stok/toplu', ['tur' => 'sarf', 'secili' => range(1, 1001)])->assertStatus(422)->assertJsonPath('message', fn ($m) => str_contains($m, '1000'));
     }
 
     public function test_sarf_json_yaniti_doner_ve_its_e_200_luk_gruplar_gider(): void
@@ -76,7 +76,7 @@ class StokListeTest extends TestCase
     public function test_liste_sayfa_boyutu_secilebilir(): void
     {
         $u = $this->kurulum();
-        $this->actingAs($u)->get('/stok/liste?sayfa=600')->assertOk()->assertSee('Sayfa başına')->assertSee('en fazla 600');
+        $this->actingAs($u)->get('/stok/liste?sayfa=1000')->assertOk()->assertSee('Sayfa başına')->assertSee('en fazla 1000');
         $this->actingAs($u)->get('/stok/liste?sayfa=7')->assertOk();
     }
 

@@ -76,7 +76,7 @@
     @endif
     <div class="col-lg-2 col-md-4">
       <label class="form-label small text-muted mb-1">Sayfa başına</label>
-      <select name="sayfa" class="form-select" onchange="this.form.submit()">@foreach([100, 300, 600] as $n)<option value="{{ $n }}" @selected($sayfa === $n)>{{ $n }} ürün</option>@endforeach</select>
+      <select name="sayfa" class="form-select" onchange="this.form.submit()">@foreach([100, 300, 600, 1000] as $n)<option value="{{ $n }}" @selected($sayfa === $n)>{{ $n }} ürün</option>@endforeach</select>
     </div>
     <div class="col-auto d-flex gap-2">
       <button class="btn btn-primary"><i class="bi bi-funnel me-1"></i>Filtrele</button>
@@ -112,10 +112,10 @@
       <div class="d-flex flex-column gap-2">
         @if($sayfaIlaclar->count() > 1)<select id="otoIlac" class="form-select form-select-sm">@foreach($sayfaIlaclar as $ad => $adet)<option value="{{ $ad }}">{{ $ad }} ({{ $adet }} ürün)</option>@endforeach</select>@endif
         <div class="input-group input-group-sm">
-          <input type="number" id="otoAdet" min="1" max="600" class="form-control" placeholder="Adet (en fazla 600)">
+          <input type="number" id="otoAdet" min="1" max="1000" class="form-control" placeholder="Adet (en fazla 1000)">
           <button type="button" class="btn btn-success" id="otoSec"><i class="bi bi-magic me-1"></i>SKT'si yakın olanları seç</button>
         </div>
-        <div class="small text-muted" id="otoMesaj">Adede göre otomatik seç (en fazla 600; 600 ürün için "Sayfa başına" 600 seçin): önce ilacı aratın, adedi yazın. SKT'si en yakın partiden başlanır, süresi geçenler atlanır.</div>
+        <div class="small text-muted" id="otoMesaj">Adede göre otomatik seç (en fazla 1000; 600 üzeri için "Sayfa başına" 1000 seçin): önce ilacı aratın, adedi yazın. SKT'si en yakın partiden başlanır, süresi geçenler atlanır.</div>
       </div>
     </div>
   </div>
@@ -184,7 +184,7 @@ document.getElementById('otoTemizle').addEventListener('click',function(){docume
 document.getElementById('otoSec').addEventListener('click',function(){
  const n=parseInt(document.getElementById('otoAdet').value,10),m=document.getElementById('otoMesaj');
  if(!n||n<1){m.textContent='Geçerli bir adet girin.';return}
- if(n>600){document.getElementById('otoAdet').value=600;m.textContent='Tek seferde en fazla 600 ürün seçilebilir; adet 600 olarak ayarlandı, tekrar basın.';return}
+ if(n>1000){document.getElementById('otoAdet').value=1000;m.textContent='Tek seferde en fazla 1000 ürün seçilebilir; adet 1000 olarak ayarlandı, tekrar basın.';return}
  const ilacSel=document.getElementById('otoIlac');
  const bugun=new Date().toISOString().slice(0,10);
  let satirlar=[...document.querySelectorAll('tbody tr[data-gtin]')];
@@ -247,7 +247,7 @@ function topluOnay(e){const n=document.querySelectorAll('.sec:checked').length;
  if(e&&e.submitter&&e.submitter.dataset.yerel)return true;
  const t=document.querySelector('.islem-btn.active'),tur=t.dataset.tur,sarf=['sarf','sarf_iptal'].includes(tur);
  if(!sarf&&n>100){alert('Bu işlem türünde tek seferde en fazla 100 ürün bildirilebilir.');return false}
- if(sarf&&n>600){alert('Tek seferde en fazla 600 ürün bildirilebilir.');return false}
+ if(sarf&&n>1000){alert('Tek seferde en fazla 1000 ürün bildirilebilir.');return false}
  const ek=sarf&&n>SARF_GRUP?' ('+Math.ceil(n/SARF_GRUP)+' grup halinde, her grupta en fazla '+SARF_GRUP+' ürün)':'';
  if(!confirm(n+' ürün için "'+t.dataset.ad+'" bildirimi İTS\'e gönderilecek'+ek+'. Onaylıyor musunuz?'))return false;
  if(sarf){sarfGruplu(tur,t.dataset.ad);return false}
