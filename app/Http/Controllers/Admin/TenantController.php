@@ -45,6 +45,7 @@ class TenantController extends Controller
     {
         // Pozitif: uzatır (süresi dolmuşsa bugünden başlar); negatif: bitiş tarihinden gün düşer.
         $gun = $request->validate(['gun' => 'required|integer|not_in:0|min:-3650|max:3650'])['gun'];
+        $gun = (int) $gun; // doğrulama metin döner; Carbon addDays sayı ister
         $baz = $gun < 0 || $tenant->lisans_bitis->isFuture() ? $tenant->lisans_bitis : now();
         $tenant->update(['lisans_bitis' => $baz->copy()->addDays($gun)->startOfDay()]);
         AuditLog::kaydet('lisans_uzat', ['tenant' => $tenant->id, 'gun' => $gun]);
@@ -56,6 +57,7 @@ class TenantController extends Controller
     public function kalanAyarla(Request $request, Tenant $tenant)
     {
         $gun = $request->validate(['kalan' => 'required|integer|min:0|max:3650'])['kalan'];
+        $gun = (int) $gun; // doğrulama metin döner; Carbon addDays sayı ister
         $eski = $tenant->kalanGun();
         $tenant->update(['lisans_bitis' => now()->startOfDay()->addDays($gun)]);
         AuditLog::kaydet('lisans_kalan_ayarla', ['tenant' => $tenant->id, 'eski' => $eski, 'yeni' => $gun]);
