@@ -23,6 +23,22 @@ class MusteriDuzeltSilTest extends TestCase
         return User::factory()->create(['rol' => 'super_admin', 'tenant_id' => null]);
     }
 
+    public function test_kalan_gun_ayarlanir_ve_gun_eklenip_cikarilir(): void
+    {
+        $t = $this->tenant();
+        $this->actingAs($this->admin())->get(route('admin.tenants.index'))->assertSee('Ayarla');
+        $this->post(route('admin.tenants.kalan', $t), ['kalan' => 10])->assertSessionHas('ok');
+        $this->assertSame(10, $t->fresh()->kalanGun());
+        $this->post(route('admin.tenants.uzat', $t), ['gun' => -4]);
+        $this->assertSame(6, $t->fresh()->kalanGun());
+        $this->post(route('admin.tenants.uzat', $t), ['gun' => 30]);
+        $this->assertSame(36, $t->fresh()->kalanGun());
+        $this->post(route('admin.tenants.kalan', $t), ['kalan' => 0]);
+        $this->assertSame(0, $t->fresh()->kalanGun());
+        $this->post(route('admin.tenants.kalan', $t), ['kalan' => -1])->assertSessionHasErrors('kalan');
+        $this->post(route('admin.tenants.uzat', $t), ['gun' => 0])->assertSessionHasErrors('gun');
+    }
+
     public function test_duzelt_formu_acilir_ve_bilgiler_guncellenir(): void
     {
         $t = $this->tenant();

@@ -69,12 +69,13 @@ class DashboardController extends Controller
         ];
     }
 
-    /** Bugün stoğa giren ürünler (GTIN bazında); ilaç adı önbellekte varsa gösterilir, İTS çağrısı yapılmaz. */
+    /** Bugün stoğa giren ürünler (GTIN bazında), ilaç adlarıyla. */
     private function bugunGirenler(int $tid): array
     {
         $satirlar = StokKalemi::where('tenant_id', $tid)->where('created_at', '>=', now()->startOfDay())
             ->selectRaw('gtin, count(*) as adet, min(skt) as en_yakin_skt')->groupBy('gtin')->orderByDesc('adet')->get();
-        $adlar = Cache::get('ilac_adlari_'.$tid, []);
+        // Ad haritası önbellekte yoksa İTS'ten alınır (6 saat önbelleğe yazılır); yalnız bugün giriş varsa.
+        $adlar = $satirlar->isEmpty() ? [] : \App\Support\IlacAdlari::harita();
 
         return [
             'kalem' => $satirlar->count(),

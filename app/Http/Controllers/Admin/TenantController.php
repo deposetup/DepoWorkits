@@ -43,12 +43,24 @@ class TenantController extends Controller
 
     public function uzat(Request $request, Tenant $tenant)
     {
-        $gun = $request->validate(['gun' => 'required|integer|min:1|max:3650'])['gun'];
-        $baz = $tenant->lisans_bitis->isFuture() ? $tenant->lisans_bitis : now();
-        $tenant->update(['lisans_bitis' => $baz->copy()->addDays($gun)]);
+        // Pozitif: uzatır (süresi dolmuşsa bugünden başlar); negatif: bitiş tarihinden gün düşer.
+        $gun = $request->validate(['gun' => 'required|integer|not_in:0|min:-3650|max:3650'])['gun'];
+        $baz = $gun < 0 || $tenant->lisans_bitis->isFuture() ? $tenant->lisans_bitis : now();
+        $tenant->update(['lisans_bitis' => $baz->copy()->addDays($gun)->startOfDay()]);
         AuditLog::kaydet('lisans_uzat', ['tenant' => $tenant->id, 'gun' => $gun]);
 
-        return back()->with('ok', 'Lisans uzatıldı.');
+        return back()->with('ok', 'Lisans '.($gun > 0 ? $gun.' gün uzatıldı.' : abs($gun).' gün kısaltıldı.').' Kalan: '.$tenant->fresh()->kalanGun().' gün.');
+    }
+
+    /** Kalan gün sayısını doğrudan belirler: bitiş = bugün + N (0 = bugün biter). */
+    public function kalanAyarla(Request $request, Tenant $tenant)
+    {
+        $gun = $request->validate(['kalan' => 'required|integer|min:0|max:3650'])['kalan'];
+        $eski = $tenant->kalanGun();
+        $tenant->update(['lisans_bitis' => now()->startOfDay()->addDays($gun)]);
+        AuditLog::kaydet('lisans_kalan_ayarla', ['tenant' => $tenant->id, 'eski' => $eski, 'yeni' => $gun]);
+
+        return back()->with('ok', $tenant->unvan.': kalan gün '.$eski.' → '.$gun.' olarak ayarlandı.');
     }
 
     /** PTS havuzundaki (mal alımı yapılmamış) paketleri havuzdan çıkarır; kayıtlar silinmez, durumu 'sifirlandi' olur. */

@@ -110,6 +110,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/musteriler/{tenant}/sil', [TenantController::class, 'sil'])->name('tenants.sil');
         Route::post('/gln-sorgu', \App\Http\Controllers\Admin\GlnSorguController::class)->middleware('throttle:20,1')->name('gln-sorgu');
         Route::post('/musteriler/{tenant}/tur', [TenantController::class, 'turDegistir'])->name('tenants.tur');
+        Route::post('/musteriler/{tenant}/kalan-gun', [TenantController::class, 'kalanAyarla'])->name('tenants.kalan');
         Route::post('/musteriler/{tenant}/uzat', [TenantController::class, 'uzat'])->name('tenants.uzat');
         Route::get('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'index'])->name('kullanici.index');
         Route::post('/musteriler/{tenant}/kullanicilar', [KullaniciController::class, 'store'])->name('kullanici.store');

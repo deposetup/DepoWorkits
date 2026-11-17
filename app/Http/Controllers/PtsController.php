@@ -64,7 +64,38 @@ class PtsController extends Controller
             return redirect()->route('pts')->withErrors(['pts' => $e->getMessage()]);
         }
 
-        return redirect()->route('pts.paket', $paket);
+        $cariMesaj = $this->cariyeEkle($request, $its, $paket);
+
+        return redirect()->route('pts.paket', $paket)->with($cariMesaj ? ['ok' => $cariMesaj] : []);
+    }
+
+    /** Gönderen firma cari değilse İTS paydaş listesinden bulup cariye ekler; hata olursa paket alma etkilenmez. */
+    private function cariyeEkle(Request $request, ItsClient $its, PtsPaketi $paket): ?string
+    {
+        $gln = $paket->kaynak_gln;
+        if (! $gln) {
+            return null;
+        }
+        try {
+            $tid = $request->user()->tenant_id;
+            if (\App\Models\Cari::where(['tenant_id' => $tid, 'gln' => $gln])->exists()) {
+                return null;
+            }
+            $f = \App\Support\PaydasAdi::coz([$gln], $request->user()->tenant, $its)[$gln] ?? null;
+            if (! $f) {
+                return null;
+            }
+            $cari = \App\Models\Cari::create(['tenant_id' => $tid, 'user_id' => $request->user()->id, 'gln' => $gln,
+                'unvan' => $f['unvan'], 'tip' => array_key_exists($f['tip'], PaydasController::TIPLER) ? $f['tip'] : null, 'aktif' => true]);
+            \App\Models\AuditLog::kaydet('cari_ekle', ['cari' => $cari->id, 'gln' => $gln, 'kaynak' => 'pts']);
+            \App\Models\Cari::onbellekTemizle();
+
+            return $cari->unvan.' cariye otomatik eklendi.';
+        } catch (\Throwable $e) {
+            report($e);
+
+            return null;
+        }
     }
 
     /** Sorgu listesindeki bir paketin kutu (ürün) sayısını döner; paket daha önce indirilmediyse indirip saklar. */

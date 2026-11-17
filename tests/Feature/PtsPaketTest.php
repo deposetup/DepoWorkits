@@ -21,6 +21,24 @@ class PtsPaketTest extends TestCase
         return User::factory()->create(['tenant_id' => $t->id, 'rol' => 'kullanici']);
     }
 
+    public function test_paket_alinirken_gonderen_firma_cariye_otomatik_eklenir(): void
+    {
+        $u = $this->user();
+        foreach (['uretici', 'depo'] as $tip) {
+            \App\Models\Cari::where('tenant_id', $u->tenant_id)->delete();
+            \App\Models\Cari::onbellekTemizle();
+            \Illuminate\Support\Facades\DB::table('paydas_anliklari')->where('gln', '8680001000022')->delete();
+            \Illuminate\Support\Facades\DB::table('paydas_anliklari')->insert(['gln' => '8680001000022', 'unvan' => 'ORNEK FIRMA', 'tip' => $tip, 'aktif' => true, 'created_at' => now(), 'updated_at' => now()]);
+            $this->actingAs($u)->post('/pts/al', ['transfer_id' => '100004870'])->assertRedirect()->assertSessionHas('ok');
+            $c = \App\Models\Cari::where(['tenant_id' => $u->tenant_id, 'gln' => '8680001000022'])->first();
+            $this->assertNotNull($c);
+            $this->assertSame($tip, $c->tip);
+            // ikinci kez almak çift kayıt oluşturmaz
+            $this->actingAs($u)->post('/pts/al', ['transfer_id' => '100004870'])->assertRedirect();
+            $this->assertSame(1, \App\Models\Cari::where(['tenant_id' => $u->tenant_id, 'gln' => '8680001000022'])->count());
+        }
+    }
+
     public function test_parser_farkli_bicimleri_okur(): void
     {
         $a = PtsXmlParser::parse('<transfer><sourceGLN>8680001000022</sourceGLN><productList><product><GTIN>08699617650153</GTIN><lotNumber>L1</lotNumber><expirationDate>2030-05-01T00:00:00</expirationDate><serialNumber>A1</serialNumber></product></productList></transfer>');

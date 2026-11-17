@@ -8,6 +8,8 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <style>
+  @font-face { font-family: 'Orbit-B PL'; src: url('{{ asset('fonts/OrbitB-PL.ttf') }}') format('truetype'); font-display: swap; }
+  .orbit { font-family: 'Orbit-B PL', system-ui, sans-serif; font-weight: 400; letter-spacing: .04em; }
   :root { --lacivert: #0b2447; --lacivert2: #19376d; --vurgu: #5fd0ff; }
   html, body { height: 100%; }
   body { background: #f4f6fa; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -17,9 +19,13 @@
          background: radial-gradient(circle at 15% 10%, rgba(95,208,255,.22), transparent 45%), linear-gradient(160deg, var(--lacivert), #0d2b57 55%, var(--lacivert2)); }
   .sol::after { content: ""; position: absolute; width: 520px; height: 520px; right: -180px; bottom: -200px; border-radius: 50%; border: 70px solid rgba(255,255,255,.04); }
   @media (min-width: 992px) { .sol { display: flex; } }
-  .marka { display: flex; align-items: center; gap: .75rem; font-weight: 700; font-size: 1.4rem; letter-spacing: .01em; }
-  .marka .logo { width: 2.7rem; height: 2.7rem; display: grid; place-items: center; border-radius: .75rem; background: rgba(95,208,255,.16); color: var(--vurgu); font-size: 1.4rem; }
+  .marka { display: flex; align-items: center; gap: .85rem; font-size: 2.1rem; line-height: 1; }
+  .marka .logo { width: 3.4rem; height: 3.4rem; padding: .45rem; border-radius: 50%; background: rgba(95,208,255,.14); border: 1px solid rgba(95,208,255,.35); color: #fff; box-shadow: 0 0 0 .5rem rgba(95,208,255,.06); }
+  .marka .logo svg { animation: yorunge 24s linear infinite; }
+  @keyframes yorunge { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .marka .logo svg { animation: none; } }
   .marka .nokta { color: var(--vurgu); }
+  .sol > div:not(.marka) { margin: auto 0; }
   .sol h1 { font-size: 2.1rem; font-weight: 700; line-height: 1.25; max-width: 30rem; }
   .sol p.alt { color: #b9c8e6; max-width: 30rem; }
   .ozellik { list-style: none; padding: 0; margin: 1.75rem 0 0; display: grid; gap: .9rem; position: relative; z-index: 1; }
@@ -29,8 +35,13 @@
   .sol small { color: #8196c4; position: relative; z-index: 1; }
   .sag { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1.25rem; }
   .kutu { width: 100%; max-width: 25rem; }
-  .mobil-marka { display: flex; align-items: center; gap: .6rem; font-weight: 700; font-size: 1.25rem; color: var(--lacivert); margin-bottom: 1.75rem; }
-  .mobil-marka .logo { width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: .65rem; background: var(--lacivert); color: var(--vurgu); }
+  .mobil-marka { display: flex; align-items: center; gap: .6rem; font-size: 1.6rem; line-height: 1; color: var(--lacivert); margin-bottom: 1.75rem; }
+  .mobil-marka .logo { width: 2.6rem; height: 2.6rem; padding: .35rem; border-radius: 50%; background: var(--lacivert); color: #fff; }
+  .mobil-marka .nokta { color: #2a8fd0; }
+  .bolme { position: relative; }
+  .kurumsal { position: absolute; top: 1.1rem; right: 1.5rem; z-index: 2; display: block; }
+  .kurumsal img { height: 2.6rem; width: auto; display: block; }
+  @media (max-width: 575px) { .kurumsal { position: static; padding: 1rem 1.25rem 0; text-align: right; } .bolme { flex-direction: column; } .kurumsal img { height: 2.1rem; display: inline-block; } }
   @media (min-width: 992px) { .mobil-marka { display: none; } }
   .kutu h2 { font-weight: 700; color: var(--lacivert); font-size: 1.6rem; margin-bottom: .25rem; }
   .kutu .aciklama { color: #6b7a99; margin-bottom: 1.75rem; }
@@ -47,8 +58,9 @@
 <body>
 <div class="sayfa">
   <div class="bolme">
+    <a class="kurumsal" href="https://deposetup.com.tr" target="_blank" rel="noopener" title="Depo Setup Yazılım ve Danışmanlık Hizmetleri Ltd. Şti."><img src="{{ asset('img/deposetup-logo.svg') }}" alt="Depo Setup"></a>
     <section class="sol" aria-hidden="true">
-      <div class="marka"><span class="logo"><i class="bi bi-capsule-pill"></i></span><span>DepoWork<span class="nokta"> ITS</span></span></div>
+      <div class="marka"><span class="logo"><svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><ellipse cx="24" cy="24" rx="20" ry="8" transform="rotate(-28 24 24)" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="24" r="7" fill="currentColor"/><circle cx="40.5" cy="14.5" r="3.2" fill="var(--vurgu)"/></svg></span><span class="orbit">DepoWork<span class="nokta"> ITS</span></span></div>
       <div style="position:relative;z-index:1">
         <h1>İTS bildirimlerinizi tek ekrandan, güvenle yönetin.</h1>
         <p class="alt mt-3">Mal kabul, satış, devir, sarf ve deaktivasyon bildirimleriniz ile PTS paketleriniz tek bir kurumsal portalda.</p>
@@ -59,11 +71,10 @@
           <li><i class="bi bi-shield-lock"></i><span><b>Güvenli erişim</b>Müşteriye özel veri ayrımı ve işlem kayıtları.</span></li>
         </ul>
       </div>
-      <small>{{ config('its.firma') }}</small>
     </section>
     <section class="sag">
       <div class="kutu">
-        <div class="mobil-marka"><span class="logo"><i class="bi bi-capsule-pill"></i></span>DepoWork ITS</div>
+        <div class="mobil-marka"><span class="logo"><svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><ellipse cx="24" cy="24" rx="20" ry="8" transform="rotate(-28 24 24)" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="24" r="7" fill="currentColor"/><circle cx="40.5" cy="14.5" r="3.2" fill="var(--vurgu)"/></svg></span><span class="orbit">DepoWork<span class="nokta"> ITS</span></span></div>
         <h2>Hoş geldiniz</h2>
         <p class="aciklama">Hesabınızla giriş yaparak devam edin.</p>
         <form method="post" action="/giris" autocomplete="on">@csrf
@@ -91,8 +102,8 @@
     </section>
   </div>
   <footer class="alt-bilgi">
-    <span>&copy; {{ now()->year }} {{ config('its.firma') }}</span>
     <span>Sürüm {{ config('its.surum') }}</span>
+    <span class="text-end">&copy; {{ now()->year }} {{ config('its.firma') }}</span>
   </footer>
 </div>
 <script>
