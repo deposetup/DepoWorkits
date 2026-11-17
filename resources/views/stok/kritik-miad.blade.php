@@ -3,8 +3,13 @@
 @section('icerik')
 <div class="card mb-4"><div class="card-body">
 <h5 class="mb-3">Eşik Ayarı</h5>
+@if(session('ok'))<div class="alert alert-success py-2">{{ session('ok') }}</div>@endif
+@if($errors->any())<div class="alert alert-danger py-2">{{ $errors->first() }}</div>@endif
 <form method="post" action="{{ route('kritik-miad.kaydet') }}" class="row g-2 align-items-end">@csrf
-  <div class="col-12"><label class="form-label">İlaç</label><select name="gtin" class="form-select">@foreach($adlar as $g => $ad)<option value="{{ $g }}">{{ $ad }} ({{ $g }})</option>@endforeach</select></div>
+  <div class="col-12"><label class="form-label">İlaç</label>
+    <input name="ilac" value="{{ old('ilac') }}" list="ilacOneri" class="form-control" placeholder="İlaç adını ya da barkodunu yazın; yazdıkça öneriler çıkar" autocomplete="off" required>
+    <datalist id="ilacOneri">@foreach($adlar as $g => $ad)<option value="{{ $ad }} ({{ $g }})">@endforeach</datalist>
+    <div class="form-text">Listeden seçebilir ya da yalnızca barkodu yazabilirsiniz.</div></div>
   <div class="col-md-3"><label class="form-label">Kritik stok</label><input type="number" name="kritik_stok" min="0" value="0" class="form-control"></div>
   <div class="col-md-3"><label class="form-label">Miad uyarı (gün)</label><input type="number" name="miad_gun" min="1" value="90" class="form-control"></div>
   <div class="col-md-2"><button class="btn btn-primary w-100">Kaydet</button></div>

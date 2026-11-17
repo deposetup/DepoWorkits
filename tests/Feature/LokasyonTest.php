@@ -109,4 +109,17 @@ class LokasyonTest extends TestCase
         // karantina odasında düğme yok
         $this->actingAs($u)->get(route('stok.karantina'))->assertOk()->assertDontSee('miatBtn', false);
     }
+
+    public function test_esik_ayarinda_ilac_yazilarak_aranir(): void
+    {
+        $u = $this->user();
+        $this->actingAs($u)->post(route('kritik-miad.kaydet'), ['ilac' => 'ÖRNEK İLAÇ (08699617650153)', 'kritik_stok' => 5, 'miad_gun' => 60])->assertSessionHasNoErrors();
+        $this->assertSame(5, \App\Models\IlacAyari::where('tenant_id', $u->tenant_id)->where('gtin', '08699617650153')->value('kritik_stok'));
+        // yalnızca 13 haneli barkod
+        $this->actingAs($u)->post(route('kritik-miad.kaydet'), ['ilac' => '8699617650153', 'kritik_stok' => 7, 'miad_gun' => 60])->assertSessionHasNoErrors();
+        $this->assertSame(7, \App\Models\IlacAyari::where('tenant_id', $u->tenant_id)->where('gtin', '08699617650153')->value('kritik_stok'));
+        // bulunamayan ad
+        $this->actingAs($u)->from(route('kritik-miad'))->post(route('kritik-miad.kaydet'), ['ilac' => 'yokboyleilac', 'kritik_stok' => 1, 'miad_gun' => 30])->assertSessionHasErrors('ilac');
+        $this->actingAs($u)->get(route('kritik-miad'))->assertOk()->assertSee('ilacOneri', false);
+    }
 }

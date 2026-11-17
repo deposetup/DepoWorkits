@@ -41,6 +41,16 @@ class StokSiralamaTest extends TestCase
         $this->actingAs($u)->get('/stok?sirala=adet&yon=desc')->assertSeeInOrder(['ALFA TABLET', 'ZETA AMPUL', 'MAVI SURUP']);
     }
 
+    public function test_stok_sayfasi_kalem_kutu_ve_excel(): void
+    {
+        $u = $this->hazirla();
+        $r = $this->actingAs($u)->get('/stok');
+        $r->assertSee('Kalem: 3')->assertSee('Toplam kutu:')->assertSee("Excel'e Aktar", false);
+        $x = $this->actingAs($u)->get('/stok?excel=1');
+        $x->assertOk();
+        $this->assertStringContainsString('spreadsheetml', (string) $x->headers->get('content-type'));
+    }
+
     public function test_gecersiz_siralama_degeri_hata_vermez(): void
     {
         $this->actingAs($this->hazirla())->get('/stok?sirala=drop&yon=x')->assertOk();

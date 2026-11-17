@@ -173,7 +173,7 @@ class PtsController extends Controller
     }
 
     /** Her adımda işlenen ürün sayısı; nginx/PHP zaman aşımına takılmamak için Mal Alım parça parça yapılır. */
-    private const MAL_ALIM_ADIM = 200;
+    private const MAL_ALIM_ADIM = 500;
 
     /**
      * Mal Alım'ı bir parça işler ve ilerlemeyi JSON döner. Ekran bitene kadar tekrar çağırır.

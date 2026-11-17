@@ -49,7 +49,18 @@ class StokController extends Controller
         };
         $satirlar = $tum->sortBy($anahtar, SORT_NATURAL, $yon === 'desc')->values();
 
-        return view('stok.index', ['satirlar' => $satirlar, 'adlar' => $adlar, 'ara' => $ara, 'sirala' => $sirala, 'yon' => $yon, 'receteler' => $receteler]);
+        if ($request->boolean('excel')) {
+            $veri = $satirlar->map(fn ($r) => [
+                $adlar[$r->gtin] ?? '', $r->gtin, $receteler[$r->gtin] ?? '', (int) $r->adet,
+                $r->en_yakin_skt ? \Illuminate\Support\Carbon::parse($r->en_yakin_skt)->format('d.m.Y') : '',
+            ])->all();
+            $veri[] = ['TOPLAM ('.$satirlar->count().' kalem)', '', '', (int) $satirlar->sum('adet'), ''];
+
+            return \App\Support\XlsxYazici::indir('stok-'.now()->format('Ymd-His').'.xlsx',
+                ['İlaç', 'GTIN', 'Reçete', 'Adet', 'En Yakın SKT'], $veri, 'Stok');
+        }
+
+        return view('stok.index', ['kalem' => $satirlar->count(), 'kutu' => (int) $satirlar->sum('adet'), 'satirlar' => $satirlar, 'adlar' => $adlar, 'ara' => $ara, 'sirala' => $sirala, 'yon' => $yon, 'receteler' => $receteler]);
     }
 
     /** GTIN (barkod) bazlı stok: ürün başına adet ve parti/SKT kırılımı; Excel çıktısı. */
@@ -350,8 +361,28 @@ class StokController extends Controller
         return view('stok.kritik-miad', ['adlar' => $adlar, 'ayar' => $ayar, 'kritik' => $kritik, 'miad' => $miad, 'gecen' => $gecen, 'gecenAdet' => $gecenAdet, 'yaklasanAdet' => $yaklasanAdet]);
     }
 
-    public function ayarKaydet(Request $request)
+    public function ayarKaydet(Request $request, ItsClient $its)
     {
+        // İlaç yazılarak aranır: "Ad (GTIN)", yalnızca GTIN/barkod ya da ilaç adının bir kısmı kabul edilir.
+        if ($request->filled('ilac')) {
+            $giris = trim((string) $request->input('ilac'));
+            $gtin = null;
+            if (preg_match('/(\d{13,14})\)?\s*$/', $giris, $m)) {
+                $gtin = strlen($m[1]) === 13 ? '0'.$m[1] : $m[1];
+            } else {
+                $adlar = $this->adlar($its);
+                $eslesen = array_keys(array_filter($adlar, fn ($ad) => mb_stripos($ad, $giris) !== false));
+                if (count($eslesen) === 1) {
+                    $gtin = $eslesen[0];
+                } elseif (count($eslesen) > 1) {
+                    return back()->withInput()->withErrors(['ilac' => count($eslesen).' ilaç eşleşti; listeden seçin ya da adı/barkodu daha açık yazın.']);
+                }
+            }
+            if (! $gtin) {
+                return back()->withInput()->withErrors(['ilac' => '"'.mb_substr($giris, 0, 60).'" ile eşleşen ilaç bulunamadı.']);
+            }
+            $request->merge(['gtin' => $gtin]);
+        }
         $v = $request->validate(['gtin' => 'required|digits:14', 'kritik_stok' => 'required|integer|min:0|max:100000', 'miad_gun' => 'required|integer|min:1|max:1000']);
         IlacAyari::updateOrCreate(['tenant_id' => $request->user()->tenant_id, 'gtin' => $v['gtin']], ['kritik_stok' => $v['kritik_stok'], 'miad_gun' => $v['miad_gun']]);
 
