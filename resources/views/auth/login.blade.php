@@ -21,9 +21,9 @@
   @media (min-width: 992px) { .sol { display: flex; } }
   .marka { display: flex; align-items: center; gap: .85rem; font-size: 2.1rem; line-height: 1; }
   .marka .logo { width: 3.4rem; height: 3.4rem; padding: .45rem; border-radius: 50%; background: rgba(95,208,255,.14); border: 1px solid rgba(95,208,255,.35); color: #fff; box-shadow: 0 0 0 .5rem rgba(95,208,255,.06); }
-  .marka .logo svg { animation: yorunge 24s linear infinite; }
-  @keyframes yorunge { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .marka .logo svg { animation: none; } }
+  .marka .logo svg, .mobil-marka .logo svg { animation: don 7s linear infinite; }
+  @keyframes don { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .marka .logo svg, .mobil-marka .logo svg { animation: none; } }
   .marka .nokta { color: var(--vurgu); }
   .sol > div:not(.marka) { margin: auto 0; }
   .sol h1 { font-size: 2.1rem; font-weight: 700; line-height: 1.25; max-width: 30rem; }
@@ -39,9 +39,9 @@
   .mobil-marka .logo { width: 2.6rem; height: 2.6rem; padding: .35rem; border-radius: 50%; background: var(--lacivert); color: #fff; }
   .mobil-marka .nokta { color: #2a8fd0; }
   .bolme { position: relative; }
-  .kurumsal { position: absolute; top: 1.1rem; right: 1.5rem; z-index: 2; display: block; }
-  .kurumsal img { height: 2.6rem; width: auto; display: block; }
-  @media (max-width: 575px) { .kurumsal { position: static; padding: 1rem 1.25rem 0; text-align: right; } .bolme { flex-direction: column; } .kurumsal img { height: 2.1rem; display: inline-block; } }
+  .kurumsal { position: absolute; top: 1.25rem; right: 1.75rem; z-index: 2; display: block; }
+  .kurumsal img { height: 3.4rem; width: auto; display: block; }
+  @media (max-width: 575px) { .kurumsal { position: static; padding: 1rem 1.25rem 0; text-align: right; } .bolme { flex-direction: column; } .kurumsal img { height: 2.7rem; display: inline-block; } }
   @media (min-width: 992px) { .mobil-marka { display: none; } }
   .kutu h2 { font-weight: 700; color: var(--lacivert); font-size: 1.6rem; margin-bottom: .25rem; }
   .kutu .aciklama { color: #6b7a99; margin-bottom: 1.75rem; }
@@ -60,7 +60,7 @@
   <div class="bolme">
     <a class="kurumsal" href="https://deposetup.com.tr" target="_blank" rel="noopener" title="Depo Setup Yazılım ve Danışmanlık Hizmetleri Ltd. Şti."><img src="{{ asset('img/deposetup-logo.svg') }}" alt="Depo Setup"></a>
     <section class="sol" aria-hidden="true">
-      <div class="marka"><span class="logo"><svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><ellipse cx="24" cy="24" rx="20" ry="8" transform="rotate(-28 24 24)" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="24" r="7" fill="currentColor"/><circle cx="40.5" cy="14.5" r="3.2" fill="var(--vurgu)"/></svg></span><span class="orbit">DepoWork<span class="nokta"> ITS</span></span></div>
+      <div class="marka"><span class="logo"><svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><g transform="rotate(-45 24 24)"><rect x="5" y="14" width="38" height="20" rx="10" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M24 14h9a10 10 0 0 1 0 20h-9z" fill="var(--vurgu)"/><path d="M24 14v20" stroke="currentColor" stroke-width="2.6"/></g></svg></span><span class="orbit">DepoWork<span class="nokta"> ITS</span></span></div>
       <div style="position:relative;z-index:1">
         <h1>İTS bildirimlerinizi tek ekrandan, güvenle yönetin.</h1>
         <p class="alt mt-3">Mal kabul, satış, devir, sarf ve deaktivasyon bildirimleriniz ile PTS paketleriniz tek bir kurumsal portalda.</p>
@@ -74,7 +74,7 @@
     </section>
     <section class="sag">
       <div class="kutu">
-        <div class="mobil-marka"><span class="logo"><svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><ellipse cx="24" cy="24" rx="20" ry="8" transform="rotate(-28 24 24)" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="24" r="7" fill="currentColor"/><circle cx="40.5" cy="14.5" r="3.2" fill="var(--vurgu)"/></svg></span><span class="orbit">DepoWork<span class="nokta"> ITS</span></span></div>
+        <div class="mobil-marka"><span class="logo"><svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><g transform="rotate(-45 24 24)"><rect x="5" y="14" width="38" height="20" rx="10" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M24 14h9a10 10 0 0 1 0 20h-9z" fill="var(--vurgu)"/><path d="M24 14v20" stroke="currentColor" stroke-width="2.6"/></g></svg></span><span class="orbit">DepoWork<span class="nokta"> ITS</span></span></div>
         <h2>Hoş geldiniz</h2>
         <p class="aciklama">Hesabınızla giriş yaparak devam edin.</p>
         <form method="post" action="/giris" autocomplete="on">@csrf
@@ -102,8 +102,8 @@
     </section>
   </div>
   <footer class="alt-bilgi">
-    <span>Sürüm {{ config('its.surum') }}</span>
-    <span class="text-end">&copy; {{ now()->year }} {{ config('its.firma') }}</span>
+    <span>&copy; {{ now()->year }} {{ config('its.firma') }}</span>
+    <span class="text-end">Sürüm {{ config('its.surum') }}</span>
   </footer>
 </div>
 <script>
