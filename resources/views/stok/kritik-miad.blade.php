@@ -1,6 +1,15 @@
 @extends('layouts.app')
 @section('baslik', 'Kritik / Miad')
 @section('icerik')
+<div class="card mb-4"><div class="card-body">
+<h5 class="mb-3">Eşik Ayarı</h5>
+<form method="post" action="{{ route('kritik-miad.kaydet') }}" class="row g-2 align-items-end">@csrf
+  <div class="col-12"><label class="form-label">İlaç</label><select name="gtin" class="form-select">@foreach($adlar as $g => $ad)<option value="{{ $g }}">{{ $ad }} ({{ $g }})</option>@endforeach</select></div>
+  <div class="col-md-3"><label class="form-label">Kritik stok</label><input type="number" name="kritik_stok" min="0" value="0" class="form-control"></div>
+  <div class="col-md-3"><label class="form-label">Miad uyarı (gün)</label><input type="number" name="miad_gun" min="1" value="90" class="form-control"></div>
+  <div class="col-md-2"><button class="btn btn-primary w-100">Kaydet</button></div>
+</form>
+</div></div>
 <div class="row g-4">
 <div class="col-lg-6"><h5>Kritik Stok</h5>
 <table class="table table-sm bg-white"><thead><tr><th>İlaç</th><th class="text-end">Stok</th><th class="text-end">Eşik</th></tr></thead><tbody>
@@ -20,11 +29,4 @@
 @if(count($miad) > 200)<div class="small text-muted">İlk 200 parti gösteriliyor ({{ count($miad) }} parti).</div>@endif
 </div>
 </div>
-<h5 class="mt-4">Eşik Ayarı</h5>
-<form method="post" action="{{ route('kritik-miad.kaydet') }}" class="row g-2 align-items-end">@csrf
-  <div class="col-md-5"><label class="form-label">İlaç</label><select name="gtin" class="form-select">@foreach($adlar as $g => $ad)<option value="{{ $g }}">{{ $ad }} ({{ $g }})</option>@endforeach</select></div>
-  <div class="col-md-2"><label class="form-label">Kritik stok</label><input type="number" name="kritik_stok" min="0" value="0" class="form-control"></div>
-  <div class="col-md-2"><label class="form-label">Miad uyarı (gün)</label><input type="number" name="miad_gun" min="1" value="90" class="form-control"></div>
-  <div class="col-md-2"><button class="btn btn-primary">Kaydet</button></div>
-</form>
 @endsection
