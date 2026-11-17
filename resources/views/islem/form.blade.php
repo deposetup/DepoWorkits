@@ -28,7 +28,7 @@
 @include('islem._ilerleme')
 <script>
 (function(){
- const sarf=@json(in_array($tur, ['sarf', 'sarf_iptal'])),GRUP=sarf?200:50,form=document.getElementById('islemForm');
+ const sarf=@json(in_array($tur, ['sarf', 'sarf_iptal'])),GRUP=sarf?500:50,form=document.getElementById('islemForm');
  form.addEventListener('submit',function(e){
   e.preventDefault();
   const satirlar=form.kodlar.value.split(/\r\n|\r|\n/).map(x=>x.trim()).filter(Boolean);

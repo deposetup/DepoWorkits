@@ -201,7 +201,7 @@ function topluOnay(e){const n=document.querySelectorAll('.sec:checked').length;
  const t=document.querySelector('.islem-btn.active'),tur=t.dataset.tur,sarf=['sarf','sarf_iptal'].includes(tur);
  if(!sarf&&n>100){alert('Bu işlem türünde tek seferde en fazla 100 ürün bildirilebilir.');return false}
  if(sarf&&n>1000){alert('Tek seferde en fazla 1000 ürün bildirilebilir.');return false}
- const grup=sarf?200:50,ids=[...document.querySelectorAll('.sec:checked')].map(c=>c.value),gruplar=[];
+ const grup=sarf?500:50,ids=[...document.querySelectorAll('.sec:checked')].map(c=>c.value),gruplar=[];
  for(let i=0;i<ids.length;i+=grup)gruplar.push(ids.slice(i,i+grup));
  if(!confirm(n+' ürün için "'+t.dataset.ad+'" bildirimi İTS\'e gönderilecek'+(gruplar.length>1?' ('+gruplar.length+' grup halinde)':'')+'. Onaylıyor musunuz?'))return false;
  const f=document.getElementById('toplu');

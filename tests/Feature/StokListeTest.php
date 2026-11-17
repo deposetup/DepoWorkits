@@ -46,13 +46,13 @@ class StokListeTest extends TestCase
         $this->actingAs($u)->postJson('/stok/toplu', ['tur' => 'sarf', 'secili' => range(1, 1001)])->assertStatus(422)->assertJsonPath('message', fn ($m) => str_contains($m, '1000'));
     }
 
-    public function test_sarf_json_yaniti_doner_ve_its_e_200_luk_gruplar_gider(): void
+    public function test_sarf_json_yaniti_doner_ve_its_e_500_luk_gruplar_gider(): void
     {
         $u = $this->kurulum();
         $u->tenant->update(['tur' => 'hastane']);
         StokKalemi::query()->delete();
         $ids = [];
-        for ($i = 1; $i <= 450; $i++) {
+        for ($i = 1; $i <= 1000; $i++) {
             $ids[] = StokKalemi::create(['tenant_id' => $u->tenant_id, 'gtin' => '08699999999990', 'sn' => 'S'.$i, 'bn' => 'L1', 'skt' => now()->addYear(), 'durum' => 'stokta'])->id;
         }
         $mock = new class extends \App\Services\Its\MockItsClient {
@@ -68,9 +68,9 @@ class StokListeTest extends TestCase
         $this->app->instance(\App\Services\Its\ItsClient::class, $mock);
 
         $r = $this->actingAs($u)->postJson('/stok/toplu', ['tur' => 'sarf', 'secili' => $ids])->assertOk()->assertJsonStructure(['satirlar', 'bildirim']);
-        $this->assertSame([200, 200, 50], $mock->gruplar);
-        $this->assertCount(450, $r->json('satirlar'));
-        $this->assertSame(450, StokKalemi::where('durum', 'sarf')->count());
+        $this->assertSame([500, 500], $mock->gruplar);
+        $this->assertCount(1000, $r->json('satirlar'));
+        $this->assertSame(1000, StokKalemi::where('durum', 'sarf')->count());
     }
 
     public function test_liste_sayfa_boyutu_secilebilir(): void

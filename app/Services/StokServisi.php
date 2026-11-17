@@ -17,7 +17,7 @@ use InvalidArgumentException;
 class StokServisi
 {
     /** Hastane sarf bildirimlerinde İTS'e tek istekte gönderilen ürün sayısı. */
-    public const SARF_GRUP = 200;
+    public const SARF_GRUP = 500;
 
     /** Sarf için tek seferde seçilebilecek en fazla ürün. */
     public const SARF_AZAMI = 1000;
