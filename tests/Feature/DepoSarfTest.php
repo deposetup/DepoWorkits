@@ -143,9 +143,20 @@ class DepoSarfTest extends TestCase
     {
         $u = $this->user('hastane');
         $this->actingAs($u)->get('/islem/sarf')->assertOk()->assertSee('bildirimDurum', false)->assertSee('bdBar', false);
-        $this->actingAs($u)->get('/islem/kabul')->assertOk()->assertDontSee('bildirimDurum', false);
+        $this->actingAs($u)->get('/islem/kabul')->assertOk()->assertSee('bildirimDurum', false)->assertSee('%0', false);
         $this->actingAs($u)->post('/islem/kabul', ['kodlar' => self::KOD]);
         $this->actingAs($u)->postJson('/islem/sarf', ['kodlar' => self::KOD])->assertOk()
             ->assertJsonStructure(['satirlar' => [['kod', 'durum', 'mesaj']], 'bildirim'])->assertJsonPath('satirlar.0.durum', 'tamam');
+    }
+
+    public function test_parcali_gonderim_sonuclari_birikir_ve_sonuc_ekrani_acilir(): void
+    {
+        $u = $this->user('hastane');
+        $this->actingAs($u)->post('/islem/kabul', ['kodlar' => self::KOD]);
+        $id = 'abc12345-test';
+        $this->actingAs($u)->postJson('/islem/sarf', ['kodlar' => self::KOD, 'toplu_id' => $id])->assertOk();
+        $this->actingAs($u)->post('/islem/sarf/sonuc', ['toplu_id' => $id])->assertOk()->assertSee('Sonuç')->assertSee('ÖRNEK İLAÇ');
+        // sonuç bir kez okunur; ikinci istek forma döner
+        $this->actingAs($u)->post('/islem/sarf/sonuc', ['toplu_id' => $id])->assertRedirect('/islem/sarf');
     }
 }

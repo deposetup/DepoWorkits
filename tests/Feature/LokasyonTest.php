@@ -92,4 +92,21 @@ class LokasyonTest extends TestCase
         $this->kalem($u, 'Y1', now()->addDays(30)->toDateString());
         $this->actingAs($u)->get(route('kritik-miad'))->assertOk()->assertSee('Süresi Geçenler')->assertSee('3.000 adet')->assertSee('Miadı Yaklaşan');
     }
+
+    public function test_red_odasinda_miadi_dolanlar_tek_tikla_deaktive_edilir(): void
+    {
+        $u = $this->user();
+        $a = $this->kalem($u, 'A1', now()->subDays(3)->toDateString());
+        $b = $this->kalem($u, 'A2', now()->subDays(9)->toDateString());
+        $gecerli = $this->kalem($u, 'A3', now()->addYear()->toDateString());
+        $r = $this->actingAs($u)->get(route('stok.red-odasi'))->assertOk()->assertSee('Miadı Dolanları Bildir (2)')->assertSee('miatBtn', false);
+        $this->assertStringContainsString(json_encode([$b->id, $a->id]), $r->getContent()); // SKT'ye göre sıralı otomatik seçim
+
+        $this->postJson(route('stok.toplu'), ['tur' => 'deaktive', 'sebep' => '40', 'aciklama' => 'Miadı dolan ürün', 'secili' => [$a->id, $b->id]])->assertOk();
+        $this->assertSame(2, StokKalemi::where('durum', 'deaktive')->count());
+        $this->assertSame('stokta', $gecerli->fresh()->durum);
+        $this->actingAs($u)->get(route('stok.red-odasi'))->assertOk()->assertSee('Miadı Dolanları Bildir (0)');
+        // karantina odasında düğme yok
+        $this->actingAs($u)->get(route('stok.karantina'))->assertOk()->assertDontSee('miatBtn', false);
+    }
 }

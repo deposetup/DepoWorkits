@@ -56,4 +56,37 @@ class StokCsvTest extends TestCase
         $this->assertSame(4, StokKalemi::where('tenant_id', $u->tenant_id)->count());
         $this->actingAs($u)->get(route('admin.stok-csv', $u->tenant))->assertStatus(403);
     }
+
+    public function test_adim_adim_ice_aktarma_yuzde_ilerler_ve_sonucu_verir(): void
+    {
+        $u = $this->user();
+        $satir = "GTIN;SN;BN;EXP_DATE\r\n";
+        for ($i = 1; $i <= 12; $i++) {
+            $satir .= "08699844750091;SN$i;P1;2030-01-31\r\n";
+        }
+        $h = $this->actingAs($u)->postJson(route('stok.ice-aktar.csv.hazirla'), ['dosya' => UploadedFile::fake()->createWithContent('stok.csv', $satir)])
+            ->assertOk()->assertJsonPath('toplam', 12)->json();
+
+        // küçük adımla ilerlemeyi doğrula: servis doğrudan 5 satırlık adımlar atar
+        $aktar = app(\App\Services\StokCsvAktar::class);
+        $anahtar = 'stokcsv:'.$u->tenant_id.':'.$h['token'];
+        $d = \Illuminate\Support\Facades\Cache::get($anahtar);
+        $d = $aktar->adim($u->tenant, $d, 5);
+        $this->assertSame(5, $d['r']['okunan']);
+        $this->assertFalse($d['bitti']);
+        \Illuminate\Support\Facades\Cache::put($anahtar, $d, 600);
+
+        $son = $this->postJson(route('stok.ice-aktar.csv.adim'), ['token' => $h['token']])->assertOk()->assertJsonPath('bitti', true)->assertJsonPath('okunan', 12)->json();
+        $this->assertSame(12, $son['sonuc']['eklenen']);
+        $this->assertSame(12, StokKalemi::count());
+        $this->postJson(route('stok.ice-aktar.csv.adim'), ['token' => $h['token']])->assertStatus(404);
+    }
+
+    public function test_hazirlik_hatali_dosyayi_json_olarak_reddeder(): void
+    {
+        $u = $this->user();
+        $this->actingAs($u)->postJson(route('stok.ice-aktar.csv.hazirla'), ['dosya' => UploadedFile::fake()->createWithContent('x_8680001000011.csv', self::CSV)])
+            ->assertStatus(422)->assertJsonPath('message', fn ($m) => str_contains($m, 'uyuşmuyor'));
+        $this->actingAs($u)->get(route('stok.ice-aktar'))->assertOk()->assertSee('csvPanel', false)->assertSee('Dosya yükleme');
+    }
 }

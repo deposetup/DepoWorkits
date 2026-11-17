@@ -51,18 +51,45 @@ class IslemController extends Controller
             StokKalemi::redOdasinaAl($request->user()->tenant_id);
         }
 
-        // Sarf ekranı gruplar halinde (JSON) çağırır; ilerleme tarayıcıda gösterilir.
+        // Ekran gruplar halinde (JSON) çağırır; ilerleme tarayıcıda gösterilir, sonuçlar sunucuda birikir.
         if ($request->expectsJson()) {
+            \App\Support\TopluSonuc::ekle($request, $tur, $sonuc);
+
             return response()->json(['satirlar' => $sonuc['satirlar'], 'bildirim' => $sonuc['bildirim']]);
         }
 
+        return $this->sonucEkrani($request, $tur, $sonuc, $v['karsi_gln'] ?? null);
+    }
+
+    /** Parça parça gönderim bittikten sonra birikmiş sonuçla ayrıntılı sonuç ekranını açar. */
+    public function sonuc(Request $request, string $tur)
+    {
+        abort_unless(isset(StokServisi::TURLER[$tur]), 404);
+        abort_unless($request->user()->tenant_id, 403);
+        $this->sarfYetkisi($tur);
+        $v = $request->validate(['toplu_id' => 'required|string', 'karsi_gln' => 'nullable|digits:13', 'geri' => 'nullable|in:stok']);
+        $sonuc = \App\Support\TopluSonuc::al($request, $tur);
+        if (! $sonuc) {
+            $yon = ($v['geri'] ?? null) === 'stok' ? redirect()->route('stok.liste') : redirect()->route('islem', $tur);
+
+            return $yon->withErrors(['kodlar' => 'Sonuç bulunamadı veya süresi doldu. Bildirim sonuçları için Hareketler ekranına bakabilirsiniz.']);
+        }
+        if (($v['geri'] ?? null) === 'stok') {
+            return view('islem.form', ['tur' => $tur, 'baslik' => StokServisi::TURLER[$tur][2], 'sebepler' => StokServisi::DEAKTIVE_SEBEPLER, 'sonuc' => $sonuc, 'geri' => route('stok.liste')]);
+        }
+
+        return $this->sonucEkrani($request, $tur, $sonuc, $v['karsi_gln'] ?? null);
+    }
+
+    private function sonucEkrani(Request $request, string $tur, array $sonuc, ?string $karsiGln)
+    {
         // PTS gönderimi yalnızca satış bildirimi TAMAMEN başarılıysa (hiç hatalı satır yok) kullanıcı onayına sunulur.
         $ptsGonderim = null;
         $tamBasarili = $sonuc['satirlar'] !== [] && collect($sonuc['satirlar'])->every(fn ($s) => $s['durum'] === 'tamam');
-        if ($tur === 'satis' && $tamBasarili && ! empty($sonuc['kalemler_ok']) && \Illuminate\Support\Facades\Schema::hasTable('pts_gonderimleri')) {
+        if ($tur === 'satis' && $tamBasarili && ! empty($sonuc['kalemler_ok']) && $karsiGln && \Illuminate\Support\Facades\Schema::hasTable('pts_gonderimleri')) {
             $ptsGonderim = PtsGonderim::create(PtsGonderim::mevcutAlanlar([
                 'tenant_id' => $request->user()->tenant_id, 'user_id' => $request->user()->id,
-                'alici_gln' => $v['karsi_gln'], 'alici_unvan' => PtsGonderim::unvanBul($v['karsi_gln'], $request->user()->tenant_id), 'bildirim_id' => $sonuc['bildirim'],
+                'alici_gln' => $karsiGln, 'alici_unvan' => PtsGonderim::unvanBul($karsiGln, $request->user()->tenant_id), 'bildirim_id' => $sonuc['bildirim'],
                 'adet' => count($sonuc['kalemler_ok']), 'kalemler' => $sonuc['kalemler_ok'],
             ]));
         }

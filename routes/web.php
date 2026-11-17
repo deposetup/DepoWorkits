@@ -78,10 +78,15 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::get('/paydaslar', [\App\Http\Controllers\PaydasController::class, 'index'])->name('paydaslar');
         Route::get('/stok/ice-aktar', [\App\Http\Controllers\StokAktarController::class, 'form'])->name('stok.ice-aktar');
         Route::post('/stok/ice-aktar/csv', [\App\Http\Controllers\StokAktarController::class, 'csv'])->name('stok.ice-aktar.csv');
+        Route::post('/stok/ice-aktar/csv/hazirla', [\App\Http\Controllers\StokAktarController::class, 'csvHazirla'])->name('stok.ice-aktar.csv.hazirla');
+        Route::post('/stok/ice-aktar/dogrula/baslat', [\App\Http\Controllers\StokAktarController::class, 'dogrulaBaslat'])->name('stok.ice-aktar.dogrula.baslat');
+        Route::post('/stok/ice-aktar/dogrula/adim', [\App\Http\Controllers\StokAktarController::class, 'dogrulaAdim'])->name('stok.ice-aktar.dogrula.adim');
+        Route::post('/stok/ice-aktar/csv/adim', [\App\Http\Controllers\StokAktarController::class, 'csvAdim'])->name('stok.ice-aktar.csv.adim');
         Route::post('/stok/ice-aktar', [\App\Http\Controllers\StokAktarController::class, 'calistir'])->name('stok.ice-aktar.calistir');
         Route::post('/islem-sonuc/excel', [IslemController::class, 'sonucExcel'])->name('islem.sonuc-excel');
         Route::get('/islem/{tur}', [IslemController::class, 'form'])->name('islem');
         Route::post('/islem/{tur}', [IslemController::class, 'calistir'])->name('islem.calistir');
+        Route::post('/islem/{tur}/sonuc', [IslemController::class, 'sonuc'])->name('islem.sonuc');
     });
 
     Route::middleware('superadmin')->prefix('yonetim')->name('admin.')->group(function () {

@@ -38,6 +38,118 @@ class StokAktarController extends Controller
         return view('stok.ice-aktar', ['paketSayisi' => PtsPaketi::where('tenant_id', $request->user()->tenant_id)->count(), 'sonuc' => null, 'csv' => $sonuc]);
     }
 
+    /** 1. aşama (XHR, yükleme yüzdesi tarayıcıda): dosyayı alır, çözer, satırları sayar. */
+    public function csvHazirla(Request $request, \App\Services\StokCsvAktar $aktar)
+    {
+        abort_unless($request->user()->tenant_id, 403);
+        $request->validate(['dosya' => 'required|file|max:51200|mimes:csv,txt,zip']);
+        try {
+            $durum = $aktar->hazirla($request->user()->tenant, $request->file('dosya'));
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+        $token = bin2hex(random_bytes(16));
+        \Illuminate\Support\Facades\Cache::put($this->csvAnahtar($request, $token), $durum, now()->addHours(2));
+
+        return response()->json(['token' => $token, 'toplam' => $durum['toplam'], 'dosya' => $request->file('dosya')->getClientOriginalName()]);
+    }
+
+    /** 2. aşama: her çağrıda en fazla 5.000 satır işler; bitince özeti döndürür. */
+    public function csvAdim(Request $request, \App\Services\StokCsvAktar $aktar)
+    {
+        abort_unless($request->user()->tenant_id, 403);
+        $v = $request->validate(['token' => ['required', 'regex:/^[a-f0-9]{32}$/']]);
+        $anahtar = $this->csvAnahtar($request, $v['token']);
+        $kilit = \Illuminate\Support\Facades\Cache::lock($anahtar.':kilit', 300);
+        if (! $kilit->get()) {
+            return response()->json(['message' => 'Önceki adım hâlâ sürüyor, lütfen bekleyin.'], 409);
+        }
+        try {
+            $durum = \Illuminate\Support\Facades\Cache::get($anahtar);
+            if (! $durum || ! is_file($durum['yol'])) {
+                return response()->json(['message' => 'İçe aktarma oturumu bulunamadı veya süresi doldu. Dosyayı yeniden yükleyin.'], 404);
+            }
+            $tenant = $request->user()->tenant;
+            $durum = $aktar->adim($tenant, $durum);
+            $cevap = ['okunan' => $durum['r']['okunan'], 'toplam' => $durum['toplam'], 'bitti' => $durum['bitti'], 'gecersiz' => $durum['r']['gecersiz']];
+            if ($durum['bitti']) {
+                $cevap['sonuc'] = $aktar->sonuc($tenant, $durum);
+                $aktar->temizle($durum);
+                \Illuminate\Support\Facades\Cache::forget($anahtar);
+            } else {
+                \Illuminate\Support\Facades\Cache::put($anahtar, $durum, now()->addHours(2));
+            }
+
+            return response()->json($cevap);
+        } finally {
+            $kilit->release();
+        }
+    }
+
+    /** Doğrulamalı içe aktarma (PTS paketleri / karekod listesi): işi başlatır. */
+    public function dogrulaBaslat(Request $request, \App\Services\StokDogrulaAktar $servis)
+    {
+        abort_unless($request->user()->tenant_id, 403);
+        $v = $request->validate(['kaynak' => 'required|in:kodlar,pts', 'kodlar' => 'nullable|required_if:kaynak,kodlar|string|max:2000000']);
+        $d = $servis->baslat($request->user()->tenant, $v['kaynak'], $v['kodlar'] ?? null);
+        $token = bin2hex(random_bytes(16));
+        \Illuminate\Support\Facades\Cache::put('stokdogrula:'.$request->user()->tenant_id.':'.$token, $d, now()->addHours(3));
+
+        return response()->json(['token' => $token] + $this->dogrulaDurum($servis, $d));
+    }
+
+    /** Doğrulamalı içe aktarma: bir adım ilerletir. */
+    public function dogrulaAdim(Request $request, \App\Services\StokDogrulaAktar $servis)
+    {
+        abort_unless($request->user()->tenant_id, 403);
+        $v = $request->validate(['token' => ['required', 'regex:/^[a-f0-9]{32}$/']]);
+        $anahtar = 'stokdogrula:'.$request->user()->tenant_id.':'.$v['token'];
+        $kilit = \Illuminate\Support\Facades\Cache::lock($anahtar.':kilit', 300);
+        if (! $kilit->get()) {
+            return response()->json(['message' => 'Önceki adım hâlâ sürüyor, lütfen bekleyin.'], 409);
+        }
+        try {
+            $d = \Illuminate\Support\Facades\Cache::get($anahtar);
+            if (! $d) {
+                return response()->json(['message' => 'İçe aktarma oturumu bulunamadı veya süresi doldu. İşlemi yeniden başlatın.'], 404);
+            }
+            try {
+                $d = $servis->adim($request->user()->tenant, $d);
+            } catch (\Throwable $e) {
+                report($e);
+
+                return response()->json(['message' => 'İTS sorgusu başarısız: '.$e->getMessage().' (aynı adım tekrar denenebilir; ilerleme korunur)'], 502);
+            }
+            $cevap = $this->dogrulaDurum($servis, $d);
+            if ($d['bitti']) {
+                $cevap['sonuc'] = $servis->sonuc($d);
+                $servis->temizle($d);
+                \Illuminate\Support\Facades\Cache::forget($anahtar);
+            } else {
+                \Illuminate\Support\Facades\Cache::put($anahtar, $d, now()->addHours(3));
+            }
+
+            return response()->json($cevap);
+        } finally {
+            $kilit->release();
+        }
+    }
+
+    private function dogrulaDurum(\App\Services\StokDogrulaAktar $servis, array $d): array
+    {
+        return [
+            'asama' => $d['asama'], 'bitti' => $d['bitti'],
+            'a' => ['islenen' => $d['asama'] === 'paket' ? $d['paketSira'] : count($d['paketler']), 'toplam' => count($d['paketler'])],
+            'b' => ['islenen' => $d['islenen'], 'toplam' => $d['asama'] === 'sorgu' ? $d['yazilan'] : 0],
+            'alinan' => $d['alinan'], 'zatenVar' => $d['zatenVar'], 'digerSay' => $d['digerSay'], 'aday' => $d['yazilan'],
+        ];
+    }
+
+    private function csvAnahtar(Request $request, string $token): string
+    {
+        return 'stokcsv:'.$request->user()->tenant_id.':'.$token;
+    }
+
     public function calistir(Request $request, ItsClient $its)
     {
         abort_unless($request->user()->tenant_id, 403);

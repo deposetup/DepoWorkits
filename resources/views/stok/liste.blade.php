@@ -86,14 +86,8 @@
   </form>
 </div>
 
+@include('islem._ilerleme')
 <form method="post" action="{{ route('stok.toplu') }}" id="toplu" onsubmit="return topluOnay(event)">@csrf
-<div id="bildirimDurum" class="sl-kart p-3 mb-3 d-none">
-  <div class="d-flex flex-wrap align-items-center gap-2 mb-2"><strong id="bdBaslik">Bildirim durumu</strong><span id="bdOzet" class="small text-muted ms-auto"></span></div>
-  <div class="progress mb-2" style="height:22px"><div id="bdBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%">0%</div></div>
-  <div id="bdGruplar" class="small"></div>
-  <div id="bdHata" class="mt-2"></div>
-  <div id="bdSon" class="mt-2 d-none"><a href="{{ request()->fullUrl() }}" class="btn btn-sm btn-primary"><i class="bi bi-arrow-clockwise me-1"></i>Listeyi yenile</a></div>
-</div>
 <div class="sl-kart p-3 mb-3">
   <div class="row g-3">
     <div class="col-lg-8">
@@ -201,57 +195,21 @@ document.getElementById('otoSec').addEventListener('click',function(){
 function alanlar(){const t=document.getElementById('tur').value;
  document.getElementById('glnAlan').classList.toggle('d-none',!['satis','iade','devir'].includes(t));
  document.getElementById('sebepAlan').classList.toggle('d-none',!['deaktive','deaktive_iptal'].includes(t))}
-const SARF_GRUP=200;
-function esc(t){return String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-async function sarfGruplu(tur,ad){
- const ids=[...document.querySelectorAll('.sec:checked')].map(c=>c.value),
-  gruplar=[];for(let i=0;i<ids.length;i+=SARF_GRUP)gruplar.push(ids.slice(i,i+SARF_GRUP));
- const kutu=document.getElementById('bildirimDurum'),bar=document.getElementById('bdBar'),liste=document.getElementById('bdGruplar'),
-  ozet=document.getElementById('bdOzet'),hata=document.getElementById('bdHata'),son=document.getElementById('bdSon'),btn=document.getElementById('uygula');
- kutu.classList.remove('d-none');son.classList.add('d-none');hata.innerHTML='';btn.disabled=true;
- document.getElementById('bdBaslik').textContent=ad+' bildirimi — İTS\'e gönderiliyor';
- bar.className='progress-bar progress-bar-striped progress-bar-animated';bar.style.width='0%';bar.textContent='0%';
- liste.innerHTML=gruplar.map((g,i)=>'<div id="bdg'+i+'" class="d-flex gap-2 py-1 border-bottom"><span class="text-muted">Grup '+(i+1)+'/'+gruplar.length+'</span><span>'+g.length+' ürün</span><span class="ms-auto text-muted" id="bdd'+i+'">Bekliyor</span></div>').join('');
- kutu.scrollIntoView({behavior:'smooth',block:'center'});
- window.onbeforeunload=()=>'Bildirim sürüyor, sayfadan ayrılmayın.';
- let tamam=0,hatali=0,islenen=0;const hatalar=[];
- for(let i=0;i<gruplar.length;i++){
-  const d=document.getElementById('bdd'+i);d.innerHTML='<span class="spinner-border spinner-border-sm me-1"></span>Gönderiliyor…';d.className='ms-auto text-primary';
-  const fd=new FormData();fd.append('_token',document.querySelector('#toplu input[name=_token]').value);fd.append('tur',tur);gruplar[i].forEach(id=>fd.append('secili[]',id));
-  try{
-   const r=await fetch(document.getElementById('toplu').action,{method:'POST',headers:{'Accept':'application/json'},body:fd});
-   const j=await r.json().catch(()=>({message:'Sunucudan geçersiz yanıt ('+r.status+').'}));
-   if(!r.ok)throw new Error(j.message||('Sunucu hatası (HTTP '+r.status+')'));
-   const t=j.satirlar.filter(x=>x.durum==='tamam').length,h=j.satirlar.length-t;
-   tamam+=t;hatali+=h;j.satirlar.filter(x=>x.durum!=='tamam').forEach(x=>hatalar.push(x));
-   d.innerHTML=(h?'<i class="bi bi-exclamation-triangle-fill text-warning"></i> ':'<i class="bi bi-check-circle-fill text-success"></i> ')+'Başarılı '+t+(h?' · Hatalı '+h:'')+(j.bildirim?' · Bildirim No '+esc(j.bildirim):'');
-   d.className='ms-auto '+(h?'text-warning':'text-success');
-  }catch(e){
-   hatali+=gruplar[i].length;d.innerHTML='<i class="bi bi-x-circle-fill text-danger"></i> Hata: '+esc(e.message);d.className='ms-auto text-danger';
-   for(let k=i+1;k<gruplar.length;k++){document.getElementById('bdd'+k).textContent='Gönderilmedi';}
-   hata.innerHTML='<div class="alert alert-danger mb-0">Grup '+(i+1)+' gönderilemedi: '+esc(e.message)+'. Sonraki gruplar gönderilmedi; listeyi yenileyip kalan ürünleri tekrar seçin.</div>';
-   break;
-  }
-  islenen+=gruplar[i].length;const y=Math.floor(islenen*100/ids.length);bar.style.width=y+'%';bar.textContent=y+'%';
-  ozet.textContent=islenen+' / '+ids.length+' ürün işlendi · Başarılı: '+tamam+' · Hatalı: '+hatali;
- }
- window.onbeforeunload=null;btn.disabled=false;
- bar.classList.remove('progress-bar-animated','progress-bar-striped');bar.classList.add(hatali?'bg-warning':'bg-success');
- document.getElementById('bdBaslik').textContent=ad+' bildirimi — tamamlandı';
- ozet.textContent=islenen+' / '+ids.length+' ürün işlendi · Başarılı: '+tamam+' · Hatalı: '+hatali;
- if(hatalar.length&&!hata.innerHTML)hata.innerHTML='<div class="table-responsive"><table class="table table-sm table-danger mb-0"><tbody>'+hatalar.slice(0,200).map(x=>'<tr><td class="font-monospace small">'+esc(x.kod)+'</td><td>'+esc(x.mesaj)+'</td></tr>').join('')+'</tbody></table></div>'+(hatalar.length>200?'<div class="small text-muted">İlk 200 hata gösteriliyor.</div>':'');
- son.classList.remove('d-none');
-}
 function topluOnay(e){const n=document.querySelectorAll('.sec:checked').length;
  if(!n){alert('Önce ürün seçin.');return false}
  if(e&&e.submitter&&e.submitter.dataset.yerel)return true;
  const t=document.querySelector('.islem-btn.active'),tur=t.dataset.tur,sarf=['sarf','sarf_iptal'].includes(tur);
  if(!sarf&&n>100){alert('Bu işlem türünde tek seferde en fazla 100 ürün bildirilebilir.');return false}
  if(sarf&&n>1000){alert('Tek seferde en fazla 1000 ürün bildirilebilir.');return false}
- const ek=sarf&&n>SARF_GRUP?' ('+Math.ceil(n/SARF_GRUP)+' grup halinde, her grupta en fazla '+SARF_GRUP+' ürün)':'';
- if(!confirm(n+' ürün için "'+t.dataset.ad+'" bildirimi İTS\'e gönderilecek'+ek+'. Onaylıyor musunuz?'))return false;
- if(sarf){sarfGruplu(tur,t.dataset.ad);return false}
- return true}
+ const grup=sarf?200:50,ids=[...document.querySelectorAll('.sec:checked')].map(c=>c.value),gruplar=[];
+ for(let i=0;i<ids.length;i+=grup)gruplar.push(ids.slice(i,i+grup));
+ if(!confirm(n+' ürün için "'+t.dataset.ad+'" bildirimi İTS\'e gönderilecek'+(gruplar.length>1?' ('+gruplar.length+' grup halinde)':'')+'. Onaylıyor musunuz?'))return false;
+ const f=document.getElementById('toplu');
+ topluBildirim({adetler:gruplar.map(g=>g.length),ad:t.dataset.ad,btn:document.getElementById('uygula'),
+  sonucUrl:@json(route('islem.sonuc', '__TUR__')).replace('__TUR__',tur),geri:'stok',
+  istek:(i,id)=>{const fd=new FormData(f);fd.delete('secili[]');gruplar[i].forEach(x=>fd.append('secili[]',x));fd.set('toplu_id',id);
+   return fetch(f.action,{method:'POST',headers:{'Accept':'application/json'},body:fd})}});
+ return false}
 alanlar();islemSec(document.querySelector('.islem-btn.active'));
 </script>
 @endsection

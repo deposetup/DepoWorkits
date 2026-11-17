@@ -219,8 +219,14 @@ class StokController extends Controller
 
         $urunler = $partiler->groupBy('gtin')->map(fn ($l, $gtin) => (object) ['gtin' => $gtin, 'ad' => $adlar[$gtin] ?? null, 'adet' => $l->sum('adet'), 'partiler' => $l])->values();
 
+        // Red Odası'nda SKT'si geçmiş ürünler: tek tıkla "Deaktive (Miat)" bildirimi için otomatik seçilir.
+        $miatIds = ($oda === StokKalemi::RED_ODASI && StokKalemi::lokasyonVar())
+            ? StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')->where('lokasyon', $oda)
+                ->whereNotNull('skt')->where('skt', '<', now()->toDateString())->orderBy('skt')->limit(5000)->pluck('id')->all()
+            : [];
+
         return view('stok.red-odasi', ['urunler' => $urunler, 'toplam' => $urunler->sum('adet'), 'hazir' => StokKalemi::lokasyonVar(),
-            'oda' => $oda, 'karantina' => $oda === StokKalemi::KARANTINA_ODASI]);
+            'oda' => $oda, 'karantina' => $oda === StokKalemi::KARANTINA_ODASI, 'miatIds' => $miatIds]);
     }
 
     /** Reyon - Raf: tüm lokasyonların stoktaki adet özeti. */
@@ -290,6 +296,8 @@ class StokController extends Controller
         $sonuc = $servis->kalemleriIsle($request->user(), $v['tur'], $kalemler, $v['sebep'] ?? null, $v['aciklama'] ?? null, $v['karsi_gln'] ?? null);
 
         if ($request->expectsJson()) {
+            \App\Support\TopluSonuc::ekle($request, $v['tur'], $sonuc);
+
             return response()->json(['satirlar' => $sonuc['satirlar'], 'bildirim' => $sonuc['bildirim']]);
         }
 

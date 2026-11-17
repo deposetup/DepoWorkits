@@ -25,65 +25,23 @@
   @endif
   <button class="btn btn-primary mt-3" id="gonderBtn">Gönder</button>
 </form>
-@if(in_array($tur, ['sarf', 'sarf_iptal']))
-<div id="bildirimDurum" class="card mb-4 d-none"><div class="card-body">
-  <div class="d-flex flex-wrap align-items-center gap-2 mb-2"><strong id="bdBaslik">Bildirim durumu</strong><span id="bdOzet" class="small text-muted ms-auto"></span></div>
-  <div class="progress mb-2" style="height:22px"><div id="bdBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%">0%</div></div>
-  <div id="bdGruplar" class="small"></div>
-  <div id="bdHata" class="mt-2"></div>
-  <form id="bdExcel" method="post" action="{{ route('islem.sonuc-excel') }}" class="mt-2 d-none">@csrf<input type="hidden" name="veri" id="bdVeri"><input type="hidden" name="baslik" value="{{ $baslik }}">
-    <button class="btn btn-sm btn-outline-success"><i class="bi bi-file-earmark-excel me-1"></i>Sonucu Excel'e aktar</button></form>
-</div></div>
+@include('islem._ilerleme')
 <script>
 (function(){
- const GRUP=200,form=document.getElementById('islemForm');
- const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
- form.addEventListener('submit',async function(e){
+ const sarf=@json(in_array($tur, ['sarf', 'sarf_iptal'])),GRUP=sarf?200:50,form=document.getElementById('islemForm');
+ form.addEventListener('submit',function(e){
   e.preventDefault();
   const satirlar=form.kodlar.value.split(/\r\n|\r|\n/).map(x=>x.trim()).filter(Boolean);
   if(!satirlar.length){alert('Önce karekod girin.');return}
   const gruplar=[];for(let i=0;i<satirlar.length;i+=GRUP)gruplar.push(satirlar.slice(i,i+GRUP));
-  if(!confirm(satirlar.length+' ürün için bildirim İTS\'e gönderilecek'+(gruplar.length>1?' ('+gruplar.length+' grup halinde, her grupta en fazla '+GRUP+' ürün)':'')+'. Onaylıyor musunuz?'))return;
-  const kutu=document.getElementById('bildirimDurum'),bar=document.getElementById('bdBar'),liste=document.getElementById('bdGruplar'),
-   ozet=document.getElementById('bdOzet'),hata=document.getElementById('bdHata'),btn=document.getElementById('gonderBtn'),xl=document.getElementById('bdExcel');
-  kutu.classList.remove('d-none');xl.classList.add('d-none');hata.innerHTML='';btn.disabled=true;
-  document.getElementById('bdBaslik').textContent='İTS\'e gönderiliyor…';
-  bar.className='progress-bar progress-bar-striped progress-bar-animated';bar.style.width='0%';bar.textContent='0%';ozet.textContent='';
-  liste.innerHTML=gruplar.map((g,i)=>'<div class="d-flex gap-2 py-1 border-bottom"><span class="text-muted">Grup '+(i+1)+'/'+gruplar.length+'</span><span>'+g.length+' ürün</span><span class="ms-auto text-muted" id="bdd'+i+'">Bekliyor</span></div>').join('');
-  kutu.scrollIntoView({behavior:'smooth',block:'center'});
-  window.onbeforeunload=()=>'Bildirim sürüyor, sayfadan ayrılmayın.';
-  let tamam=0,hatali=0,islenen=0;const tum=[];let durdu=false;
-  for(let i=0;i<gruplar.length;i++){
-   const d=document.getElementById('bdd'+i);d.innerHTML='<span class="spinner-border spinner-border-sm me-1"></span>Gönderiliyor…';d.className='ms-auto text-primary';
-   const fd=new FormData(form);fd.set('kodlar',gruplar[i].join('\n'));
-   try{
-    const r=await fetch(form.action,{method:'POST',headers:{'Accept':'application/json'},body:fd});
-    const j=await r.json().catch(()=>({message:'Sunucudan geçersiz yanıt ('+r.status+').'}));
-    if(!r.ok)throw new Error(j.message||('Sunucu hatası (HTTP '+r.status+')'));
-    const t=j.satirlar.filter(x=>x.durum==='tamam').length,h=j.satirlar.length-t;
-    tamam+=t;hatali+=h;tum.push(...j.satirlar);
-    d.innerHTML=(h?'<i class="bi bi-exclamation-triangle-fill text-warning"></i> ':'<i class="bi bi-check-circle-fill text-success"></i> ')+'Başarılı '+t+(h?' · Hatalı '+h:'')+(j.bildirim?' · Bildirim No '+esc(j.bildirim):'');
-    d.className='ms-auto '+(h?'text-warning':'text-success');
-   }catch(err){
-    hatali+=gruplar[i].length;durdu=true;d.innerHTML='<i class="bi bi-x-circle-fill text-danger"></i> Hata: '+esc(err.message);d.className='ms-auto text-danger';
-    for(let k=i+1;k<gruplar.length;k++)document.getElementById('bdd'+k).textContent='Gönderilmedi';
-    hata.innerHTML='<div class="alert alert-danger mb-0">Grup '+(i+1)+' gönderilemedi: '+esc(err.message)+'. Sonraki gruplar gönderilmedi. Önceki gruplar İTS\'e iletilmiştir; kalan karekodları tekrar gönderebilirsiniz.</div>';
-    break;
-   }
-   islenen+=gruplar[i].length;const y=Math.floor(islenen*100/satirlar.length);bar.style.width=y+'%';bar.textContent=y+'%';
-   ozet.textContent=islenen+' / '+satirlar.length+' ürün işlendi · Başarılı: '+tamam+' · Hatalı: '+hatali;
-  }
-  window.onbeforeunload=null;btn.disabled=false;
-  bar.classList.remove('progress-bar-animated','progress-bar-striped');bar.classList.add(hatali?'bg-warning':'bg-success');
-  document.getElementById('bdBaslik').textContent=durdu?'Bildirim yarıda kaldı':'Bildirim tamamlandı';
-  ozet.textContent=islenen+' / '+satirlar.length+' ürün işlendi · Başarılı: '+tamam+' · Hatalı: '+hatali;
-  const hl=tum.filter(x=>x.durum!=='tamam');
-  if(hl.length&&!durdu)hata.innerHTML='<div class="table-responsive"><table class="table table-sm table-danger mb-0"><tbody>'+hl.slice(0,200).map(x=>'<tr><td class="font-monospace small">'+esc(x.kod)+'</td><td>'+esc(x.mesaj)+'</td></tr>').join('')+'</tbody></table></div>'+(hl.length>200?'<div class="small text-muted">İlk 200 hata gösteriliyor; tümü için Excel\'e aktarın.</div>':'');
-  if(tum.length){document.getElementById('bdVeri').value=JSON.stringify(tum);xl.classList.remove('d-none')}
+  if(!confirm(satirlar.length+' ürün için bildirim İTS\'e gönderilecek'+(gruplar.length>1?' ('+gruplar.length+' grup halinde)':'')+'. Onaylıyor musunuz?'))return;
+  topluBildirim({adetler:gruplar.map(g=>g.length),ad:@json($baslik),btn:document.getElementById('gonderBtn'),
+   sonucUrl:@json(route('islem.sonuc', $tur)),karsiGln:form.karsi_gln?form.karsi_gln.value:'',
+   istek:(i,id)=>{const fd=new FormData(form);fd.set('kodlar',gruplar[i].join('\n'));fd.set('toplu_id',id);
+    return fetch(form.action,{method:'POST',headers:{'Accept':'application/json'},body:fd})}});
  });
 })();
 </script>
-@endif
 @isset($sonuc)
 @php
   $tumSatirlar = collect($sonuc['satirlar'])->sortBy(fn ($x) => $x['durum'] === 'tamam' ? 1 : 0)->values();
