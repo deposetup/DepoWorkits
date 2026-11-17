@@ -51,6 +51,11 @@ class IslemController extends Controller
             StokKalemi::redOdasinaAl($request->user()->tenant_id);
         }
 
+        // Sarf ekranı gruplar halinde (JSON) çağırır; ilerleme tarayıcıda gösterilir.
+        if ($request->expectsJson()) {
+            return response()->json(['satirlar' => $sonuc['satirlar'], 'bildirim' => $sonuc['bildirim']]);
+        }
+
         // PTS gönderimi yalnızca satış bildirimi TAMAMEN başarılıysa (hiç hatalı satır yok) kullanıcı onayına sunulur.
         $ptsGonderim = null;
         $tamBasarili = $sonuc['satirlar'] !== [] && collect($sonuc['satirlar'])->every(fn ($s) => $s['durum'] === 'tamam');

@@ -21,6 +21,16 @@
 @foreach($onizleme['gecersiz'] as $h)<div class="small text-danger">{{ $h }}</div>@endforeach
 @if($onizleme['fazla'])<div class="alert alert-warning small mt-2">1.000 ürün sınırı aşıldı; {{ $onizleme['fazla'] }} satır işlenmedi. Kalanlar için dosyayı bölüp tekrar yükleyin.</div>@endif
 @if($sat)
+@if($gecerli->isNotEmpty())
+<form method="post" action="{{ route('islem.calistir', 'kabul') }}" class="card card-body mt-3 mb-3 border-warning" onsubmit="return confirm('{{ $gecerli->count() }} ürün için Mal Kabul bildirimi İTS\'e GERÇEK olarak gönderilecek. Ürünlerin gerçekten sizde (arada) olduğundan emin misiniz?')">@csrf
+  <input type="hidden" name="kodlar" value="{{ $gecerli->pluck('kod')->implode("\n") }}">
+  <div class="fw-semibold mb-1">İTS'e Mal Kabul bildir ({{ $gecerli->count() }} ürün)</div>
+  <div class="small text-muted mb-2">Bu işlem İTS'e Mal Alım bildirimi gönderir; başarılı ürünler stoğunuza girer. Ürün sizde arada değilse İTS satır bazında hata verir.</div>
+  <div class="row g-2 align-items-center"><div class="col-md-5"><input name="lokasyon" class="form-control form-control-sm" placeholder="Lokasyon (isteğe bağlı): reyon / raf" maxlength="80"></div>
+  <div class="col-auto"><button class="btn btn-warning"><i class="bi bi-box-arrow-in-down me-1"></i>Mal Kabul Bildir</button></div></div>
+</form>
+@endif
+
 <div class="card mt-3"><div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
   <span><b>{{ count($sat) }}</b> ürün okundu @if($onizleme['gecmis'])· <span class="text-danger">{{ $onizleme['gecmis'] }} ürünün SKT'si geçmiş (Mal Kabul'e dahil edilmez)</span>@endif</span>
   <span class="d-flex gap-2">
@@ -35,15 +45,6 @@
 
 <div id="gorseller" class="d-none mt-3"><div class="row g-3" id="kareler"></div></div>
 
-@if($gecerli->isNotEmpty())
-<form method="post" action="{{ route('islem.calistir', 'kabul') }}" class="card card-body mt-3 border-warning" onsubmit="return confirm('{{ $gecerli->count() }} ürün için Mal Kabul bildirimi İTS\'e GERÇEK olarak gönderilecek. Ürünlerin gerçekten sizde (arada) olduğundan emin misiniz?')">@csrf
-  <input type="hidden" name="kodlar" value="{{ $gecerli->pluck('kod')->implode("\n") }}">
-  <div class="fw-semibold mb-1">İTS'e Mal Kabul bildir ({{ $gecerli->count() }} ürün)</div>
-  <div class="small text-muted mb-2">Bu işlem İTS'e Mal Alım bildirimi gönderir; başarılı ürünler stoğunuza girer. Ürün sizde arada değilse İTS satır bazında hata verir.</div>
-  <div class="row g-2 align-items-center"><div class="col-md-5"><input name="lokasyon" class="form-control form-control-sm" placeholder="Lokasyon (isteğe bağlı): reyon / raf" maxlength="80"></div>
-  <div class="col-auto"><button class="btn btn-warning"><i class="bi bi-box-arrow-in-down me-1"></i>Mal Kabul Bildir</button></div></div>
-</form>
-@endif
 
 <script src="https://cdn.jsdelivr.net/npm/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
 <script>

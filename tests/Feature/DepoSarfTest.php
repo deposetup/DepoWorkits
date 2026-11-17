@@ -138,4 +138,14 @@ class DepoSarfTest extends TestCase
         \App\Models\Tenant::query()->delete();
         $this->actingAs($this->user('hastane'))->get('/analiz')->assertOk()->assertSee('Hastane Sarf')->assertDontSee('Mal Devir');
     }
+
+    public function test_sarf_ekrani_durum_paneli_ve_json_yaniti(): void
+    {
+        $u = $this->user('hastane');
+        $this->actingAs($u)->get('/islem/sarf')->assertOk()->assertSee('bildirimDurum', false)->assertSee('bdBar', false);
+        $this->actingAs($u)->get('/islem/kabul')->assertOk()->assertDontSee('bildirimDurum', false);
+        $this->actingAs($u)->post('/islem/kabul', ['kodlar' => self::KOD]);
+        $this->actingAs($u)->postJson('/islem/sarf', ['kodlar' => self::KOD])->assertOk()
+            ->assertJsonStructure(['satirlar' => [['kod', 'durum', 'mesaj']], 'bildirim'])->assertJsonPath('satirlar.0.durum', 'tamam');
+    }
 }

@@ -130,9 +130,11 @@ class IlacReceteTest extends TestCase
     public function test_gercek_ilac_xlsx_dosyasi(): void
     {
         $yol = '/Users/halilguler/Documents/DepoWorkIts/İlaç.xlsx';
-        if (! is_file($yol)) {
-            $this->markTestSkipped('Gerçek dosya bu makinede yok.');
+        $z = new \ZipArchive();
+        if (! is_file($yol) || ! is_readable($yol) || @$z->open($yol) !== true) {
+            $this->markTestSkipped('Gerçek dosya bu makinede yok ya da okunamıyor.');
         }
+        $z->close();
         $s = IlacReceteYukleyici::yukle($yol);
         fwrite(STDERR, "\nGERCEK: ".json_encode($s, JSON_UNESCAPED_UNICODE)."\n");
         $this->assertGreaterThan(37000, $s['yazilan']);
