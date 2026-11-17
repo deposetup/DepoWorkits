@@ -51,6 +51,11 @@ class StokSiralamaTest extends TestCase
         $this->assertStringContainsString('spreadsheetml', (string) $x->headers->get('content-type'));
     }
 
+    public function test_ana_sayfada_bugun_giren_urunler(): void
+    {
+        $this->actingAs($this->hazirla())->get('/')->assertOk()->assertSee('Bugün Stoğa Giren Ürünler')->assertSee('Kalem: 3')->assertSee('Toplam kutu:');
+    }
+
     public function test_gecersiz_siralama_degeri_hata_vermez(): void
     {
         $this->actingAs($this->hazirla())->get('/stok?sirala=drop&yon=x')->assertOk();

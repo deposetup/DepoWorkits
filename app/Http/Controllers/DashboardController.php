@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Hareket;
 use App\Models\PtsPaketi;
+use App\Models\StokKalemi;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
 
@@ -21,6 +22,7 @@ class DashboardController extends Controller
         return view('dashboard', ['tenant' => $tenant] + ($tenant ? [
             'sarf' => $tenant->sarfYapabilir() ? $this->aylikSarf($tenant->id) : null,
             'pts' => $this->ptsHavuzu($tenant->id),
+            'bugun' => $this->bugunGirenler($tenant->id),
         ] : []));
     }
 
@@ -64,6 +66,20 @@ class DashboardController extends Controller
             'en_eski_gun' => ($ilk = $liste->first()) ? (int) $ilk->created_at->startOfDay()->diffInDays(now()->startOfDay()) : null,
             'son30_alinan' => PtsPaketi::where('tenant_id', $tid)->where('durum', 'mal_alindi')->where('updated_at', '>=', now()->subDays(30))->count(),
             'liste' => $liste,
+        ];
+    }
+
+    /** Bugün stoğa giren ürünler (GTIN bazında); ilaç adı önbellekte varsa gösterilir, İTS çağrısı yapılmaz. */
+    private function bugunGirenler(int $tid): array
+    {
+        $satirlar = StokKalemi::where('tenant_id', $tid)->where('created_at', '>=', now()->startOfDay())
+            ->selectRaw('gtin, count(*) as adet, min(skt) as en_yakin_skt')->groupBy('gtin')->orderByDesc('adet')->get();
+        $adlar = Cache::get('ilac_adlari_'.$tid, []);
+
+        return [
+            'kalem' => $satirlar->count(),
+            'kutu' => (int) $satirlar->sum('adet'),
+            'liste' => $satirlar->take(10)->map(fn ($x) => ['gtin' => $x->gtin, 'ad' => $adlar[$x->gtin] ?? null, 'adet' => (int) $x->adet]),
         ];
     }
 }

@@ -43,6 +43,19 @@
     ['İTS Bağlantısı', 'Bağlantıyı sına', 'bi-plug', route('ayarlar.its')],
   ];
 @endphp
+@isset($bugun)
+<div class="card mt-1"><div class="card-header bg-white d-flex justify-content-between align-items-center"><span class="fw-semibold"><i class="bi bi-box-arrow-in-down me-1"></i>Bugün Stoğa Giren Ürünler</span>
+  <span><span class="badge text-bg-primary">Kalem: {{ $bugun['kalem'] }}</span> <span class="badge text-bg-success">Toplam kutu: {{ number_format($bugun['kutu'], 0, ',', '.') }}</span></span></div>
+  @if($bugun['liste']->isEmpty())
+  <div class="card-body small text-muted">Bugün stoğa giren ürün yok.</div>
+  @else
+  <table class="table table-sm align-middle mb-0"><thead><tr><th>İlaç</th><th>GTIN</th><th class="text-end">Adet</th></tr></thead><tbody>
+  @foreach($bugun['liste'] as $b)<tr><td>{{ $b['ad'] ?? '—' }}</td><td class="font-monospace small">{{ $b['gtin'] }}</td><td class="text-end">{{ $b['adet'] }}</td></tr>@endforeach
+  </tbody></table>
+  @if($bugun['kalem'] > $bugun['liste']->count())<div class="p-2 small text-muted">İlk {{ $bugun['liste']->count() }} kalem gösteriliyor; tamamı için <a href="{{ route('stok') }}">Stok</a> sayfasına bakın.</div>@endif
+  @endif
+</div>
+@endisset
 @isset($pts)
 <div class="row g-3 mt-1">
   <div class="col-lg-6"><div class="card h-100"><div class="card-header bg-white fw-semibold"><i class="bi bi-inbox me-1"></i>PTS Havuzu: Arada Kalanlar</div><div class="card-body">
