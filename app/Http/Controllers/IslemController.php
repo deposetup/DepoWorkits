@@ -111,7 +111,7 @@ class IslemController extends Controller
         $sirali = collect($satirlar)->filter(fn ($s) => is_array($s) && isset($s['kod']))->sortBy(fn ($s) => ($s['durum'] ?? '') === 'tamam' ? 1 : 0)->values();
 
         $receteler = \App\Models\IlacRecete::tipler($sirali->map(fn ($s) => \App\Support\IlacAdlari::gtinBul((string) $s['kod'])));
-        $gosterilen = fn ($g) => isset(\App\Models\IlacRecete::GOSTERILEN[$receteler[$g] ?? '']) ? $receteler[$g] : '';
+        $gosterilen = fn ($g) => $receteler[$g] ?? '';
 
         return \App\Support\XlsxYazici::indir('sonuc-'.now()->format('Ymd-His').'.xlsx', ['Sıra', 'İlaç', 'Reçete', 'Karekod', 'Sonuç', 'Mesaj'],
             $sirali->map(fn ($s, $i) => [

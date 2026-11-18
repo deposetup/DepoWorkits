@@ -13,9 +13,6 @@ class IlacRecete extends Model
     protected $keyType = 'string';
     protected $guarded = [];
 
-    /** Ekranlarda gösterilen reçete tipleri (diğerleri depolanır ama gösterilmez). */
-    public const GOSTERILEN = ['Kırmızı' => 'danger', 'Yeşil' => 'success'];
-
     /** Rakam dışını atar, 14 haneye soldan sıfırla tamamlar (13 haneli EAN ile 14 haneli GTIN aynı ürünü gösterir). */
     public static function anahtar(?string $gtin): ?string
     {
@@ -63,22 +60,17 @@ class IlacRecete extends Model
     public const TUMU = ['Kırmızı' => 'text-bg-danger', 'Yeşil' => 'text-bg-success', 'Turuncu' => 'text-bg-warning', 'Mor' => 'text-bg-secondary', 'Beyaz' => 'text-bg-light border'];
 
     /**
-     * Varsayılan: yalnızca Kırmızı / Yeşil için renkli "… Reçete" rozeti (işlem sonuçlarında).
-     * $hepsi = true: stok ekranları için tüm tiplerin kısa rozeti (Beyaz, Turuncu, Mor dahil).
+     * Tüm reçete tiplerini (Kırmızı, Yeşil, Turuncu, Mor, Beyaz) renkli rozet olarak üretir.
+     * Varsayılan: "… Reçete" yazılı (işlem sonuçları, PTS paketi). $hepsi = true: yalnızca tip adı (stok ekranları).
      */
     public static function rozet(?string $tip, bool $hepsi = false): string
     {
-        if ($hepsi) {
-            if ($tip === null || $tip === '') {
-                return '';
-            }
-            $sinif = self::TUMU[$tip] ?? 'text-bg-light border';
-            $stil = $tip === 'Mor' ? ' style="background:#7c4dbd!important"' : '';
-
-            return '<span class="badge '.$sinif.'"'.$stil.'>'.e($tip).'</span>';
+        if ($tip === null || $tip === '') {
+            return '';
         }
-        $renk = self::GOSTERILEN[$tip ?? ''] ?? null;
+        $sinif = self::TUMU[$tip] ?? 'text-bg-light border';
+        $stil = $tip === 'Mor' ? ' style="background:#7c4dbd!important"' : '';
 
-        return $renk ? '<span class="badge text-bg-'.$renk.'">'.e($tip).' Reçete</span>' : '';
+        return '<span class="badge '.$sinif.'"'.$stil.'>'.e($tip).($hepsi ? '' : ' Reçete').'</span>';
     }
 }

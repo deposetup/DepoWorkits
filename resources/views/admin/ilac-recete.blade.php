@@ -2,7 +2,7 @@
 @section('baslik', 'İlaç Reçete Listesi')
 @section('icerik')
 <h4>İlaç Reçete Listesi <small class="text-muted">GTIN &rarr; reçete tipi</small></h4>
-<p class="small text-muted">Yüklenen liste <b>tüm müşteriler</b> için ortaktır. Sarf, mal kabul, satış, iade, deaktivasyon sonuç tablolarında ve PTS paket ekranında ürün GTIN'i ile eşleşip yalnızca <span class="badge text-bg-danger">Kırmızı</span> ve <span class="badge text-bg-success">Yeşil</span> reçeteli ürünler işaretlenir. Diğer tipler (Beyaz, Turuncu, Mor) depolanır ama gösterilmez.</p>
+<p class="small text-muted">Yüklenen liste <b>tüm müşteriler</b> için ortaktır. Sarf, mal kabul, satış, iade, deaktivasyon sonuç tablolarında ve PTS paket ekranında ürün GTIN'i ile eşleşip tüm reçete tipleri (<span class="badge text-bg-danger">Kırmızı</span> <span class="badge text-bg-success">Yeşil</span> <span class="badge text-bg-warning">Turuncu</span> <span class="badge text-bg-secondary" style="background:#7c4dbd!important">Mor</span> <span class="badge text-bg-light border">Beyaz</span>) müşteriler tarafından da görülür.</p>
 @unless($hazir)<div class="alert alert-warning">Reçete tablosu henüz oluşturulmadı (migration çalıştırılmalı).</div>@else
 <div class="row g-3 mb-3">
   <div class="col-md-5"><div class="card h-100"><div class="card-body">
