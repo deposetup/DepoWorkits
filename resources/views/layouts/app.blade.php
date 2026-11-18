@@ -96,6 +96,7 @@
       ['Sorgular', 'bi-patch-question', null, [
         ['Durum Sorgu', 'bi-shield-check', route('durum'), ['durum*']],
         ['Paydaşlar', 'bi-building', route('paydaslar'), ['paydaslar']],
+        ['İlaç Fiyat Listesi (TEST)', 'bi-tags', route('ilac-fiyat'), ['ilac-fiyat']],
       ]],
       ['Cari Kartlar', 'bi-person-lines-fill', 'cari.index', []],
       ['Analiz', 'bi-graph-up', 'analiz', []],
@@ -137,6 +138,7 @@
         @php $yeniTalep = \Illuminate\Support\Facades\Schema::hasTable('destek_talepleri') ? \App\Models\DestekTalebi::where('durum', 'yeni')->count() : 0; @endphp
         <a class="yan-link {{ request()->routeIs('admin.tenants.*', 'admin.kullanici.*') ? 'aktif' : '' }}" href="{{ route('admin.tenants.index') }}"><i class="bi bi-people"></i>Müşteriler</a>
         <a class="yan-link {{ request()->routeIs('admin.ilac-recete*') ? 'aktif' : '' }}" href="{{ route('admin.ilac-recete') }}"><i class="bi bi-capsule"></i>İlaç Reçete Listesi</a>
+        <a class="yan-link {{ request()->routeIs('admin.ilac-fiyat*') ? 'aktif' : '' }}" href="{{ route('admin.ilac-fiyat') }}"><i class="bi bi-tags"></i>İlaç Fiyat Listesi (TEST)</a>
         <a class="yan-link {{ request()->routeIs('admin.yoneticiler*') ? 'aktif' : '' }}" href="{{ route('admin.yoneticiler') }}"><i class="bi bi-shield-lock"></i>Kullanıcılar</a>
         <a class="yan-link {{ request()->routeIs('admin.talepler*') ? 'aktif' : '' }}" href="{{ route('admin.talepler') }}"><i class="bi bi-life-preserver"></i>Destek Talepleri @if($yeniTalep)<span class="badge text-bg-warning ms-auto">{{ $yeniTalep }}</span>@endif</a>
         <a class="yan-link {{ request()->routeIs('admin.paydas-degisimleri') ? 'aktif' : '' }}" href="{{ route('admin.paydas-degisimleri') }}"><i class="bi bi-bell"></i>Paydaş Değişimleri</a>

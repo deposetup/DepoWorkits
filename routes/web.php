@@ -32,6 +32,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
     Route::middleware('lisans:salt_okunur')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('home');
         Route::get('/stok', [StokController::class, 'index'])->name('stok');
+        Route::get('/ilac-fiyat', [\App\Http\Controllers\IlacFiyatController::class, 'index'])->name('ilac-fiyat');
         Route::get('/reyon-raf', [StokController::class, 'reyonRaf'])->name('stok.reyon-raf');
         Route::get('/reyon-raf/red-odasi', [StokController::class, 'redOdasi'])->name('stok.red-odasi');
         Route::get('/reyon-raf/karantina-odasi', [StokController::class, 'karantinaOdasi'])->name('stok.karantina');
@@ -94,6 +95,8 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/musteriler', [TenantController::class, 'store'])->name('tenants.store');
         Route::get('/talepler', [\App\Http\Controllers\Admin\TalepController::class, 'index'])->name('talepler');
         Route::get('/ilac-recete', [\App\Http\Controllers\Admin\IlacReceteController::class, 'index'])->name('ilac-recete');
+        Route::get('/ilac-fiyat', [\App\Http\Controllers\Admin\IlacFiyatController::class, 'index'])->name('ilac-fiyat');
+        Route::post('/ilac-fiyat', [\App\Http\Controllers\Admin\IlacFiyatController::class, 'yukle'])->name('ilac-fiyat.yukle');
         Route::post('/ilac-recete', [\App\Http\Controllers\Admin\IlacReceteController::class, 'yukle'])->name('ilac-recete.yukle');
         Route::get('/kullanicilar', [\App\Http\Controllers\Admin\YoneticiController::class, 'index'])->name('yoneticiler');
         Route::post('/kullanicilar', [\App\Http\Controllers\Admin\YoneticiController::class, 'store'])->name('yoneticiler.store');
