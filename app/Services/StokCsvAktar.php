@@ -79,8 +79,8 @@ class StokCsvAktar
 
         return [
             'yol' => $yol, 'ayrac' => $ayrac, 'g' => $g, 's' => $s, 'b' => $b, 'x' => $x, 'konum' => $konum, 'toplam' => $toplam, 'bitti' => $toplam === 0,
-            'var' => StokKalemi::where('tenant_id', $tenant->id)->where('durum', 'stokta')->count(), 'gecerli' => 0, 'dosya_gln' => $dosyaGln,
-            'r' => ['okunan' => 0, 'eklenen' => 0, 'guncellenen' => 0, 'atlanan_durum' => 0, 'gecersiz' => 0, 'ornek_hatalar' => []],
+            'basla' => now()->format('Y-m-d H:i:s'), 'var' => StokKalemi::where('tenant_id', $tenant->id)->where('durum', 'stokta')->count(), 'gecerli' => 0, 'dosya_gln' => $dosyaGln,
+            'r' => ['okunan' => 0, 'eklenen' => 0, 'guncellenen' => 0, 'atlanan_durum' => 0, 'gecersiz' => 0, 'silinen' => 0, 'ornek_hatalar' => []],
         ];
     }
 
@@ -129,7 +129,7 @@ class StokCsvAktar
                     $korunan[$k->gtin.'/'.$k->sn] = true;
                 }
             }
-            $simdi = now();
+            $simdi = isset($d['basla']) ? \Illuminate\Support\Carbon::parse($d['basla']) : now();
             $parca = [];
             foreach ($satirlar as $anahtar => [$gtin, $sn, $bn, $skt]) {
                 if (isset($korunan[$anahtar])) { $r['atlanan_durum']++; continue; }
@@ -150,11 +150,23 @@ class StokCsvAktar
     public function sonuc(Tenant $tenant, array $d): array
     {
         $r = $d['r'];
+        // Dosya İTS'in tam stok kaydıdır: bu aktarımda dosyada görülmeyen eski 'stokta' kayıtlar silinir (güncel stok = dosya).
+        // Boş/hatalı dosya stoğu silmesin diye yalnızca geçerli satır varsa ve geçersiz satır yoksa çalışır.
+        $r['silinen'] = 0;
+        $r['silme_atlandi'] = false;
+        if (isset($d['basla'])) {
+            if (($d['gecerli'] ?? 0) > 0 && ($r['gecersiz'] ?? 0) === 0) {
+                $r['silinen'] = StokKalemi::where('tenant_id', $tenant->id)->where('durum', 'stokta')
+                    ->where(fn ($q) => $q->whereNull('son_islem_at')->orWhere('son_islem_at', '<', $d['basla']))->delete();
+            } else {
+                $r['silme_atlandi'] = true;
+            }
+        }
         $son = StokKalemi::where('tenant_id', $tenant->id)->where('durum', 'stokta')->count();
-        $r['eklenen'] = max(0, $son - $d['var']);
+        $r['eklenen'] = max(0, $son - ($d['var'] - $r['silinen']));
         $r['guncellenen'] = max(0, $d['gecerli'] - $r['eklenen']);
         StokKalemi::redOdasinaAl($tenant->id);
-        AuditLog::kaydet('stok.csv-ice-aktar', ['tenant' => $tenant->id, 'okunan' => $r['okunan'], 'eklenen' => $r['eklenen'], 'gecersiz' => $r['gecersiz']]);
+        AuditLog::kaydet('stok.csv-ice-aktar', ['tenant' => $tenant->id, 'okunan' => $r['okunan'], 'eklenen' => $r['eklenen'], 'silinen' => $r['silinen'], 'gecersiz' => $r['gecersiz']]);
 
         return $r + ['dosya_gln' => $d['dosya_gln']];
     }

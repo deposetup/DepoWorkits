@@ -9,6 +9,7 @@
 @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 @isset($csv)
 <div class="alert alert-success"><b>Dosya içe aktarıldı.</b> {{ number_format($csv['okunan'], 0, ',', '.') }} satır okundu: <b>{{ number_format($csv['eklenen'], 0, ',', '.') }}</b> yeni ürün stoğa eklendi, {{ number_format($csv['guncellenen'], 0, ',', '.') }} ürün zaten kayıtlıydı (güncellendi)@if($csv['atlanan_durum']), {{ $csv['atlanan_durum'] }} ürün satış/sarf gibi başka durumda olduğu için atlandı @endif @if($csv['gecersiz']), <span class="text-danger">{{ $csv['gecersiz'] }} geçersiz satır</span>@endif.
+@if(! empty($csv['silinen'])) <b>{{ number_format($csv['silinen'], 0, ',', '.') }}</b> eski stok kaydı dosyada olmadığı için stoktan silindi (güncel stok = dosya).@endif @if(! empty($csv['silme_atlandi'])) <span class="text-danger">Dosyada geçersiz satır olduğu (ya da geçerli satır olmadığı) için eski kayıtlar silinmedi.</span>@endif
 @foreach($csv['ornek_hatalar'] as $h)<div class="small text-danger">{{ $h }}</div>@endforeach
 <div class="mt-2"><a href="{{ route('stok.barkod') }}" class="btn btn-sm btn-success">Barkod Bazlı Stok</a> <a href="{{ route('stok.liste') }}" class="btn btn-sm btn-outline-success">Stok Listesi</a></div></div>
 @endisset
@@ -22,7 +23,7 @@
 </div></div>
 <div class="card mb-3"><div class="card-body">
   <h6><i class="bi bi-filetype-csv me-1"></i>İTS portalından indirilen stok dosyası (CSV / ZIP)</h6>
-  <p class="small text-muted mb-2">İTS portalından kendi GLN'inizle indirdiğiniz stok dosyasını (<code>GTIN;SN;BN;EXP_DATE</code>) yükleyin. Dosya İTS'in kendi kaydı olduğu için ürünler tek tek sorgulanmadan stoğunuza alınır; İTS'e bildirim gönderilmez. Dosya adında GLN varsa sizin GLN'inizle aynı olmalıdır. Büyük dosyalar için .zip yükleyebilirsiniz (en fazla 50 MB). Satış/sarf gibi başka durumdaki ürünler ezilmez, SKT'si geçenler otomatik Red Odası'na alınır.</p>
+  <p class="small text-muted mb-2">İTS portalından kendi GLN'inizle indirdiğiniz stok dosyasını (<code>GTIN;SN;BN;EXP_DATE</code>) yükleyin. Dosya İTS'in kendi kaydı olduğu için ürünler tek tek sorgulanmadan stoğunuza alınır ve <b>dosyada olmayan eski stok kayıtları silinir (güncel stok = yüklenen dosya)</b>; İTS'e bildirim gönderilmez. Dosya adında GLN varsa sizin GLN'inizle aynı olmalıdır. Büyük dosyalar için .zip yükleyebilirsiniz (en fazla 50 MB). Satış/sarf gibi başka durumdaki ürünler ezilmez, SKT'si geçenler otomatik Red Odası'na alınır.</p>
   <form method="post" action="{{ route('stok.ice-aktar.csv') }}" enctype="multipart/form-data" class="d-flex gap-2 flex-wrap align-items-center" id="csvForm">@csrf
     <input type="file" name="dosya" accept=".csv,.txt,.zip" class="form-control w-auto" required>
     <button class="btn btn-primary" id="csvBtn"><i class="bi bi-upload me-1"></i>Dosyayı Stoğa Aktar</button></form>
@@ -91,6 +92,7 @@
     set(ab,100);yz.textContent='%100';bitir();bs.textContent='İçe aktarma tamamlandı';const c=d.sonuc;
     son.innerHTML='<div class="alert alert-success mb-0"><b>Dosya içe aktarıldı.</b> '+nf(c.okunan)+' satır okundu: <b>'+nf(c.eklenen)+'</b> yeni ürün stoğa eklendi, '+nf(c.guncellenen)+' ürün zaten kayıtlıydı (güncellendi)'
      +(c.atlanan_durum?', '+nf(c.atlanan_durum)+' ürün başka durumda olduğu için atlandı':'')+(c.gecersiz?', '+nf(c.gecersiz)+' satır geçersiz':'')+'.'
+     +(c.silinen?' <b>'+nf(c.silinen)+'</b> eski stok kaydı dosyada olmadığı için stoktan silindi (güncel stok = dosya).':'')+(c.silme_atlandi?' <span class="text-danger">Dosyada geçersiz satır olduğu (ya da geçerli satır olmadığı) için eski kayıtlar silinmedi.</span>':'')
      +(c.ornek_hatalar||[]).map(x=>'<div class="small text-danger">'+esc(x)+'</div>').join('')+linkler()+'</div>'}
     catch(err){hata(err.message,dongu)}};
    function baslat0(){acik=true;butonlar.forEach(b=>b.disabled=true);son.innerHTML='';can(ab);window.onbeforeunload=()=>'İçe aktarma sürüyor, sayfadan ayrılmayın.'}
