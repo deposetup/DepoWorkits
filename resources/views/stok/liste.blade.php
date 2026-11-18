@@ -43,6 +43,24 @@
   .sl-tablo tbody tr:has(.sec:checked) { background:#e8f3ff; }
   .islem-btn { font-weight:600; } .islem-btn.active { box-shadow:0 0 0 .2rem rgba(11,36,71,.25); transform:translateY(-1px); }
   .sl-alt { position:sticky; bottom:0; z-index:1020; margin-top:1rem; }
+  .yazdir-alan, .yazdir-baslik, .yazdir-alt { display: none; }
+  @media print {
+    @page { size: A4; margin: 12mm 12mm 16mm; }
+    body * { visibility: hidden !important; }
+    #yazdirAlan, #yazdirAlan * { visibility: visible !important; }
+    #yazdirAlan { display: block; position: absolute; left: 0; top: 0; width: 100%; }
+    .yazdir-baslik { display: block; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px; }
+    .yazdir-baslik .musteri { font-size: 15px; font-weight: 700; }
+    .yazdir-baslik .detay { font-size: 11px; color: #333; }
+    .yazdir-baslik .oda { font-size: 13px; font-weight: 600; margin-top: 6px; }
+    .yazdir-alt { display: block; position: fixed; left: 0; right: 0; bottom: 0; text-align: center; font-size: 10px; color: #555; border-top: 1px solid #999; padding-top: 4px; }
+    #yazdirAlan table { table-layout: fixed; width: 100%; font-size: 10.5px; border-collapse: collapse; }
+    #yazdirAlan th, #yazdirAlan td { border: 1px solid #999 !important; padding: 3px 5px !important; vertical-align: top; word-wrap: break-word; }
+    #yazdirAlan thead { display: table-header-group; }
+    #yazdirAlan tr { break-inside: avoid; }
+    #yazdirAlan .col-gtin { width: 15%; } #yazdirAlan .col-ilac { width: 25%; } #yazdirAlan .col-recete { width: 10%; } #yazdirAlan .col-parti { width: 11%; } #yazdirAlan .col-sn { width: 15%; } #yazdirAlan .col-skt { width: 10%; } #yazdirAlan .col-lok { width: 14%; }
+    #yazdirAlan .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
 </style>
 
 <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
@@ -50,7 +68,10 @@
     <h4 class="mb-1"><i class="bi bi-upc-scan me-2"></i>Stok Listesi (Karekod)</h4>
     <div class="text-muted small">Portal üzerinden yapılan bildirimlerle oluşan ürün bazlı stok. İTS stok sorgusu sunmadığı için İTS'teki tüm kayıtlar burada görünmez.</div>
   </div>
-  <a href="{{ request()->fullUrlWithQuery(['excel' => 1, 'page' => null]) }}" class="btn btn-outline-success"><i class="bi bi-file-earmark-excel me-1"></i>Excel'e Aktar</a>
+  <div class="d-flex gap-2">
+    <button type="button" class="btn btn-outline-dark" onclick="window.print()"><i class="bi bi-printer me-1"></i>Yazdır</button>
+    <a href="{{ request()->fullUrlWithQuery(['excel' => 1, 'page' => null]) }}" class="btn btn-outline-success"><i class="bi bi-file-earmark-excel me-1"></i>Excel'e Aktar</a>
+  </div>
 </div>
 @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 
@@ -159,6 +180,23 @@
 </div></div>
 </form>
 <div class="mt-3">{{ $kalemler->links() }}</div>
+
+@php $t = auth()->user()->tenant; @endphp
+<div id="yazdirAlan" class="yazdir-alan">
+<div class="yazdir-baslik">
+  <div class="musteri">{{ $t?->unvan }}</div>
+  <div class="detay">@if($t?->gln)GLN: {{ $t->gln }}@endif @if($t?->il || $t?->ilce) · {{ collect([$t->ilce, $t->il])->filter()->implode(' / ') }}@endif @if($t?->telefon) · Tel: {{ $t->telefon }}@endif</div>
+  <div class="oda">Stok Listesi · {{ $sekmeler[$durum][0] ?? '' }}@if($ara !== '') · Arama: {{ $ara }}@endif @if($lokasyon !== '') · Lokasyon: {{ $lokasyon === '-' ? 'Lokasyonsuz' : $lokasyon }}@endif · {{ now()->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</div>
+</div>
+<div class="mb-2 small">Listelenen: <strong>{{ number_format($kalemler->count(), 0, ',', '.') }}</strong> ürün @if($kalemler->hasPages())(toplam {{ number_format($kalemler->total(), 0, ',', '.') }} ürün · Sayfa {{ $kalemler->currentPage() }} / {{ $kalemler->lastPage() }})@endif</div>
+<table>
+<thead><tr><th class="col-gtin">GTIN</th><th class="col-ilac">İlaç</th><th class="col-recete">Reçete</th><th class="col-parti">Parti</th><th class="col-sn">Seri No</th><th class="col-skt">SKT</th><th class="col-lok">Lokasyon</th></tr></thead><tbody>
+@forelse($kalemler as $k)
+<tr><td class="font-monospace">{{ $k->gtin }}</td><td>{{ $adlar[$k->gtin] ?? '—' }}</td><td>{!! \App\Models\IlacRecete::rozet($receteHarita[\App\Models\IlacRecete::anahtar($k->gtin) ?? ''] ?? null, true) ?: '—' !!}</td><td class="font-monospace">{{ $k->bn ?: '—' }}</td><td class="font-monospace">{{ $k->sn }}</td><td>{{ $k->skt?->format('d.m.Y') ?? '—' }}</td><td>{{ $k->lokasyon ?: '—' }}</td></tr>
+@empty<tr><td colspan="7">Bu görünümde ürün yok.</td></tr>@endforelse
+</tbody></table>
+<div class="yazdir-alt">Bu çıktı its.depowork.com.tr aracılığı ile hazırlanmıştır.</div>
+</div>
 
 <script>
 function say(){document.getElementById('sayi').textContent=document.querySelectorAll('.sec:checked').length}
