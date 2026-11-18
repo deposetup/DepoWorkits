@@ -113,7 +113,9 @@ class StokController extends Controller
         };
         $urunler = $urunler->sortBy($anahtar, SORT_NATURAL, $yon === 'desc')->values();
 
-        return view('stok.barkod', ['urunler' => $urunler, 'ara' => $ara, 'toplam' => $urunler->sum('adet'), 'sirala' => $sirala, 'yon' => $yon]);
+        $receteler = \App\Models\IlacRecete::tipler($urunler->pluck('gtin'));
+
+        return view('stok.barkod', ['receteler' => $receteler, 'urunler' => $urunler, 'ara' => $ara, 'toplam' => $urunler->sum('adet'), 'sirala' => $sirala, 'yon' => $yon]);
     }
 
     /** Karekod metni (okunabilir GS1 biçimi). */
