@@ -228,7 +228,8 @@ class StokController extends Controller
                 $partiler->map(fn ($p) => [$adlar[$p->gtin] ?? '', $p->gtin, $p->bn, $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '', (int) $p->adet])->all(), $oda);
         }
 
-        $urunler = $partiler->groupBy('gtin')->map(fn ($l, $gtin) => (object) ['gtin' => $gtin, 'ad' => $adlar[$gtin] ?? null, 'adet' => $l->sum('adet'), 'partiler' => $l])->values();
+        $receteler = \App\Models\IlacRecete::tipler($partiler->pluck('gtin')->unique());
+        $urunler = $partiler->groupBy('gtin')->map(fn ($l, $gtin) => (object) ['gtin' => $gtin, 'ad' => $adlar[$gtin] ?? null, 'recete' => $receteler[$gtin] ?? null, 'adet' => $l->sum('adet'), 'partiler' => $l])->values();
 
         // Red Odası'nda SKT'si geçmiş ürünler: tek tıkla "Deaktive (Miat)" bildirimi için otomatik seçilir.
         $miatIds = ($oda === StokKalemi::RED_ODASI && StokKalemi::lokasyonVar())
