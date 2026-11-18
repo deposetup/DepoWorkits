@@ -359,7 +359,9 @@ class StokController extends Controller
             }
         }
 
-        return view('stok.kritik-miad', ['adlar' => $adlar, 'ayar' => $ayar, 'kritik' => $kritik, 'miad' => $miad, 'gecen' => $gecen, 'gecenAdet' => $gecenAdet, 'yaklasanAdet' => $yaklasanAdet]);
+        $receteler = \App\Models\IlacRecete::tipler(collect($gecen)->merge($miad)->pluck('gtin')->unique());
+
+        return view('stok.kritik-miad', ['receteler' => $receteler, 'adlar' => $adlar, 'ayar' => $ayar, 'kritik' => $kritik, 'miad' => $miad, 'gecen' => $gecen, 'gecenAdet' => $gecenAdet, 'yaklasanAdet' => $yaklasanAdet]);
     }
 
     public function ayarKaydet(Request $request, ItsClient $its)
