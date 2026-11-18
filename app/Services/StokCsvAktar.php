@@ -122,7 +122,7 @@ class StokCsvAktar
         fclose($f);
 
         if ($satirlar) {
-            // Satış/devir/sarf gibi başka durumdaki yerel kayıtlar dosya ile ezilmez (yalnızca bu adımdaki ürünler için sorgulanır).
+            // Satış/devir/sarf gibi başka durumdaki yerel kayıtlar dosya ile değiştirilmez (yalnızca bu adımdaki ürünler için sorgulanır).
             $korunan = [];
             foreach (array_chunk(array_unique(array_column($satirlar, 0)), 500) as $gtinler) {
                 foreach (StokKalemi::where('tenant_id', $tenant->id)->where('durum', '!=', 'stokta')->whereIn('gtin', $gtinler)->get(['gtin', 'sn']) as $k) {

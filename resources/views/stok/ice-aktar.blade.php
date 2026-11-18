@@ -23,7 +23,7 @@
 </div></div>
 <div class="card mb-3"><div class="card-body">
   <h6><i class="bi bi-filetype-csv me-1"></i>İTS portalından indirilen stok dosyası (CSV / ZIP)</h6>
-  <p class="small text-muted mb-2">İTS portalından kendi GLN'inizle indirdiğiniz stok dosyasını (<code>GTIN;SN;BN;EXP_DATE</code>) yükleyin. Dosya İTS'in kendi kaydı olduğu için ürünler tek tek sorgulanmadan stoğunuza alınır ve <b>dosyada olmayan eski stok kayıtları silinir (güncel stok = yüklenen dosya)</b>; İTS'e bildirim gönderilmez. Dosya adında GLN varsa sizin GLN'inizle aynı olmalıdır. Büyük dosyalar için .zip yükleyebilirsiniz (en fazla 50 MB). Satış/sarf gibi başka durumdaki ürünler ezilmez, SKT'si geçenler otomatik Red Odası'na alınır.</p>
+  <p class="small text-muted mb-2">İTS portalından kendi GLN'inizle indirdiğiniz stok dosyasını (<code>GTIN;SN;BN;EXP_DATE</code>) yükleyin. Dosya İTS'in kendi kaydı olduğu için ürünler tek tek sorgulanmadan stoğunuza alınır ve <b>dosyada olmayan eski stok kayıtları silinir (güncel stok = yüklenen dosya)</b>; İTS'e bildirim gönderilmez. Dosya adında GLN varsa sizin GLN'inizle aynı olmalıdır. Büyük dosyalar için .zip yükleyebilirsiniz (en fazla 50 MB). Satış/sarf gibi başka durumdaki ürünlere dokunulmaz (değiştirilmez), SKT'si geçenler otomatik Red Odası'na alınır.</p>
   <form method="post" action="{{ route('stok.ice-aktar.csv') }}" enctype="multipart/form-data" class="d-flex gap-2 flex-wrap align-items-center" id="csvForm">@csrf
     <input type="file" name="dosya" accept=".csv,.txt,.zip" class="form-control w-auto" required>
     <button class="btn btn-primary" id="csvBtn"><i class="bi bi-upload me-1"></i>Dosyayı Stoğa Aktar</button></form>
