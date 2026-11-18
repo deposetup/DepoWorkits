@@ -9,15 +9,24 @@
   </div>
 </div>
 <style>
-  .yazdir-baslik { display: none; }
+  .yazdir-baslik, .yazdir-alt { display: none; }
+  #yazdirAlan table { table-layout: fixed; width: 100%; }
   @media print {
+    @page { size: A4; margin: 12mm 12mm 16mm; }
     body * { visibility: hidden !important; }
     #yazdirAlan, #yazdirAlan * { visibility: visible !important; }
     #yazdirAlan { position: absolute; left: 0; top: 0; width: 100%; }
-    .yazdir-baslik { display: block; margin-bottom: .75rem; }
     .yazdirma { display: none !important; }
-    #yazdirAlan table { font-size: 11px; }
+    .yazdir-baslik { display: block; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px; }
+    .yazdir-baslik .musteri { font-size: 15px; font-weight: 700; }
+    .yazdir-baslik .detay { font-size: 11px; color: #333; }
+    .yazdir-baslik .oda { font-size: 13px; font-weight: 600; margin-top: 6px; }
+    .yazdir-alt { display: block; position: fixed; left: 0; right: 0; bottom: 0; text-align: center; font-size: 10px; color: #555; border-top: 1px solid #999; padding-top: 4px; }
+    #yazdirAlan table { font-size: 11px; border-collapse: collapse; }
+    #yazdirAlan th, #yazdirAlan td { border: 1px solid #999 !important; padding: 4px 6px !important; vertical-align: top; word-wrap: break-word; }
+    #yazdirAlan thead { display: table-header-group; }
     #yazdirAlan tr { break-inside: avoid; }
+    #yazdirAlan .col-gtin { width: 17%; } #yazdirAlan .col-adet { width: 9%; } #yazdirAlan .col-ilac { width: 42%; } #yazdirAlan .col-parti { width: 32%; }
   }
 </style>
 @if($karantina)
@@ -46,16 +55,22 @@ document.getElementById('miatBtn').addEventListener('click',function(){
 </script>
 @endif
 @unless($hazir)<div class="alert alert-warning">Lokasyon özelliği henüz etkinleştirilmedi (veritabanı güncellemesi bekleniyor).</div>@endunless
+@php $t = auth()->user()->tenant; @endphp
 <div id="yazdirAlan">
-<div class="yazdir-baslik"><h4 class="mb-0">{{ $oda }}</h4><div class="small">{{ now()->timezone('Europe/Istanbul')->format('d.m.Y H:i') }} · {{ auth()->user()->tenant?->unvan }}</div></div>
+<div class="yazdir-baslik">
+  <div class="musteri">{{ $t?->unvan }}</div>
+  <div class="detay">@if($t?->gln)GLN: {{ $t->gln }}@endif @if($t?->il || $t?->ilce) · {{ collect([$t->ilce, $t->il])->filter()->implode(' / ') }}@endif @if($t?->telefon) · Tel: {{ $t->telefon }}@endif</div>
+  <div class="oda">{{ $oda }} · {{ now()->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</div>
+</div>
 <div class="d-flex gap-3 mb-2 small text-muted"><span>Ürün çeşidi: <strong>{{ $urunler->count() }}</strong></span><span>Toplam adet: <strong>{{ $toplam }}</strong></span></div>
 <div class="table-responsive"><table class="table table-sm bg-white align-middle">
-<thead><tr><th>GTIN</th><th>İlaç</th><th class="text-end">Adet</th><th>Parti / SKT / Adet</th><th class="yazdirma"></th></tr></thead><tbody>
+<thead><tr><th class="col-gtin">GTIN</th><th class="col-ilac">İlaç</th><th class="col-adet text-end">Adet</th><th class="col-parti">Parti / SKT<span class="yazdirma"> / Adet</span></th><th class="yazdirma"></th></tr></thead><tbody>
 @forelse($urunler as $u)
 <tr><td class="font-monospace">{{ $u->gtin }}</td><td>{{ $u->ad ?? '—' }}</td><td class="text-end fw-semibold">{{ $u->adet }}</td>
-<td class="small">@foreach($u->partiler as $p)<div><span class="font-monospace">{{ $p->bn ?: '—' }}</span> · {{ $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '—' }} · <b>{{ $p->adet }}</b> adet</div>@endforeach</td>
+<td class="small">@foreach($u->partiler as $p)<div><span class="font-monospace">{{ $p->bn ?: '—' }}</span> · {{ $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '—' }}<span class="yazdirma"> · <b>{{ $p->adet }}</b> adet</span></div>@endforeach</td>
 <td class="text-end yazdirma"><a class="btn btn-sm btn-outline-primary" href="{{ route('stok.liste', ['ara' => $u->gtin, 'lokasyon' => $oda]) }}"><i class="bi bi-upc-scan me-1"></i>Karekodlar</a></td></tr>
 @empty<tr><td colspan="5" class="text-muted">{{ $karantina ? 'Karantina Odası boş.' : 'Red Odası boş: SKT\'si geçmiş ürün yok.' }}</td></tr>@endforelse
 </tbody></table></div>
+<div class="yazdir-alt">Bu çıktı its.depowork.com.tr aracılığı ile hazırlanmıştır.</div>
 </div>
 @endsection
