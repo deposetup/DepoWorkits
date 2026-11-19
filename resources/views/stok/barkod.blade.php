@@ -79,7 +79,7 @@
 <div class="yazdir-baslik">
   <div class="musteri">{{ $t?->unvan }}</div>
   <div class="detay">@if($t?->gln)GLN: {{ $t->gln }}@endif @if($t?->il || $t?->ilce) · {{ collect([$t->ilce, $t->il])->filter()->implode(' / ') }}@endif @if($t?->telefon) · Tel: {{ $t->telefon }}@endif</div>
-  <div class="oda">Barkod Bazlı Stok@if($ara !== '') · Arama: {{ $ara }}@endif · {{ now()->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</div>
+  <div class="oda">Barkod Bazlı Stok{{ '' }}@if($ara !== '') · Arama: {{ $ara }}@endif · {{ now()->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</div>
 </div>
 <div class="mb-2 small">Ürün çeşidi: <strong>{{ $urunler->count() }}</strong> · Toplam adet: <strong>{{ $toplam }}</strong></div>
 <table>
