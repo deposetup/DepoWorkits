@@ -83,15 +83,15 @@ class StokController extends Controller
             ->groupBy('gtin', 'bn', 'skt')->orderBy('gtin')->orderBy('skt')->get()->groupBy('gtin');
 
         if ($request->boolean('excel')) {
+            // Barkod başına tek satır: toplam adet + partiler tek hücrede
             $satirlar = [];
             foreach ($partiler as $gtin => $liste) {
-                foreach ($liste as $p) {
-                    $satirlar[] = [$adlar[$gtin] ?? '', $gtin, $p->bn, $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '', (int) $p->adet];
-                }
+                $partiMetni = $liste->map(fn ($p) => ($p->bn ?: '—').' / '.($p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '—').' ('.(int) $p->adet.')')->implode('; ');
+                $satirlar[] = [$adlar[$gtin] ?? '', $gtin, (int) $liste->sum('adet'), $partiMetni];
             }
 
             return \App\Support\XlsxYazici::indir('barkod-bazli-stok-'.now()->format('Ymd-His').'.xlsx',
-                ['İlaç', 'GTIN', 'Parti', 'SKT', 'Adet'], $satirlar, 'Barkod Bazlı Stok');
+                ['İlaç', 'GTIN', 'Adet', 'Parti / SKT (adet)'], $satirlar, 'Barkod Bazlı Stok');
         }
 
         $urunler = $partiler->map(fn ($liste, $gtin) => (object) [
