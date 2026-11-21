@@ -41,6 +41,7 @@
     ['Paydaşlar', 'Aktif / pasif paydaş listesi', 'bi-building', route('paydaslar')],
     ['Cari Kartlar', 'Sık çalışılan alıcı/tedarikçiler', 'bi-person-lines-fill', route('cari.index')],
     ['İTS Bağlantısı', 'Bağlantıyı sına', 'bi-plug', route('ayarlar.its')],
+    ['Kullanım Kılavuzu', 'Adım adım kullanım bilgisi', 'bi-book', route('kilavuz')],
   ];
 @endphp
 <div class="d-flex justify-content-end mt-2"><button type="button" id="duzenBtn" class="btn btn-sm btn-outline-secondary"><i class="bi bi-sliders me-1"></i>Özetleri düzenle</button></div>

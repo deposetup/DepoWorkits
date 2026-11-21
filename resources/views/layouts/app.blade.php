@@ -144,6 +144,7 @@
         <a class="yan-link {{ request()->routeIs('admin.paydas-degisimleri') ? 'aktif' : '' }}" href="{{ route('admin.paydas-degisimleri') }}"><i class="bi bi-bell"></i>Paydaş Değişimleri</a>
         <a class="yan-link {{ request()->routeIs('admin.giris-kayitlari') ? 'aktif' : '' }}" href="{{ route('admin.giris-kayitlari') }}"><i class="bi bi-clock-history"></i>Giriş Kayıtları</a>
       @endif
+      <a class="yan-link {{ request()->routeIs('kilavuz') ? 'aktif' : '' }}" href="{{ route('kilavuz') }}"><i class="bi bi-book"></i>Kullanım Kılavuzu</a>
       <a class="yan-link {{ request()->routeIs('sifre') ? 'aktif' : '' }}" href="{{ route('sifre') }}"><i class="bi bi-key"></i>Şifre Değiştir</a>
     </nav>
     <div class="yan-kullanici">

@@ -25,6 +25,7 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
     Route::post('/cikis', [AuthController::class, 'logout'])->name('logout');
     Route::get('/sifre', [SifreController::class, 'form'])->name('sifre');
     Route::post('/sifre', [SifreController::class, 'guncelle'])->name('sifre.guncelle');
+    Route::view('/kilavuz', 'kilavuz')->name('kilavuz');
     Route::get('/kvkk-onay', fn () => view('kvkk'))->name('kvkk.form');
     Route::post('/kvkk-onay', [AuthController::class, 'kvkkOnayla'])->name('kvkk.onay');
 
