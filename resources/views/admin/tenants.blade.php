@@ -3,15 +3,12 @@
 @section('icerik')
 <h4>Müşteriler</h4>
 <table class="table table-sm bg-white align-middle">
-  <thead><tr><th>Ünvan</th><th>GLN</th><th>Tür</th><th>Lisans</th><th>Durum</th><th></th></tr></thead>
+  <thead><tr><th>Ünvan</th><th>GLN</th><th>Lisans</th><th>Durum</th><th></th></tr></thead>
   <tbody>
   @foreach($tenants as $t)
     @php $kalan = $t->kalanGun(); @endphp
     <tr>
-      <td>{{ $t->unvan }}</td><td>{{ $t->gln }}</td><td><form method="post" action="{{ route('admin.tenants.tur', $t) }}">@csrf
-        <select name="tur" class="form-select form-select-sm" style="width:200px" onchange="this.form.submit()">
-          @foreach(\App\Models\Tenant::TURLER as $k => $ad)<option value="{{ $k }}" @selected($t->tur === $k)>{{ $ad }}</option>@endforeach
-        </select></form></td>
+      <td>{{ $t->unvan }}</td><td>{{ $t->gln }}</td>
       <td class="text-nowrap">{{ $t->lisans_bitis->format('d.m.Y') }} <span class="badge {{ $kalan > 30 ? 'text-bg-light border' : ($kalan > 0 ? 'text-bg-warning' : 'text-bg-danger') }}">{{ $kalan }} gün</span></td>
       <td>{!! $t->lisansAktifMi() ? '<span class="badge text-bg-success">Aktif</span>' : '<span class="badge text-bg-danger">Pasif/Süresi doldu</span>' !!}</td>
       <td class="text-nowrap">
