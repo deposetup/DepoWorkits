@@ -202,6 +202,16 @@ class ItsRestClient implements ItsClient
         return $this->bildir($tenant, '/common/app/transfercancel/', ['productList' => $this->liste($urunler)], $urunler);
     }
 
+    public function ihracat(Tenant $tenant, array $urunler, string $alici): ItsSonuc
+    {
+        return $this->bildir($tenant, '/wholesale/app/export/', ['dt' => 'X', 'fr' => $tenant->gln, 'rt' => mb_substr($alici, 0, 100), 'document' => new \stdClass, 'productList' => $this->liste($urunler)], $urunler);
+    }
+
+    public function ihracatIptal(Tenant $tenant, array $urunler): ItsSonuc
+    {
+        return $this->bildir($tenant, '/wholesale/app/exportcancel/', ['dt' => 'C', 'fr' => $tenant->gln, 'productList' => $this->liste($urunler)], $urunler);
+    }
+
     public function hastaneSarf(Tenant $tenant, array $urunler): ItsSonuc
     {
         return $this->bildir($tenant, '/consume/app/consume/', ['dt' => 'D', 'fr' => $tenant->gln, 'productList' => $this->liste($urunler)], $urunler);

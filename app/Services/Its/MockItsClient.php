@@ -112,6 +112,16 @@ class MockItsClient implements ItsClient
             : ['gtin' => $u['gtin'], 'sn' => $u['sn'], 'gln1' => $tenant->gln, 'gln2' => null, 'uc' => '60014'], $urunler);
     }
 
+    public function ihracat(Tenant $tenant, array $urunler, string $alici): ItsSonuc
+    {
+        return $this->basari($urunler);
+    }
+
+    public function ihracatIptal(Tenant $tenant, array $urunler): ItsSonuc
+    {
+        return $this->basari($urunler);
+    }
+
     public function satis(Tenant $tenant, array $urunler, string $karsiGln): ItsSonuc
     {
         return $this->basari($urunler);

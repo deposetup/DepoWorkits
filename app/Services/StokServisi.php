@@ -32,6 +32,8 @@ class StokServisi
         'satis_iptal' => ['satis', 'stokta', 'Satış İptal'],
         'devir' => ['stokta', 'devir', 'Mal Devir'],
         'devir_iptal' => ['devir', 'stokta', 'Mal Devir İptal'],
+        'ihracat' => ['stokta', 'ihracat', 'İhracat'],
+        'ihracat_iptal' => ['ihracat', 'stokta', 'İhracat İptal'],
         'deaktive' => ['stokta', 'deaktive', 'Deaktive'],
         'deaktive_iptal' => ['deaktive', 'stokta', 'Deaktivasyon İptal'],
     ];
@@ -93,6 +95,13 @@ class StokServisi
             throw new InvalidArgumentException('Ecza depoları ve hastaneler Mal Devir kullanmaz.');
         }
 
+        if (in_array($tur, ['ihracat', 'ihracat_iptal'], true) && ! $tenant->ihracatYapabilir()) {
+            throw new InvalidArgumentException('İhracat bildirimi yalnızca ihracat yetkisi olan paydaşlar (depo, üretici, ihracatçı, ihracata yetkili firma) içindir.');
+        }
+        if ($tur === 'ihracat' && trim((string) $aciklama) === '') {
+            throw new InvalidArgumentException('İhracat için alıcı bilgisi zorunludur.');
+        }
+
         $satirlar = [];
         $gonderilecek = [];
         $goruldu = [];
@@ -109,7 +118,7 @@ class StokServisi
                     throw new InvalidArgumentException('Ürün zaten stokta.');
                 }
                 if ($gereken !== null && (! $kalem || $kalem->durum !== $gereken)) {
-                    throw new InvalidArgumentException('Ürün '.($gereken === 'stokta' ? 'stokta' : ($gereken === 'satis' ? 'satılmış durumda' : ($gereken === 'devir' ? 'devredilmiş durumda' : ($gereken === 'deaktive' ? 'deaktive edilmiş durumda' : 'sarf edilmiş durumda')))).' değil.');
+                    throw new InvalidArgumentException('Ürün '.($gereken === 'stokta' ? 'stokta' : ($gereken === 'satis' ? 'satılmış durumda' : ($gereken === 'devir' ? 'devredilmiş durumda' : ($gereken === 'deaktive' ? 'deaktive edilmiş durumda' : ($gereken === 'ihracat' ? 'ihraç edilmiş durumda' : 'sarf edilmiş durumda'))))).' değil.');
                 }
                 if ($tur === 'kabul' && ($g['xd'] ?? null) && $g['xd'] < now()->toDateString()) {
                     throw new InvalidArgumentException('Son kullanma tarihi geçmiş.');
@@ -134,6 +143,8 @@ class StokServisi
                 'satis_iptal' => $this->its->satisIptal($tenant, $parca),
                 'devir' => $this->its->malDevir($tenant, $parca, (string) $karsiGln),
                 'devir_iptal' => $this->its->malDevirIptal($tenant, $parca),
+                'ihracat' => $this->its->ihracat($tenant, $parca, (string) $aciklama),
+                'ihracat_iptal' => $this->its->ihracatIptal($tenant, $parca),
                 'deaktive' => $this->its->deaktive($tenant, $sebep ?? '10', $parca, $aciklama),
                 'deaktive_iptal' => $this->its->deaktiveIptal($tenant, $sebep ?? '10', $parca, $aciklama),
             };

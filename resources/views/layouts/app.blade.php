@@ -72,6 +72,10 @@
           ['Mal Devir', 'bi-arrow-left-right', route('islem', 'devir'), ['islem:devir']],
           ['Mal Devir İptal', 'bi-x-circle', route('islem', 'devir_iptal'), ['islem:devir_iptal']],
         ] : []),
+        ...(($u->tenant?->ihracatYapabilir() ?? false) ? [
+          ['İhracat', 'bi-airplane', route('islem', 'ihracat'), ['islem:ihracat']],
+          ['İhracat İptal', 'bi-airplane-engines', route('islem', 'ihracat_iptal'), ['islem:ihracat_iptal']],
+        ] : []),
         ...(($u->tenant?->sarfYapabilir() ?? true) ? [
           ['Hastane Sarf', 'bi-hospital', route('islem', 'sarf'), ['islem:sarf']],
           ['Sarf İptal', 'bi-arrow-counterclockwise', route('islem', 'sarf_iptal'), ['islem:sarf_iptal']],

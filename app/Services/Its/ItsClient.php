@@ -30,6 +30,12 @@ interface ItsClient
     /** Mal Devir İptal (§14). */
     public function malDevirIptal(Tenant $tenant, array $urunler): ItsSonuc;
 
+    /** İhracat Bildirimi (§4, wholesale/app/export, dt=X): $alici (rt) en fazla 100 karakter, boş olamaz. */
+    public function ihracat(Tenant $tenant, array $urunler, string $alici): ItsSonuc;
+
+    /** İhracat İptal Bildirimi (§5, wholesale/app/exportcancel, dt=C). */
+    public function ihracatIptal(Tenant $tenant, array $urunler): ItsSonuc;
+
     public function sarfIptal(Tenant $tenant, array $urunler): ItsSonuc;
 
     public function hastaneSarf(Tenant $tenant, array $urunler): ItsSonuc;

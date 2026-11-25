@@ -73,6 +73,7 @@
         <tr><td>Satış</td><td>Ürünü bir paydaşa satarken. Alıcı kendi Mal Alım bildirimini yapana kadar ürün arada bekler.</td><td>Alıcı GLN (13 hane)</td></tr>
         <tr><td>Satış İptal</td><td>Hatalı veya geri dönen satışı iptal etmek için.</td><td>—</td></tr>
         <tr><td>Mal Devir / Devir İptal</td><td>Aynı role sahip paydaşlar arasında devir (örn. depo → depo).</td><td>Karşı GLN</td></tr>
+        <tr><td>İhracat / İhracat İptal</td><td>Yalnızca <b>ecza deposu, üretici, ihracatçı ve ihracata yetkili firma</b> türündeki kurumlar görür. Ürünü yurt dışına çıkarırken İTS'e ihracat bildirimi yapar; hatalı bildirimi iptalle geri alır, ürün tekrar stoğa döner.</td><td>İhracat: alıcı bilgisi (zorunlu, en çok 100 karakter)</td></tr>
         <tr><td>Hastane Sarf / Sarf İptal</td><td>Hastanelerde ürünün kullanımının bildirilmesi ve iptali.</td><td>—</td></tr>
         <tr><td>Ürün İade</td><td>Ürünü tedarikçiye iade ederken.</td><td>İade edilen paydaşın GLN'i</td></tr>
         <tr><td>Deaktive / Deaktivasyon İptal</td><td>Ürünü sistemden çıkarma (fire, geri çekme vb.) veya bu işlemi geri alma.</td><td>Sebep (zorunlu), açıklama</td></tr>
@@ -82,7 +83,7 @@
       <li>Kurumunuzun türüne göre (eczane, depo, hastane) bazı işlemler menüde görünmez; bu normaldir.</li>
       <li>GLN'i elle yazmak yerine <b>Cari Kartlar</b>'a kayıtlı paydaşlarınızı listeden seçebilirsiniz.</li>
       <li><b>PTS Gönderimleri:</b> Satış başarıyla bildirildikten sonra alıcıya PTS paketi göndermek için kullanılır. PTS göndermek Satış bildiriminin yerine geçmez; Satış ayrıca yapılmalıdır.</li>
-      <li>Satış veya devir sonrası sonuç ekranındaki geri alma düğmesiyle hatalı bildirimi hemen geri alabilirsiniz.</li>
+      <li>Satış, devir veya ihracat sonrası sonuç ekranındaki geri alma düğmesiyle hatalı bildirimi hemen geri alabilirsiniz. Daha eski ihracatlar için <b>İhracat İptal</b> ekranını ya da <b>Stok Listesi → İhraç Edildi</b> sekmesini kullanın.</li>
     </ul>
   </div></div></div>
 

@@ -3,6 +3,8 @@
 @section('icerik')
 <h4>{{ $baslik }}</h4>
 @if($tur === 'deaktive_iptal')<div class="alert alert-info small">Deaktive edilmiş ürünleri geri stoğa alır. Deaktivasyonda kullandığınız <b>sebebi</b> seçin. Kılavuz bu servisi eczaneler için tanımlar; depo hesabınızda İTS reddederse sonuç ekranında İTS'in hata mesajı görünür.</div>@endif
+@if($tur === 'ihracat')<div class="alert alert-info small">İhracat bildirimi yalnızca <b>ihracat yetkisi olan paydaşlar</b> (depo, üretici, ihracatçı, ihracata yetkili firma) içindir. Ürünler İTS'te sistemden çıkarılır; <b>alıcı bilgisi</b> (en fazla 100 karakter) zorunludur. Hata yaptıysanız sonuç ekranındaki <b>İhracatı geri al</b> butonunu ya da <a href="{{ route('islem', 'ihracat_iptal') }}">İhracat İptal</a> ekranını kullanın.</div>@endif
+@if($tur === 'ihracat_iptal')<div class="alert alert-info small">Daha önce bildirdiğiniz ihracatı iptal eder; ürünler tekrar stoğunuza döner. İTS iptali reddederse sonuç ekranında İTS'in hata mesajı görünür.</div>@endif
 @if($tur === 'devir')<div class="alert alert-info small">Mal Devir yalnızca <b>aynı role sahip</b> paydaşlar arasında yapılabilir (depo → depo). Hata yaptıysanız <b>Mal Devir İptal</b> kullanın. Karşı paydaşın aktif olup olmadığını <b>Sorgular → Paydaşlar</b> ekranından kontrol edebilirsiniz.</div>@endif
 @if($tur === 'satis')<div class="alert alert-info small">Satış bildirimi sonrası ürünler alıcıya hemen geçmez; alıcı kendi <b>Mal Alım</b> bildirimini yapana kadar arada bekler. Hata yaptıysanız sonuç ekranındaki <b>Satışı geri al</b> butonunu ya da daha önceki satışlar için <a href="{{ route('islem', 'satis_iptal') }}">Satış İptal</a> ekranını kullanın.</div>@endif
 <form method="post" action="{{ route('islem.calistir', $tur) }}" class="mb-4" id="islemForm">@csrf
@@ -13,6 +15,9 @@
   @endif
   @if(in_array($tur, ['iade', 'satis', 'devir']))
   <div class="mt-2 col-md-6">@include('cari._secici', ['hedef' => 'karsi_gln_input'])<input id="karsi_gln_input" name="karsi_gln" value="{{ old('karsi_gln') }}" class="form-control" placeholder="{{ $tur === 'satis' ? 'Satış yapılan paydaşın GLN\'i (13 hane)' : ($tur === 'devir' ? 'Devir yapılan paydaşın GLN\'i (13 hane)' : 'İade edilen paydaşın GLN\'i (13 hane)') }}" maxlength="13" required></div>
+  @endif
+  @if($tur === 'ihracat')
+  <div class="mt-2 col-md-8"><input name="aciklama" value="{{ old('aciklama') }}" class="form-control" placeholder="İhracat alıcı bilgisi (zorunlu, en fazla 100 karakter)" maxlength="100" required></div>
   @endif
   @if(in_array($tur, ['deaktive', 'deaktive_iptal']))
   <div class="row g-2 mt-2">
@@ -57,8 +62,9 @@
 </div>
 @if($hataSayi)<div class="alert alert-danger rounded-0 mb-0 py-2 small"><i class="bi bi-exclamation-triangle me-1"></i><b>{{ $hataSayi }} ürün için bildirim yapılamadı.</b> Başarısız satırlar aşağıda en üstte listelenmiştir.</div>@endif
 @php
-  $geriAlinabilir = in_array($tur, ['satis', 'devir'], true);
-  $iptalTuru = $tur === 'satis' ? 'satis_iptal' : 'devir_iptal';
+  $geriAlinabilir = in_array($tur, ['satis', 'devir', 'ihracat'], true);
+  $iptalTuru = $tur.'_iptal';
+  $geriAd = ['satis' => ['satışı', 'satışını', 'Satışı geri al'], 'devir' => ['devri', 'devrini', 'Devri geri al'], 'ihracat' => ['ihracatı', 'ihracatını', 'İhracatı geri al']][$tur] ?? ['', '', '']; 
   $ilacAdlari = \App\Support\IlacAdlari::harita();
   $basarili = collect($sonuc['satirlar'])->where('durum', 'tamam')->pluck('kod')->values();
   $receteler = \App\Models\IlacRecete::tipler($tumSatirlar->map(fn ($x) => \App\Support\IlacAdlari::gtinBul($x['kod'])));
@@ -67,15 +73,15 @@
 @foreach($tumSatirlar as $s)
 <tr class="{{ $s['durum'] === 'tamam' ? 'table-success' : 'table-danger' }}"><td class="font-monospace small">{{ \Illuminate\Support\Str::limit(\App\Support\IlacAdlari::parantezsiz($s['kod']), 60) }}</td><td>{{ $ilacAdlari[\App\Support\IlacAdlari::gtinBul($s['kod'])] ?? '—' }}</td><td>{!! \App\Models\IlacRecete::rozet($receteler[\App\Support\IlacAdlari::gtinBul($s['kod'])] ?? null) !!}</td><td>{{ $s['durum'] === 'tamam' ? 'Başarılı' : $s['mesaj'] }}</td>
 @if($geriAlinabilir)<td class="text-end">@if($s['durum'] === 'tamam')
-  <form method="post" action="{{ route('islem.calistir', $iptalTuru) }}" onsubmit="return confirm('Bu ürünün {{ $tur === 'satis' ? 'satışı' : 'devri' }} İTS\'te iptal edilecek. Emin misiniz?')">@csrf<input type="hidden" name="kodlar" value="{{ $s['kod'] }}"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-arrow-counterclockwise me-1"></i>{{ $tur === 'satis' ? 'Satışı geri al' : 'Devri geri al' }}</button></form>
+  <form method="post" action="{{ route('islem.calistir', $iptalTuru) }}" onsubmit="return confirm('Bu ürünün {{ $geriAd[0] }} İTS\'te iptal edilecek. Emin misiniz?')">@csrf<input type="hidden" name="kodlar" value="{{ $s['kod'] }}"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-arrow-counterclockwise me-1"></i>{{ $geriAd[2] }}</button></form>
 @endif</td>@endif
 </tr>
 @endforeach
 </table></div>
 @if($geriAlinabilir && $basarili->count() > 1)
-<form method="post" action="{{ route('islem.calistir', $iptalTuru) }}" class="mt-3" onsubmit="return confirm('Başarılı {{ $basarili->count() }} ürünün {{ $tur === 'satis' ? 'satışı' : 'devri' }} İTS\'te iptal edilecek. Emin misiniz?')">@csrf<input type="hidden" name="kodlar" value="{{ $basarili->implode("\n") }}"><button class="btn btn-danger"><i class="bi bi-arrow-counterclockwise me-1"></i>Başarılı {{ $basarili->count() }} ürünün {{ $tur === 'satis' ? 'satışını' : 'devrini' }} geri al</button></form>
+<form method="post" action="{{ route('islem.calistir', $iptalTuru) }}" class="mt-3" onsubmit="return confirm('Başarılı {{ $basarili->count() }} ürünün {{ $geriAd[0] }} İTS\'te iptal edilecek. Emin misiniz?')">@csrf<input type="hidden" name="kodlar" value="{{ $basarili->implode("\n") }}"><button class="btn btn-danger"><i class="bi bi-arrow-counterclockwise me-1"></i>Başarılı {{ $basarili->count() }} ürünün {{ $geriAd[1] }} geri al</button></form>
 @endif
-@if($geriAlinabilir && $basarili->isNotEmpty())<div class="small text-muted mt-2">Geri alma yalnızca alıcı henüz Mal Alım bildirimi yapmadıysa mümkündür; aksi hâlde İTS reddeder ve hata mesajı sonuç ekranında görünür.</div>@endif
+@if($geriAlinabilir && $basarili->isNotEmpty())<div class="small text-muted mt-2">@if($tur === 'ihracat')İTS iptali reddederse hata mesajı sonuç ekranında görünür.@else Geri alma yalnızca alıcı henüz Mal Alım bildirimi yapmadıysa mümkündür; aksi hâlde İTS reddeder ve hata mesajı sonuç ekranında görünür.@endif</div>@endif
 @if($tur === 'satis' && isset($sonuc))
 @if(isset($ptsGonderim) && $ptsGonderim)
 <div class="card border-primary mt-3"><div class="card-header bg-primary text-white"><i class="bi bi-send me-1"></i>PTS verisi gönderimi</div>

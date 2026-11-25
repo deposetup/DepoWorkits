@@ -35,6 +35,9 @@ class IslemController extends Controller
         if (in_array($tur, ['deaktive', 'deaktive_iptal'], true)) {
             $request->validate(['sebep' => 'required']);
         }
+        if ($tur === 'ihracat') {
+            $request->validate(['aciklama' => 'required|string|max:100'], ['aciklama.required' => 'İhracat için alıcı bilgisi zorunludur.']);
+        }
 
         $sonuc = $servis->isle($request->user(), $tur, $v['kodlar'], $v['sebep'] ?? null, $v['aciklama'] ?? null, $v['karsi_gln'] ?? null);
 
@@ -130,6 +133,10 @@ class IslemController extends Controller
         if (in_array($tur, ['satis', 'satis_iptal'], true)) {
             $tenant = auth()->user()->tenant;
             abort_if($tenant && ! $tenant->satisYapabilir(), 403, 'Hastaneler satış yapamaz; yalnızca sarf ve iade bildirir.');
+        }
+        if (in_array($tur, ['ihracat', 'ihracat_iptal'], true)) {
+            $tenant = auth()->user()->tenant;
+            abort_if($tenant && ! $tenant->ihracatYapabilir(), 403, 'İhracat bildirimi yalnızca ihracat yetkisi olan paydaşlar (depo, üretici, ihracatçı, ihracata yetkili firma) içindir.');
         }
         if (in_array($tur, ['devir', 'devir_iptal'], true)) {
             $tenant = auth()->user()->tenant;

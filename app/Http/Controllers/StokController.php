@@ -140,7 +140,8 @@ class StokController extends Controller
     {
         $tid = $request->user()->tenant_id;
         $durum = $request->query('durum', 'stokta');
-        abort_unless(in_array($durum, ['stokta', 'satis', 'sarf', 'devir', 'deaktive'], true), 404);
+        abort_unless(in_array($durum, ['stokta', 'satis', 'sarf', 'devir', 'ihracat', 'deaktive'], true), 404);
+        abort_if($durum === 'ihracat' && ! $request->user()->tenant?->ihracatYapabilir(), 404);
         abort_if($durum === 'satis' && ! $request->user()->tenant?->satisYapabilir(), 404);
         $ara = trim((string) $request->query('ara', ''));
         $adlar = $this->adlar($its);
@@ -183,7 +184,7 @@ class StokController extends Controller
         $receteHarita = \App\Models\IlacRecete::tipler((clone $q)->reorder()->distinct()->pluck('gtin'));
         $receteHarita = collect($receteHarita)->mapWithKeys(fn ($tip, $g) => [\App\Models\IlacRecete::anahtar($g) => $tip])->all();
         if ($request->boolean('excel')) {
-            $ad = ['stokta' => 'stok', 'satis' => 'satildi', 'sarf' => 'sarf', 'devir' => 'devredildi', 'deaktive' => 'deaktive'][$durum];
+            $ad = ['stokta' => 'stok', 'satis' => 'satildi', 'sarf' => 'sarf', 'devir' => 'devredildi', 'ihracat' => 'ihrac', 'deaktive' => 'deaktive'][$durum];
 
             return \App\Support\XlsxYazici::indir($ad.'-listesi-'.now()->format('Ymd-His').'.xlsx',
                 ['İlaç', 'Reçete', 'GTIN', 'Seri No', 'Parti', 'SKT', 'Lokasyon', 'Karekod'],
@@ -280,7 +281,7 @@ class StokController extends Controller
     {
         abort_unless($request->user()->tenant_id, 403);
         $v = $request->validate([
-            'tur' => 'required|in:satis,sarf,iade,deaktive,devir,satis_iptal,sarf_iptal,devir_iptal,deaktive_iptal',
+            'tur' => 'required|in:satis,sarf,iade,deaktive,devir,ihracat,satis_iptal,sarf_iptal,devir_iptal,ihracat_iptal,deaktive_iptal',
             'secili' => 'required|array|min:1|max:1000',
             'secili.*' => 'integer',
             'karsi_gln' => 'nullable|digits:13',
@@ -296,12 +297,16 @@ class StokController extends Controller
         }
         abort_if(in_array($v['tur'], ['sarf', 'sarf_iptal'], true) && ! $request->user()->tenant->sarfYapabilir(), 403, 'Ecza depoları sarf bildirimi yapamaz.');
         abort_if(in_array($v['tur'], ['satis', 'satis_iptal'], true) && ! $request->user()->tenant->satisYapabilir(), 403, 'Hastaneler satış yapamaz; yalnızca sarf ve iade bildirir.');
+        abort_if(in_array($v['tur'], ['ihracat', 'ihracat_iptal'], true) && ! $request->user()->tenant->ihracatYapabilir(), 403, 'İhracat bildirimi yalnızca ihracat yetkisi olan paydaşlar (depo, üretici, ihracatçı, ihracata yetkili firma) içindir.');
         abort_if(in_array($v['tur'], ['devir', 'devir_iptal'], true) && ! $request->user()->tenant->devirYapabilir(), 403, 'Ecza depoları ve hastaneler Mal Devir kullanmaz.');
         if (in_array($v['tur'], ['satis', 'iade', 'devir'], true)) {
             $request->validate(['karsi_gln' => 'required|digits:13']);
         }
         if (in_array($v['tur'], ['deaktive', 'deaktive_iptal'], true)) {
             $request->validate(['sebep' => 'required']);
+        }
+        if ($v['tur'] === 'ihracat') {
+            $request->validate(['aciklama' => 'required|string|max:100'], ['aciklama.required' => 'İhracat için alıcı bilgisi zorunludur.']);
         }
 
         $kalemler = StokKalemi::where('tenant_id', $request->user()->tenant_id)->whereIn('id', $v['secili'])->get()

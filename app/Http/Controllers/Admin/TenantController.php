@@ -19,7 +19,7 @@ class TenantController extends Controller
         $data = $request->validate([
             'unvan' => 'required|string|max:255',
             'gln' => 'required|digits:13|unique:tenants,gln',
-            'tur' => 'required|in:eczane,hastane,depo,uretici,ihracatci',
+            'tur' => 'required|in:'.implode(',', array_keys(Tenant::TURLER)),
             'il' => 'nullable|string|max:60',
             'ilce' => 'nullable|string|max:60',
             'eposta' => 'nullable|email',
@@ -76,7 +76,7 @@ class TenantController extends Controller
 
     public function turDegistir(Request $request, Tenant $tenant)
     {
-        $tur = $request->validate(['tur' => 'required|in:eczane,hastane,depo,uretici,ihracatci'])['tur'];
+        $tur = $request->validate(['tur' => 'required|in:'.implode(',', array_keys(Tenant::TURLER))])['tur'];
         $eski = $tenant->tur;
         $tenant->update(['tur' => $tur]);
         AuditLog::kaydet('tenant_tur_degistir', ['tenant' => $tenant->id, 'eski' => $eski, 'yeni' => $tur]);
@@ -102,7 +102,7 @@ class TenantController extends Controller
         $v = $request->validate([
             'unvan' => 'required|string|max:255',
             'gln' => 'required|digits:13|unique:tenants,gln,'.$tenant->id,
-            'tur' => 'required|in:eczane,hastane,depo,uretici,ihracatci',
+            'tur' => 'required|in:'.implode(',', array_keys(Tenant::TURLER)),
             'il' => 'nullable|string|max:60',
             'ilce' => 'nullable|string|max:60',
             'eposta' => 'nullable|email|max:255',

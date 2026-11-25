@@ -8,8 +8,8 @@
   @foreach($tenants as $t)
     <tr>
       <td>{{ $t->unvan }}</td><td>{{ $t->gln }}</td><td><form method="post" action="{{ route('admin.tenants.tur', $t) }}" class="d-flex gap-1">@csrf
-        <select name="tur" class="form-select form-select-sm" style="width:115px" onchange="this.form.submit()">
-          @foreach(['eczane' => 'Eczane', 'hastane' => 'Hastane', 'depo' => 'Depo', 'uretici' => 'Üretici', 'ihracatci' => 'İhracatçı'] as $k => $ad)<option value="{{ $k }}" @selected($t->tur === $k)>{{ $ad }}</option>@endforeach
+        <select name="tur" class="form-select form-select-sm" style="width:200px" onchange="this.form.submit()">
+          @foreach(\App\Models\Tenant::TURLER as $k => $ad)<option value="{{ $k }}" @selected($t->tur === $k)>{{ $ad }}</option>@endforeach
         </select></form></td>
       <td>{{ $t->lisans_bitis->format('d.m.Y') }}</td><td><form method="post" action="{{ route('admin.tenants.kalan', $t) }}" class="d-flex gap-1 align-items-center" onsubmit="return confirm('{{ addslashes($t->unvan) }} için kalan gün sayısı değiştirilecek. Emin misiniz?')">@csrf
         <input type="number" name="kalan" value="{{ $t->kalanGun() }}" min="0" max="3650" class="form-control form-control-sm" style="width:80px" title="Kalan gün sayısı"><button class="btn btn-sm btn-outline-success" title="Kalan günü bu sayıya ayarla">Ayarla</button></form></td>
@@ -33,7 +33,7 @@
 <form method="post" action="{{ route('admin.tenants.store') }}" class="row g-2">@csrf
   <div class="col-md-2"><input id="gln" name="gln" class="form-control" placeholder="GLN (13 hane)" maxlength="13" inputmode="numeric" autocomplete="off" autofocus required></div>
   <div class="col-md-4"><input id="unvan" name="unvan" class="form-control" placeholder="Ünvan (otomatik: Her Kelimenin Baş Harfi Büyük)" required></div>
-  <div class="col-md-2"><select id="tur" name="tur" class="form-select"><option value="eczane">Eczane</option><option value="hastane">Hastane</option><option value="depo">Depo</option><option value="uretici">Üretici</option><option value="ihracatci">İhracatçı</option></select></div>
+  <div class="col-md-3"><select id="tur" name="tur" class="form-select">@foreach(\App\Models\Tenant::TURLER as $k => $ad)<option value="{{ $k }}">{{ $ad }}</option>@endforeach</select></div>
   <div class="col-md-2"><input type="date" name="lisans_baslangic" value="{{ now()->toDateString() }}" class="form-control" required></div>
   <div class="col-md-2"><input type="date" name="lisans_bitis" value="{{ now()->addYear()->toDateString() }}" class="form-control" required></div>
   <div class="col-md-2"><input id="il" name="il" class="form-control" placeholder="İl" maxlength="60"></div>

@@ -5,18 +5,21 @@
   $sarfVar = auth()->user()->tenant?->sarfYapabilir() ?? true;
   $devirVar = auth()->user()->tenant?->devirYapabilir() ?? true;
   $satisVar = auth()->user()->tenant?->satisYapabilir() ?? true;
-  $sekmeler = array_filter(['stokta' => ['Stokta', 'bi-box-seam'], 'satis' => ['Satıldı', 'bi-cart-check'], 'devir' => ['Devredildi', 'bi-arrow-left-right'], 'deaktive' => ['Deaktive', 'bi-slash-circle'], 'sarf' => ['Sarf', 'bi-hospital']],
-    fn ($k) => ($sarfVar || $k !== 'sarf') && ($devirVar || $k !== 'devir') && ($satisVar || $k !== 'satis'), ARRAY_FILTER_USE_KEY);
+  $ihracatVar = auth()->user()->tenant?->ihracatYapabilir() ?? false;
+  $sekmeler = array_filter(['stokta' => ['Stokta', 'bi-box-seam'], 'satis' => ['Satıldı', 'bi-cart-check'], 'devir' => ['Devredildi', 'bi-arrow-left-right'], 'ihracat' => ['İhraç Edildi', 'bi-airplane'], 'deaktive' => ['Deaktive', 'bi-slash-circle'], 'sarf' => ['Sarf', 'bi-hospital']],
+    fn ($k) => ($sarfVar || $k !== 'sarf') && ($devirVar || $k !== 'devir') && ($satisVar || $k !== 'satis') && ($ihracatVar || $k !== 'ihracat'), ARRAY_FILTER_USE_KEY);
   $islemler = array_values(match ($durum) {
     'stokta' => array_filter([
       $satisVar ? ['satis', 'Satış', 'bi-cart-check', 'success'] : null,
       $sarfVar ? ['sarf', 'Hastane Sarf', 'bi-hospital', 'info'] : null,
       $devirVar ? ['devir', 'Mal Devir', 'bi-arrow-left-right', 'primary'] : null,
+      $ihracatVar ? ['ihracat', 'İhracat', 'bi-airplane', 'secondary'] : null,
       ['iade', 'Ürün İade', 'bi-arrow-return-left', 'warning'],
       ['deaktive', 'Deaktive', 'bi-slash-circle', 'dark'],
     ]),
     'satis' => [['satis_iptal', 'Satış İptal', 'bi-cart-x', 'danger']],
     'deaktive' => [['deaktive_iptal', 'Deaktivasyon İptal', 'bi-check-circle', 'danger']],
+    'ihracat' => [['ihracat_iptal', 'İhracat İptal', 'bi-airplane-engines', 'danger']],
     'devir' => [['devir_iptal', 'Mal Devir İptal', 'bi-x-circle', 'danger']],
     default => [['sarf_iptal', 'Sarf İptal', 'bi-arrow-counterclockwise', 'danger']],
   });
@@ -120,6 +123,7 @@
         @endforeach
       </div>
       <div id="glnAlan">@include('cari._secici', ['hedef' => 'karsi_gln_input'])<input id="karsi_gln_input" name="karsi_gln" class="form-control form-control-sm" maxlength="13" placeholder="Karşı paydaş GLN (13 hane)"></div>
+      <div id="aliciAlan" class="d-none"><input name="aciklama" id="alici_input" class="form-control form-control-sm" maxlength="100" placeholder="İhracat alıcı bilgisi (zorunlu, en fazla 100 karakter)"></div>
       <div id="sebepAlan" class="d-none"><select name="sebep" class="form-select form-select-sm"><option value="">Sebep seçin</option>@foreach($sebepler as $k => $ad)<option value="{{ $k }}">{{ $k }} - {{ $ad }}</option>@endforeach</select></div>
     </div>
     <div class="col-lg-4">
@@ -232,6 +236,7 @@ document.getElementById('otoSec').addEventListener('click',function(){
 });
 function alanlar(){const t=document.getElementById('tur').value;
  document.getElementById('glnAlan').classList.toggle('d-none',!['satis','iade','devir'].includes(t));
+ document.getElementById('aliciAlan').classList.toggle('d-none',t!=='ihracat');
  document.getElementById('sebepAlan').classList.toggle('d-none',!['deaktive','deaktive_iptal'].includes(t))}
 function topluOnay(e){const n=document.querySelectorAll('.sec:checked').length;
  if(!n){alert('Önce ürün seçin.');return false}

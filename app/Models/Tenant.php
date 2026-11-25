@@ -10,6 +10,22 @@ class Tenant extends Model
 {
     protected $guarded = [];
 
+    /** Müşteri (paydaş) türleri: kod => ekran adı. Yeni müşteri kaydı, düzenleme ve doğrulamalar buradan beslenir. */
+    public const TURLER = [
+        'eczane' => 'Eczane',
+        'hastane' => 'Hastane',
+        'depo' => 'Depo',
+        'uretici' => 'Üretici',
+        'ihracatci' => 'İhracatçı',
+        'geri_odeme_kurumu' => 'Geri Ödeme Kurumu',
+        'ihracata_yetkili' => 'İhracata Yetkili Firma',
+        'ruhsat_sahibi' => 'Ruhsat Sahibi Firma',
+        'yurtdisi_tedarikci' => 'Yurt Dışı İlaç Tedarikçisi',
+    ];
+
+    /** İhracat bildirimini yapabilen türler (kılavuz §4: üretici, ecza deposu, ihracatçı depo; ihracata yetkili firma da dahil). */
+    public const IHRACAT_TURLERI = ['depo', 'uretici', 'ihracatci', 'ihracata_yetkili'];
+
     protected function casts(): array
     {
         return [
@@ -53,6 +69,12 @@ class Tenant extends Model
     public function devirYapabilir(): bool
     {
         return ! in_array($this->tur, ['depo', 'hastane'], true);
+    }
+
+    /** İhracat / İhracat İptal yalnızca ecza depoları içindir (kılavuz §4-5: üretici, ecza deposu, ihracatçı depo). */
+    public function ihracatYapabilir(): bool
+    {
+        return in_array($this->tur, self::IHRACAT_TURLERI, true);
     }
 
     public function lisansAktifMi(): bool
