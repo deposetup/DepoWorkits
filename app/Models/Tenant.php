@@ -53,28 +53,37 @@ class Tenant extends Model
         return $this->hasOne(ItsCredential::class);
     }
 
+    /**
+     * Ürün hareketi (kabul, satış, iade, deaktive, PTS, stok içe aktarma vb.) bildirimi yapabilir mi?
+     * Geri Ödeme Kurumu ilaç tedarik zincirinde yer almaz; yalnızca sorgu ve raporları kullanır.
+     */
+    public function bildirimYapabilir(): bool
+    {
+        return $this->tur !== 'geri_odeme_kurumu';
+    }
+
     /** Ecza depoları sarf (hastane sarf) bildirimi yapamaz; yalnızca tüketim noktaları (hastane, eczane vb.) yapar. */
     public function sarfYapabilir(): bool
     {
-        return $this->tur !== 'depo';
+        return $this->bildirimYapabilir() && $this->tur !== 'depo';
     }
 
     /** Hastaneler (sarf merkezleri) satış yapmaz; yalnızca sarf ve iade bildirir. */
     public function satisYapabilir(): bool
     {
-        return $this->tur !== 'hastane';
+        return $this->bildirimYapabilir() && $this->tur !== 'hastane';
     }
 
     /** Mal Devir / Mal Devir İptal şubeli müşteriler içindir; ecza depoları ve hastaneler kullanmaz. */
     public function devirYapabilir(): bool
     {
-        return ! in_array($this->tur, ['depo', 'hastane'], true);
+        return $this->bildirimYapabilir() && ! in_array($this->tur, ['depo', 'hastane'], true);
     }
 
     /** İhracat / İhracat İptal yalnızca ecza depoları içindir (kılavuz §4-5: üretici, ecza deposu, ihracatçı depo). */
     public function ihracatYapabilir(): bool
     {
-        return in_array($this->tur, self::IHRACAT_TURLERI, true);
+        return $this->bildirimYapabilir() && in_array($this->tur, self::IHRACAT_TURLERI, true);
     }
 
     public function lisansAktifMi(): bool

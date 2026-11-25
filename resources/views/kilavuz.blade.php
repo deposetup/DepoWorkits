@@ -83,7 +83,7 @@
     <p>Menüde yalnızca kurum türünüzün yapabildiği işlemler görünür. Tür, müşteri kaydınızda tanımlıdır; yanlışsa yönetici ile iletişime geçin.</p>
     @php
       $yetkiSatirlari = [
-        ['Mal Kabul, Ürün İade, Deaktive / Deaktivasyon İptal', fn ($t) => true],
+        ['Mal Kabul, PTS, Ürün İade, Deaktive / Deaktivasyon İptal', fn ($t) => $t->bildirimYapabilir()],
         ['Satış / Satış İptal', fn ($t) => $t->satisYapabilir()],
         ['Mal Devir / Mal Devir İptal', fn ($t) => $t->devirYapabilir()],
         ['Hastane Sarf / Sarf İptal', fn ($t) => $t->sarfYapabilir()],
@@ -99,6 +99,7 @@
       </tbody>
     </table></div>
     <ul>
+      <li><b>Geri Ödeme Kurumu</b> ürün hareketi bildirimi yapmaz; yalnızca sorgu ekranlarını (Durum Sorgu, Paydaşlar, İlaç Fiyat Listesi), Analiz ve Cari Kartları kullanır.</li>
       <li>Kurumunuzun türüne göre bazı işlemler menüde görünmez; bu normaldir (yukarıdaki tabloya bakın).</li>
       <li>GLN'i elle yazmak yerine <b>Cari Kartlar</b>'a kayıtlı paydaşlarınızı listeden seçebilirsiniz.</li>
       <li><b>PTS Gönderimleri:</b> Satış başarıyla bildirildikten sonra alıcıya PTS paketi göndermek için kullanılır. PTS göndermek Satış bildiriminin yerine geçmez; Satış ayrıca yapılmalıdır.</li>

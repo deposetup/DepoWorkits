@@ -57,12 +57,12 @@
   if ($u && ! $u->superAdminMi()) {
     $menu = [
       ['Ana Sayfa', 'bi-house-door', 'home', []],
-      ['Alım', 'bi-box-arrow-in-down', null, [
+      ...(($u->tenant?->bildirimYapabilir() ?? true) ? [['Alım', 'bi-box-arrow-in-down', null, [
         ['PTS Sorgu', 'bi-search', route('pts'), ['pts', 'pts.paket', 'pts.excel', 'pts.yukle', 'pts.al', 'pts.mal-alim', 'pts.dogrula']],
         ['Mal Kabul', 'bi-check2-square', route('islem', 'kabul'), ['islem:kabul']],
         ['Manuel Ekle', 'bi-plus-square', route('manuel.ekle'), ['manuel.*']],
-      ]],
-      ['Satış & Çıkış', 'bi-box-arrow-up', null, [
+      ]]] : []),
+      ...(($u->tenant?->bildirimYapabilir() ?? true) ? [['Satış & Çıkış', 'bi-box-arrow-up', null, [
         ...(($u->tenant?->satisYapabilir() ?? true) ? [
           ['Satış', 'bi-cart-check', route('islem', 'satis'), ['islem:satis']],
           ['Satış İptal', 'bi-cart-x', route('islem', 'satis_iptal'), ['islem:satis_iptal']],
@@ -83,12 +83,12 @@
         ['Ürün İade', 'bi-arrow-return-left', route('islem', 'iade'), ['islem:iade']],
         ['Deaktive', 'bi-slash-circle', route('islem', 'deaktive'), ['islem:deaktive']],
         ['Deaktivasyon İptal', 'bi-check-circle', route('islem', 'deaktive_iptal'), ['islem:deaktive_iptal']],
-      ]],
+      ]]] : []),
       ['Stok', 'bi-boxes', null, [
         ['Stok Özeti', 'bi-bar-chart-line', route('stok'), ['stok']],
         ['Barkod Bazlı Stok', 'bi-upc', route('stok.barkod'), ['stok.barkod']],
         ['Stok Listesi (Karekod)', 'bi-upc-scan', route('stok.liste'), ['stok.liste']],
-        ['Stok İçe Aktar (İTS Doğrulamalı)', 'bi-cloud-download', route('stok.ice-aktar'), ['stok.ice-aktar*']],
+        ...(($u->tenant?->bildirimYapabilir() ?? true) ? [['Stok İçe Aktar (İTS Doğrulamalı)', 'bi-cloud-download', route('stok.ice-aktar'), ['stok.ice-aktar*']]] : []),
         ['Kritik / Miad', 'bi-exclamation-triangle', route('kritik-miad'), ['kritik-miad']],
         ['Karekod Oluşturucu', 'bi-qr-code', route('karekod.olustur'), ['karekod.olustur']],
       ]],

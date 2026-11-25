@@ -57,4 +57,19 @@ class IhracatTest extends TestCase
     {
         $this->actingAs($this->user('depo'))->get('/kilavuz')->assertOk()->assertSee('Kurum türüne göre işlem yetkileri')->assertSee('Yurt Dışı İlaç Tedarikçisi');
     }
+
+    public function test_geri_odeme_kurumu_bildirim_yapamaz_ama_sorgu_ekranlari_acik(): void
+    {
+        $u = $this->user('geri_odeme_kurumu');
+        foreach (['kabul', 'satis', 'sarf', 'iade', 'deaktive', 'ihracat', 'devir'] as $tur) {
+            $this->actingAs($u)->get('/islem/'.$tur)->assertForbidden();
+        }
+        $this->actingAs($u)->get('/pts')->assertForbidden();
+        $this->actingAs($u)->get('/manuel-ekle')->assertForbidden();
+        $this->actingAs($u)->post('/stok/toplu', ['tur' => 'satis', 'secili' => [1]])->assertForbidden();
+        $this->actingAs($u)->get('/')->assertOk()->assertDontSee('Mal Kabul');
+        $this->actingAs($u)->get('/durum')->assertOk();
+        $this->actingAs($u)->get('/paydaslar')->assertOk();
+        $this->actingAs($u)->get('/analiz')->assertOk();
+    }
 }

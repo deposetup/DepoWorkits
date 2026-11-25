@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'lisans' => \App\Http\Middleware\EnsureLicenseActive::class,
+            'bildirim' => \App\Http\Middleware\EnsureBildirimYetkisi::class,
             'kvkk' => \App\Http\Middleware\EnsureKvkk::class,
             'superadmin' => \App\Http\Middleware\EnsureSuperAdmin::class,
             'musteri-gozu' => \App\Http\Middleware\MusteriGozuKoruma::class,
