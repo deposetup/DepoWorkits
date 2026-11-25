@@ -52,4 +52,9 @@ class IhracatTest extends TestCase
             $this->actingAs($u)->get('/stok/liste?durum=ihracat')->assertNotFound();
         }
     }
+
+    public function test_kilavuz_tur_yetki_tablosunu_gosterir(): void
+    {
+        $this->actingAs($this->user('depo'))->get('/kilavuz')->assertOk()->assertSee('Kurum türüne göre işlem yetkileri')->assertSee('Yurt Dışı İlaç Tedarikçisi');
+    }
 }

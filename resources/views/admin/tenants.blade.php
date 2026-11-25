@@ -2,27 +2,41 @@
 @section('baslik', 'Müşteriler')
 @section('icerik')
 <h4>Müşteriler</h4>
-<table class="table table-sm bg-white">
-  <thead><tr><th>Ünvan</th><th>GLN</th><th>Tür</th><th>Bitiş</th><th>Kalan</th><th>Durum</th><th></th></tr></thead>
+<table class="table table-sm bg-white align-middle">
+  <thead><tr><th>Ünvan</th><th>GLN</th><th>Tür</th><th>Lisans</th><th>Durum</th><th></th></tr></thead>
   <tbody>
   @foreach($tenants as $t)
+    @php $kalan = $t->kalanGun(); @endphp
     <tr>
-      <td>{{ $t->unvan }}</td><td>{{ $t->gln }}</td><td><form method="post" action="{{ route('admin.tenants.tur', $t) }}" class="d-flex gap-1">@csrf
+      <td>{{ $t->unvan }}</td><td>{{ $t->gln }}</td><td><form method="post" action="{{ route('admin.tenants.tur', $t) }}">@csrf
         <select name="tur" class="form-select form-select-sm" style="width:200px" onchange="this.form.submit()">
           @foreach(\App\Models\Tenant::TURLER as $k => $ad)<option value="{{ $k }}" @selected($t->tur === $k)>{{ $ad }}</option>@endforeach
         </select></form></td>
-      <td>{{ $t->lisans_bitis->format('d.m.Y') }}</td><td><form method="post" action="{{ route('admin.tenants.kalan', $t) }}" class="d-flex gap-1 align-items-center" onsubmit="return confirm('{{ addslashes($t->unvan) }} için kalan gün sayısı değiştirilecek. Emin misiniz?')">@csrf
-        <input type="number" name="kalan" value="{{ $t->kalanGun() }}" min="0" max="3650" class="form-control form-control-sm" style="width:80px" title="Kalan gün sayısı"><button class="btn btn-sm btn-outline-success" title="Kalan günü bu sayıya ayarla">Ayarla</button></form></td>
+      <td class="text-nowrap">{{ $t->lisans_bitis->format('d.m.Y') }} <span class="badge {{ $kalan > 30 ? 'text-bg-light border' : ($kalan > 0 ? 'text-bg-warning' : 'text-bg-danger') }}">{{ $kalan }} gün</span></td>
       <td>{!! $t->lisansAktifMi() ? '<span class="badge text-bg-success">Aktif</span>' : '<span class="badge text-bg-danger">Pasif/Süresi doldu</span>' !!}</td>
-      <td class="d-flex gap-1">
-        <form method="post" action="{{ route('admin.tenants.musteri-gozu', $t) }}">@csrf<button class="btn btn-sm btn-success" title="Bu müşteriyi, kendi ekranı gibi salt okunur görüntüle"><i class="bi bi-eye me-1"></i>Müşteri Gözü</button></form>
+      <td class="text-nowrap">
+        <form method="post" action="{{ route('admin.tenants.musteri-gozu', $t) }}" class="d-inline">@csrf<button class="btn btn-sm btn-success" title="Bu müşteriyi, kendi ekranı gibi salt okunur görüntüle"><i class="bi bi-eye me-1"></i>Müşteri Gözü</button></form>
         <a href="{{ route('admin.tenants.duzelt', $t) }}" class="btn btn-sm btn-primary"><i class="bi bi-pencil-square me-1"></i>Düzelt</a>
-        <a href="{{ route('admin.kullanici.index', $t) }}" class="btn btn-sm btn-outline-dark">Kullanıcılar</a>
-        <form method="post" action="{{ route('admin.tenants.pts-sifirla', $t) }}" onsubmit="return confirm('{{ addslashes($t->unvan) }} müşterisinin PTS Havuzu (Arada Kalanlar) sıfırlanacak. Bekleyen paketler havuzdan çıkarılır, ürünler stoğa alınmaz. Emin misiniz?')">@csrf<button class="btn btn-sm btn-outline-warning" title="Deneme PTS paketlerini ana sayfadaki PTS Havuzu özetinden çıkarır"><i class="bi bi-eraser me-1"></i>PTS Havuzunu Sıfırla</button></form>
-        <a href="{{ route('admin.tenants.its', $t) }}" class="btn btn-sm btn-outline-dark"><i class="bi bi-key me-1"></i>İTS Bilgileri</a>
-        <form method="post" action="{{ route('admin.tenants.uzat', $t) }}" class="d-flex gap-1">@csrf
-          <input type="number" name="gun" value="365" min="-3650" max="3650" class="form-control form-control-sm" style="width:80px" title="Eksi değer gün düşer"><button class="btn btn-sm btn-outline-primary" title="Girilen gün kadar ekler; eksi girerseniz düşer">Ekle / Çıkar</button></form>
-        <form method="post" action="{{ route('admin.tenants.aktif', $t) }}">@csrf<button class="btn btn-sm btn-outline-secondary">{{ $t->aktif ? 'Pasifleştir' : 'Aktifleştir' }}</button></form>
+        <div class="dropdown d-inline">
+          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Diğer</button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width:260px">
+            <li class="px-3 py-2">
+              <div class="small text-muted mb-1">Lisans: kalan gün sayısını belirle</div>
+              <form method="post" action="{{ route('admin.tenants.kalan', $t) }}" class="d-flex gap-1" onsubmit="return confirm('{{ addslashes($t->unvan) }} için kalan gün sayısı değiştirilecek. Emin misiniz?')">@csrf
+                <input type="number" name="kalan" value="{{ $kalan }}" min="0" max="3650" class="form-control form-control-sm" style="width:90px" title="Kalan gün sayısı"><button class="btn btn-sm btn-outline-success">Ayarla</button></form>
+              <div class="d-flex gap-1 mt-2">
+                @foreach([30 => '+30 gün', 365 => '+1 yıl'] as $g => $ad)
+                <form method="post" action="{{ route('admin.tenants.uzat', $t) }}">@csrf<input type="hidden" name="gun" value="{{ $g }}"><button class="btn btn-sm btn-outline-primary" title="Mevcut bitişe {{ $g }} gün ekler">{{ $ad }}</button></form>
+                @endforeach
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ route('admin.kullanici.index', $t) }}"><i class="bi bi-people me-2"></i>Kullanıcılar</a></li>
+            <li><a class="dropdown-item" href="{{ route('admin.tenants.its', $t) }}"><i class="bi bi-key me-2"></i>İTS Bilgileri</a></li>
+            <li><form method="post" action="{{ route('admin.tenants.pts-sifirla', $t) }}" onsubmit="return confirm('{{ addslashes($t->unvan) }} müşterisinin PTS Havuzu (Arada Kalanlar) sıfırlanacak. Bekleyen paketler havuzdan çıkarılır, ürünler stoğa alınmaz. Emin misiniz?')">@csrf<button class="dropdown-item" title="Deneme PTS paketlerini ana sayfadaki PTS Havuzu özetinden çıkarır"><i class="bi bi-eraser me-2"></i>PTS Havuzunu Sıfırla</button></form></li>
+            <li><form method="post" action="{{ route('admin.tenants.aktif', $t) }}">@csrf<button class="dropdown-item"><i class="bi bi-power me-2"></i>{{ $t->aktif ? 'Pasifleştir' : 'Aktifleştir' }}</button></form></li>
+          </ul>
+        </div>
       </td>
     </tr>
   @endforeach

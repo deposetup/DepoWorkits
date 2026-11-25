@@ -79,8 +79,27 @@
         <tr><td>Deaktive / Deaktivasyon İptal</td><td>Ürünü sistemden çıkarma (fire, geri çekme vb.) veya bu işlemi geri alma.</td><td>Sebep (zorunlu), açıklama</td></tr>
       </tbody>
     </table></div>
+    <h6>Kurum türüne göre işlem yetkileri</h6>
+    <p>Menüde yalnızca kurum türünüzün yapabildiği işlemler görünür. Tür, müşteri kaydınızda tanımlıdır; yanlışsa yönetici ile iletişime geçin.</p>
+    @php
+      $yetkiSatirlari = [
+        ['Mal Kabul, Ürün İade, Deaktive / Deaktivasyon İptal', fn ($t) => true],
+        ['Satış / Satış İptal', fn ($t) => $t->satisYapabilir()],
+        ['Mal Devir / Mal Devir İptal', fn ($t) => $t->devirYapabilir()],
+        ['Hastane Sarf / Sarf İptal', fn ($t) => $t->sarfYapabilir()],
+        ['İhracat / İhracat İptal', fn ($t) => $t->ihracatYapabilir()],
+      ];
+    @endphp
+    <div class="table-responsive"><table class="table table-sm table-bordered text-center align-middle small">
+      <thead><tr><th class="text-start">İşlem</th>@foreach(\App\Models\Tenant::TURLER as $ad)<th>{{ $ad }}</th>@endforeach</tr></thead>
+      <tbody>
+      @foreach($yetkiSatirlari as [$islemAd, $kural])
+        <tr><td class="text-start">{{ $islemAd }}</td>@foreach(\App\Models\Tenant::TURLER as $kod => $ad)<td>{!! $kural(new \App\Models\Tenant(['tur' => $kod])) ? '<i class="bi bi-check-lg text-success"></i>' : '<span class="text-muted">—</span>' !!}</td>@endforeach</tr>
+      @endforeach
+      </tbody>
+    </table></div>
     <ul>
-      <li>Kurumunuzun türüne göre (eczane, depo, hastane) bazı işlemler menüde görünmez; bu normaldir.</li>
+      <li>Kurumunuzun türüne göre bazı işlemler menüde görünmez; bu normaldir (yukarıdaki tabloya bakın).</li>
       <li>GLN'i elle yazmak yerine <b>Cari Kartlar</b>'a kayıtlı paydaşlarınızı listeden seçebilirsiniz.</li>
       <li><b>PTS Gönderimleri:</b> Satış başarıyla bildirildikten sonra alıcıya PTS paketi göndermek için kullanılır. PTS göndermek Satış bildiriminin yerine geçmez; Satış ayrıca yapılmalıdır.</li>
       <li>Satış, devir veya ihracat sonrası sonuç ekranındaki geri alma düğmesiyle hatalı bildirimi hemen geri alabilirsiniz. Daha eski ihracatlar için <b>İhracat İptal</b> ekranını ya da <b>Stok Listesi → İhraç Edildi</b> sekmesini kullanın.</li>
@@ -125,7 +144,7 @@
       <dt>İşlemde bazı ürünler başarısız göründü.</dt>
       <dd>Sonuç ekranında her satırın yanında İTS'in verdiği hata mesajı yazar (örn. ürün sizde değil, durumu uygun değil). Hatalı satırları düzeltip yalnızca onları tekrar gönderin.</dd>
       <dt>Menüde bir işlem göremiyorum.</dt>
-      <dd>Kurum türünüze göre (eczane, depo, hastane) yetkisiz işlemler gizlenir.</dd>
+      <dd>Kurum türünüze göre yetkisiz işlemler gizlenir. Hangi türün hangi işlemi yapabildiği <b>Satış &amp; Çıkış İşlemleri</b> bölümündeki tabloda yer alır.</dd>
       <dt>"İTS bağlantısı kurulamadı" hatası alıyorum.</dt>
       <dd>İTS Bağlantısı ekranında <i>Bağlantıyı Sına</i>'yı deneyin. Sürerse <i>Bize Yazın</i> ile talep açın; İTS şifrenizi yazmayın.</dd>
       <dt>Lisans süresi bitti.</dt>
