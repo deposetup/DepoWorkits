@@ -35,7 +35,8 @@
   <button class="btn btn-outline-secondary">Ara</button>
   @if($ara !== '')<a class="btn btn-link" href="{{ route('stok.barkod') }}">Temizle</a>@endif
 </form>
-<div class="d-flex gap-3 mb-2 small text-muted"><span>Ürün çeşidi: <strong>{{ $urunler->count() }}</strong></span><span>Toplam adet: <strong>{{ $toplam }}</strong></span></div>
+<div class="d-flex gap-3 mb-2 small text-muted"><span>Ürün çeşidi: <strong>{{ $urunler->count() }}</strong></span><span>Toplam adet: <strong>{{ $toplam }}</strong></span>@if($miadGecenToplam > 0)<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>SKT'si geçen (Red Odası): <strong>{{ $miadGecenToplam }}</strong></span>@endif</div>
+@if($miadGecenToplam > 0)<div class="alert alert-warning small py-2"><i class="bi bi-exclamation-triangle me-1"></i>Adet sütunundaki sayıya <b>son kullanma tarihi geçmiş</b> ürünler de dahildir. Bunlar <a href="{{ route('stok.red-odasi') }}">Red Odası</a>'ndadır ve İTS canlı sistemde stok olarak görünmeyebilir. Satırlardaki <span class="badge text-bg-danger"><i class="bi bi-exclamation-triangle-fill"></i> Red Odası</span> işaretinin üzerine gelerek kaç adedin etkilendiğini görebilirsiniz.</div>@endif
 <div class="table-responsive"><table class="table table-sm bg-white align-middle">
 @php
   $baslik = function (string $alan, string $ad, string $sinif = '') use ($sirala, $yon) {
@@ -54,7 +55,7 @@
 <tr>
   <td class="font-monospace">{{ $u->gtin }}</td>
   <td>{{ $u->ad ?? '—' }}</td>
-  <td class="text-end fw-semibold">{{ $u->adet }}</td>
+  <td class="text-end fw-semibold text-nowrap">@if($u->miad_gecen > 0)<span class="badge text-bg-danger me-1 miad-ipucu" role="img" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="top" title="Bu ürünün {{ $u->miad_gecen }} adedinin son kullanma tarihi geçmiş ve Red Odası'nda.{{ $u->miad_gecen < $u->adet ? ' Geçerli stok: '.($u->adet - $u->miad_gecen).' adet.' : ' Tamamı SKT\'si geçmiş.' }} İTS canlı sistemde bu adetler görünmeyebilir."><i class="bi bi-exclamation-triangle-fill"></i> {{ $u->miad_gecen }}</span>@endif{{ $u->adet }}</td>
   <td>{{ $u->partiler->count() }}</td>
   <td>{{ $u->en_yakin_skt?->format('d.m.Y') ?? '—' }} @if($rozet)<span class="badge text-bg-{{ $rozet }}">{{ $gun < 0 ? 'SKT geçti' : $gun.' gün' }}</span>@endif</td>
   <td class="text-end text-nowrap">
@@ -65,7 +66,8 @@
 <tr class="collapse" id="p{{ $i }}"><td colspan="6" class="bg-light p-0">
   <table class="table table-sm mb-0 w-auto ms-4 my-2"><thead><tr><th>Parti</th><th>SKT</th><th class="text-end">Adet</th></tr></thead><tbody>
   @foreach($u->partiler as $p)
-    <tr><td class="font-monospace">{{ $p->bn ?: '—' }}</td><td>{{ $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '—' }}</td><td class="text-end">{{ $p->adet }}</td></tr>
+    @php $pGecti = $p->skt && substr((string) $p->skt, 0, 10) < now()->toDateString(); @endphp
+    <tr class="{{ $pGecti ? 'table-danger' : '' }}"><td class="font-monospace">{{ $p->bn ?: '—' }}</td><td>{{ $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '—' }}@if($pGecti) <span class="badge text-bg-danger">Red Odası</span>@endif</td><td class="text-end">{{ $p->adet }}</td></tr>
   @endforeach
   </tbody></table>
 </td></tr>
@@ -91,4 +93,5 @@
 </tbody></table>
 <div class="yazdir-alt">Bu çıktı its.depowork.com.tr aracılığı ile hazırlanmıştır.</div>
 </div>
+<script>document.querySelectorAll('.miad-ipucu').forEach(function (e) { new bootstrap.Tooltip(e); });</script>
 @endsection

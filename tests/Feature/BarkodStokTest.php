@@ -45,4 +45,13 @@ class BarkodStokTest extends TestCase
         $r->assertOk();
         $this->assertStringContainsString('spreadsheetml', $r->headers->get('content-type'));
     }
+
+    public function test_miadi_gecen_adet_red_odasi_isaretiyle_gosterilir(): void
+    {
+        $u = $this->veri();
+        $r = $this->actingAs($u)->get('/stok/barkod')->assertOk();
+        $r->assertSee('SKT\'si geçen (Red Odası): <strong>1</strong>', false)->assertSee('1 adedinin son kullanma tarihi geçmiş', false)->assertSee('Red Odası');
+        $r->assertSee('Tamamı SKT&#039;si geçmiş', false);
+        $this->actingAs($u)->get('/stok/barkod?ara=650153')->assertDontSee('son kullanma tarihi geçmiş ve Red', false);
+    }
 }

@@ -82,22 +82,25 @@ class StokController extends Controller
         $partiler = (clone $temel)->selectRaw('gtin, bn, skt, count(*) as adet')
             ->groupBy('gtin', 'bn', 'skt')->orderBy('gtin')->orderBy('skt')->get()->groupBy('gtin');
 
+        $bugun = now()->toDateString();
         if ($request->boolean('excel')) {
             // Barkod başına tek satır: toplam adet + partiler tek hücrede
             $satirlar = [];
             foreach ($partiler as $gtin => $liste) {
                 $partiMetni = $liste->map(fn ($p) => ($p->bn ?: '—').' / '.($p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '—').' ('.(int) $p->adet.')')->implode('; ');
-                $satirlar[] = [$adlar[$gtin] ?? '', $gtin, (int) $liste->sum('adet'), $partiMetni];
+                $satirlar[] = [$adlar[$gtin] ?? '', $gtin, (int) $liste->sum('adet'), $partiMetni, (int) $liste->filter(fn ($p) => $p->skt && substr((string) $p->skt, 0, 10) < $bugun)->sum('adet')];
             }
 
             return \App\Support\XlsxYazici::indir('barkod-bazli-stok-'.now()->format('Ymd-His').'.xlsx',
-                ['İlaç', 'GTIN', 'Adet', 'Parti / SKT (adet)'], $satirlar, 'Barkod Bazlı Stok');
+                ['İlaç', 'GTIN', 'Adet', 'Parti / SKT (adet)', 'SKT Geçen (Red Odası)'], $satirlar, 'Barkod Bazlı Stok');
         }
 
         $urunler = $partiler->map(fn ($liste, $gtin) => (object) [
             'gtin' => $gtin,
             'ad' => $adlar[$gtin] ?? null,
             'adet' => $liste->sum('adet'),
+            // SKT'si geçenler Red Odası'ndadır; İTS canlı sistemde bunlar stok sayılmayabilir.
+            'miad_gecen' => (int) $liste->filter(fn ($p) => $p->skt && substr((string) $p->skt, 0, 10) < $bugun)->sum('adet'),
             'en_yakin_skt' => $liste->pluck('skt')->filter()->map(fn ($d) => \Illuminate\Support\Carbon::parse($d))->min(),
             'partiler' => $liste,
         ])->values();
@@ -115,7 +118,7 @@ class StokController extends Controller
 
         $receteler = \App\Models\IlacRecete::tipler($urunler->pluck('gtin'));
 
-        return view('stok.barkod', ['receteler' => $receteler, 'urunler' => $urunler, 'ara' => $ara, 'toplam' => $urunler->sum('adet'), 'sirala' => $sirala, 'yon' => $yon]);
+        return view('stok.barkod', ['receteler' => $receteler, 'urunler' => $urunler, 'ara' => $ara, 'toplam' => $urunler->sum('adet'), 'miadGecenToplam' => $urunler->sum('miad_gecen'), 'sirala' => $sirala, 'yon' => $yon]);
     }
 
     /** Karekod metni (okunabilir GS1 biçimi). */
