@@ -45,7 +45,7 @@ class StokSiralamaTest extends TestCase
     {
         $u = $this->hazirla();
         $r = $this->actingAs($u)->get('/stok');
-        $r->assertSee('Kalem: 3')->assertSee('Toplam kutu:')->assertSee("Excel'e Aktar", false);
+        $r->assertSee('Kalem: 3')->assertSee('Güncel stok (kutu):')->assertSee("Excel'e Aktar", false);
         $x = $this->actingAs($u)->get('/stok?excel=1');
         $x->assertOk();
         $this->assertStringContainsString('spreadsheetml', (string) $x->headers->get('content-type'));

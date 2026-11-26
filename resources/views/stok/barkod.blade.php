@@ -24,7 +24,7 @@
     #yazdirAlan th, #yazdirAlan td { border: 1px solid #999 !important; padding: 4px 6px !important; vertical-align: top; word-wrap: break-word; }
     #yazdirAlan thead { display: table-header-group; }
     #yazdirAlan tr { break-inside: avoid; }
-    #yazdirAlan .col-gtin { width: 16%; } #yazdirAlan .col-ilac { width: 32%; } #yazdirAlan .col-recete { width: 12%; } #yazdirAlan .col-adet { width: 8%; } #yazdirAlan .col-parti { width: 32%; }
+    #yazdirAlan .col-gtin { width: 16%; } #yazdirAlan .col-ilac { width: 32%; } #yazdirAlan .col-recete { width: 12%; } #yazdirAlan .col-adet { width: 8%; } #yazdirAlan .col-parti { width: 24%; }
     #yazdirAlan .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
@@ -35,8 +35,8 @@
   <button class="btn btn-outline-secondary">Ara</button>
   @if($ara !== '')<a class="btn btn-link" href="{{ route('stok.barkod') }}">Temizle</a>@endif
 </form>
-<div class="d-flex gap-3 mb-2 small text-muted"><span>Ürün çeşidi: <strong>{{ $urunler->count() }}</strong></span><span>Toplam adet: <strong>{{ $toplam }}</strong></span>@if($miadGecenToplam > 0)<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>SKT'si geçen (Red Odası): <strong>{{ $miadGecenToplam }}</strong></span>@endif</div>
-@if($miadGecenToplam > 0)<div class="alert alert-warning small py-2"><i class="bi bi-exclamation-triangle me-1"></i>Adet sütunundaki sayıya <b>son kullanma tarihi geçmiş</b> ürünler de dahildir. Bunlar <a href="{{ route('stok.red-odasi') }}">Red Odası</a>'ndadır ve İTS canlı sistemde stok olarak görünmeyebilir. Satırlardaki <span class="badge text-bg-danger"><i class="bi bi-exclamation-triangle-fill"></i> Red Odası</span> işaretinin üzerine gelerek kaç adedin etkilendiğini görebilirsiniz.</div>@endif
+<div class="d-flex gap-3 mb-2 small text-muted"><span>Ürün çeşidi: <strong>{{ $urunler->count() }}</strong></span><span>Güncel stok (adet): <strong>{{ $toplam }}</strong></span>@if($miadGecenToplam > 0)<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Red Odası: <strong>{{ $miadGecenToplam }}</strong></span>@endif</div>
+@if($miadGecenToplam > 0)<div class="alert alert-warning small py-2"><i class="bi bi-exclamation-triangle me-1"></i><b>Adet</b> sütunu güncel stoğunuzu gösterir; son kullanma tarihi geçmiş ürünler <b>düşülmüştür</b>. Düşülen adetler <b>Red Odası</b> sütununda ayrı görünür (<a href="{{ route('stok.red-odasi') }}">Red Odası</a> ekranından ayrıntıya bakabilirsiniz).</div>@endif
 <div class="table-responsive"><table class="table table-sm bg-white align-middle">
 @php
   $baslik = function (string $alan, string $ad, string $sinif = '') use ($sirala, $yon) {
@@ -46,7 +46,7 @@
       return '<th class="'.$sinif.'"><a href="'.e($url).'" class="text-decoration-none text-dark text-nowrap">'.e($ad).' <i class="bi '.$ok.'"></i></a></th>';
   };
 @endphp
-<thead><tr>{!! $baslik('gtin', 'GTIN') !!}{!! $baslik('ad', 'İlaç') !!}{!! $baslik('adet', 'Adet', 'text-end') !!}<th>Parti</th>{!! $baslik('skt', 'En Yakın SKT') !!}<th></th></tr></thead><tbody>
+<thead><tr>{!! $baslik('gtin', 'GTIN') !!}{!! $baslik('ad', 'İlaç') !!}{!! $baslik('adet', 'Adet (Güncel)', 'text-end') !!}<th class="text-center">Red Odası</th><th>Parti</th>{!! $baslik('skt', 'En Yakın SKT') !!}<th></th></tr></thead><tbody>
 @forelse($urunler as $i => $u)
 @php
   $gun = $u->en_yakin_skt ? (int) now()->startOfDay()->diffInDays($u->en_yakin_skt->startOfDay(), false) : null;
@@ -55,7 +55,7 @@
 <tr>
   <td class="font-monospace">{{ $u->gtin }}</td>
   <td>{{ $u->ad ?? '—' }}</td>
-  <td class="text-end fw-semibold text-nowrap">@if($u->miad_gecen > 0)<span class="badge text-bg-danger me-1 miad-ipucu" role="img" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="top" title="Bu ürünün {{ $u->miad_gecen }} adedinin son kullanma tarihi geçmiş ve Red Odası'nda.{{ $u->miad_gecen < $u->adet ? ' Geçerli stok: '.($u->adet - $u->miad_gecen).' adet.' : ' Tamamı SKT\'si geçmiş.' }} İTS canlı sistemde bu adetler görünmeyebilir."><i class="bi bi-exclamation-triangle-fill"></i> {{ $u->miad_gecen }}</span>@endif{{ $u->adet }}</td>
+  <td class="text-end fw-semibold">{{ $u->adet }}</td><td class="text-center">@if($u->miad_gecen > 0)<span class="badge text-bg-danger miad-ipucu" role="img" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="top" title="Bu ürünün {{ $u->miad_gecen }} adedinin son kullanma tarihi geçmiş; Red Odası'nda bekliyor ve güncel stoka dahil değil. İTS canlı sistemde de bu adetler görünmeyebilir."><i class="bi bi-exclamation-triangle-fill"></i> {{ $u->miad_gecen }}</span>@else<span class="text-muted">—</span>@endif</td>
   <td>{{ $u->partiler->count() }}</td>
   <td>{{ $u->en_yakin_skt?->format('d.m.Y') ?? '—' }} @if($rozet)<span class="badge text-bg-{{ $rozet }}">{{ $gun < 0 ? 'SKT geçti' : $gun.' gün' }}</span>@endif</td>
   <td class="text-end text-nowrap">
@@ -63,7 +63,7 @@
     <a class="btn btn-sm btn-outline-primary" href="{{ route('stok.liste', ['ara' => $u->gtin]) }}"><i class="bi bi-upc-scan me-1"></i>Karekodlar</a>
   </td>
 </tr>
-<tr class="collapse" id="p{{ $i }}"><td colspan="6" class="bg-light p-0">
+<tr class="collapse" id="p{{ $i }}"><td colspan="7" class="bg-light p-0">
   <table class="table table-sm mb-0 w-auto ms-4 my-2"><thead><tr><th>Parti</th><th>SKT</th><th class="text-end">Adet</th></tr></thead><tbody>
   @foreach($u->partiler as $p)
     @php $pGecti = $p->skt && substr((string) $p->skt, 0, 10) < now()->toDateString(); @endphp
@@ -72,7 +72,7 @@
   </tbody></table>
 </td></tr>
 @empty
-<tr><td colspan="6" class="text-muted">Stokta ürün yok. Mal Kabul veya Stok İçe Aktar ekranından ürün alın.</td></tr>
+<tr><td colspan="7" class="text-muted">Stokta ürün yok. Mal Kabul veya Stok İçe Aktar ekranından ürün alın.</td></tr>
 @endforelse
 </tbody></table></div>
 
@@ -83,13 +83,13 @@
   <div class="detay">@if($t?->gln)GLN: {{ $t->gln }}@endif @if($t?->il || $t?->ilce) · {{ collect([$t->ilce, $t->il])->filter()->implode(' / ') }}@endif @if($t?->telefon) · Tel: {{ $t->telefon }}@endif</div>
   <div class="oda">Barkod Bazlı Stok{{ '' }}@if($ara !== '') · Arama: {{ $ara }}@endif · {{ now()->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</div>
 </div>
-<div class="mb-2 small">Ürün çeşidi: <strong>{{ $urunler->count() }}</strong> · Toplam adet: <strong>{{ $toplam }}</strong></div>
+<div class="mb-2 small">Ürün çeşidi: <strong>{{ $urunler->count() }}</strong> · Güncel stok (adet): <strong>{{ $toplam }}</strong>@if($miadGecenToplam > 0) · Red Odası: <strong>{{ $miadGecenToplam }}</strong>@endif</div>
 <table>
-<thead><tr><th class="col-gtin">GTIN</th><th class="col-ilac">İlaç</th><th class="col-recete">Reçete</th><th class="col-adet text-end">Adet</th><th class="col-parti">Parti / SKT</th></tr></thead><tbody>
+<thead><tr><th class="col-gtin">GTIN</th><th class="col-ilac">İlaç</th><th class="col-recete">Reçete</th><th class="col-adet text-end">Adet (Güncel)</th><th class="col-adet text-end">Red Odası</th><th class="col-parti">Parti / SKT</th></tr></thead><tbody>
 @forelse($urunler as $u)
-<tr><td class="font-monospace">{{ $u->gtin }}</td><td>{{ $u->ad ?? '—' }}</td><td>{!! \App\Models\IlacRecete::rozet($receteler[$u->gtin] ?? null, true) ?: '—' !!}</td><td class="text-end fw-semibold">{{ $u->adet }}</td>
+<tr><td class="font-monospace">{{ $u->gtin }}</td><td>{{ $u->ad ?? '—' }}</td><td>{!! \App\Models\IlacRecete::rozet($receteler[$u->gtin] ?? null, true) ?: '—' !!}</td><td class="text-end fw-semibold">{{ $u->adet }}</td><td class="text-end">{{ $u->miad_gecen ?: '—' }}</td>
 <td class="small">@foreach($u->partiler as $p)<div><span class="font-monospace">{{ $p->bn ?: '—' }}</span> · {{ $p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '—' }}</div>@endforeach</td></tr>
-@empty<tr><td colspan="5">Stokta ürün yok.</td></tr>@endforelse
+@empty<tr><td colspan="6">Stokta ürün yok.</td></tr>@endforelse
 </tbody></table>
 <div class="yazdir-alt">Bu çıktı its.depowork.com.tr aracılığı ile hazırlanmıştır.</div>
 </div>

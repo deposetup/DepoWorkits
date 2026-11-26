@@ -35,14 +35,14 @@ class StokController extends Controller
         }
 
         $adlar = $this->adlar($its);
-        $tum = $q->get();
+        $tum = $q->get()->each(fn ($r) => $r->guncel = (int) $r->adet - (int) $r->miad_gecen); // güncel stok = toplam - Red Odası (SKT geçen)
         $receteler = \App\Models\IlacRecete::tipler($tum->pluck('gtin'));
         $sirala = in_array($request->query('sirala'), ['ad', 'adet', 'gtin', 'skt', 'recete'], true) ? $request->query('sirala') : 'gtin';
         $yon = $request->query('yon') === 'desc' ? 'desc' : 'asc';
         $turkce = fn (string $a): string => mb_strtolower(strtr($a, ['I' => 'ı', 'İ' => 'i']), 'UTF-8');
         $anahtar = match ($sirala) {
             'ad' => fn ($r) => $turkce((string) ($adlar[$r->gtin] ?? '')),
-            'adet' => fn ($r) => (int) $r->adet,
+            'adet' => fn ($r) => (int) $r->guncel,
             'skt' => fn ($r) => (string) ($r->en_yakin_skt ?? '9999-12-31'),
             'recete' => fn ($r) => $turkce((string) ($receteler[$r->gtin] ?? '~')),
             default => fn ($r) => (string) $r->gtin,
@@ -51,17 +51,17 @@ class StokController extends Controller
 
         if ($request->boolean('excel')) {
             $veri = $satirlar->map(fn ($r) => [
-                $adlar[$r->gtin] ?? '', $r->gtin, $receteler[$r->gtin] ?? '', (int) $r->adet,
+                $adlar[$r->gtin] ?? '', $r->gtin, $receteler[$r->gtin] ?? '', (int) $r->guncel,
                 $r->en_yakin_skt ? \Illuminate\Support\Carbon::parse($r->en_yakin_skt)->format('d.m.Y') : '',
                 (int) $r->miad_gecen,
             ])->all();
-            $veri[] = ['TOPLAM ('.$satirlar->count().' kalem)', '', '', (int) $satirlar->sum('adet'), '', (int) $satirlar->sum('miad_gecen')];
+            $veri[] = ['TOPLAM ('.$satirlar->count().' kalem)', '', '', (int) $satirlar->sum('guncel'), '', (int) $satirlar->sum('miad_gecen')];
 
             return \App\Support\XlsxYazici::indir('stok-'.now()->format('Ymd-His').'.xlsx',
-                ['İlaç', 'GTIN', 'Reçete', 'Adet', 'En Yakın SKT', 'SKT Geçen (Red Odası)'], $veri, 'Stok');
+                ['İlaç', 'GTIN', 'Reçete', 'Adet (Güncel Stok)', 'En Yakın SKT', 'Red Odası (SKT Geçen)'], $veri, 'Stok');
         }
 
-        return view('stok.index', ['kalem' => $satirlar->count(), 'kutu' => (int) $satirlar->sum('adet'), 'miadGecen' => (int) $satirlar->sum('miad_gecen'), 'satirlar' => $satirlar, 'adlar' => $adlar, 'ara' => $ara, 'sirala' => $sirala, 'yon' => $yon, 'receteler' => $receteler]);
+        return view('stok.index', ['kalem' => $satirlar->count(), 'kutu' => (int) $satirlar->sum('guncel'), 'miadGecen' => (int) $satirlar->sum('miad_gecen'), 'satirlar' => $satirlar, 'adlar' => $adlar, 'ara' => $ara, 'sirala' => $sirala, 'yon' => $yon, 'receteler' => $receteler]);
     }
 
     /** GTIN (barkod) bazlı stok: ürün başına adet ve parti/SKT kırılımı; Excel çıktısı. */
@@ -89,19 +89,19 @@ class StokController extends Controller
             $satirlar = [];
             foreach ($partiler as $gtin => $liste) {
                 $partiMetni = $liste->map(fn ($p) => ($p->bn ?: '—').' / '.($p->skt ? \Illuminate\Support\Carbon::parse($p->skt)->format('d.m.Y') : '—').' ('.(int) $p->adet.')')->implode('; ');
-                $satirlar[] = [$adlar[$gtin] ?? '', $gtin, (int) $liste->sum('adet'), $partiMetni, (int) $liste->filter(fn ($p) => $p->skt && substr((string) $p->skt, 0, 10) < $bugun)->sum('adet')];
+                $satirlar[] = [$adlar[$gtin] ?? '', $gtin, (int) $liste->sum('adet') - (int) $liste->filter(fn ($p) => $p->skt && substr((string) $p->skt, 0, 10) < $bugun)->sum('adet'), $partiMetni, (int) $liste->filter(fn ($p) => $p->skt && substr((string) $p->skt, 0, 10) < $bugun)->sum('adet')];
             }
 
             return \App\Support\XlsxYazici::indir('barkod-bazli-stok-'.now()->format('Ymd-His').'.xlsx',
-                ['İlaç', 'GTIN', 'Adet', 'Parti / SKT (adet)', 'SKT Geçen (Red Odası)'], $satirlar, 'Barkod Bazlı Stok');
+                ['İlaç', 'GTIN', 'Adet (Güncel Stok)', 'Parti / SKT (adet)', 'Red Odası (SKT Geçen)'], $satirlar, 'Barkod Bazlı Stok');
         }
 
         $urunler = $partiler->map(fn ($liste, $gtin) => (object) [
             'gtin' => $gtin,
             'ad' => $adlar[$gtin] ?? null,
-            'adet' => $liste->sum('adet'),
-            // SKT'si geçenler Red Odası'ndadır; İTS canlı sistemde bunlar stok sayılmayabilir.
-            'miad_gecen' => (int) $liste->filter(fn ($p) => $p->skt && substr((string) $p->skt, 0, 10) < $bugun)->sum('adet'),
+            // Adet = güncel stok (Red Odası'ndaki SKT'si geçenler hariç); Red Odası adedi ayrı gösterilir.
+            'miad_gecen' => $gecen = (int) $liste->filter(fn ($p) => $p->skt && substr((string) $p->skt, 0, 10) < $bugun)->sum('adet'),
+            'adet' => (int) $liste->sum('adet') - $gecen,
             'en_yakin_skt' => $liste->pluck('skt')->filter()->map(fn ($d) => \Illuminate\Support\Carbon::parse($d))->min(),
             'partiler' => $liste,
         ])->values();

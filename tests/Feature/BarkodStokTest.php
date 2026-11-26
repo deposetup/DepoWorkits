@@ -33,7 +33,7 @@ class BarkodStokTest extends TestCase
         $this->actingAs($u)->get('/stok/barkod')->assertOk()
             ->assertSee('08699617650153')->assertSee('08699617650160')
             ->assertSee('Ürün çeşidi: <strong>2</strong>', false)
-            ->assertSee('Toplam adet: <strong>4</strong>', false)
+            ->assertSee('Güncel stok (adet): <strong>3</strong>', false)->assertSee('Red Odası: <strong>1</strong>', false)
             ->assertSee('SKT geçti');
     }
 
@@ -46,21 +46,22 @@ class BarkodStokTest extends TestCase
         $this->assertStringContainsString('spreadsheetml', $r->headers->get('content-type'));
     }
 
-    public function test_miadi_gecen_adet_red_odasi_isaretiyle_gosterilir(): void
+    public function test_barkod_adet_guncel_stoktur_red_odasi_ayri_gorunur(): void
     {
         $u = $this->veri();
         $r = $this->actingAs($u)->get('/stok/barkod')->assertOk();
-        $r->assertSee('SKT\'si geçen (Red Odası): <strong>1</strong>', false)->assertSee('1 adedinin son kullanma tarihi geçmiş', false)->assertSee('Red Odası');
-        $r->assertSee('Tamamı SKT&#039;si geçmiş', false);
-        $this->actingAs($u)->get('/stok/barkod?ara=650153')->assertDontSee('son kullanma tarihi geçmiş ve Red', false);
+        $r->assertSee('Red Odası: <strong>1</strong>', false)->assertSee('1 adedinin son kullanma tarihi geçmiş', false)->assertSee('güncel stoka dahil değil', false);
+        $r->assertSee('Adet (Güncel)');
+        $this->actingAs($u)->get('/stok/barkod?ara=650153')->assertDontSee('son kullanma tarihi geçmiş', false);
+        $this->assertSame(3, \App\Models\StokKalemi::where('gtin', '08699617650153')->where('durum', 'stokta')->where('tenant_id', $u->tenant_id)->count());
     }
 
-    public function test_stok_ozetinde_de_red_odasi_isareti_gorunur(): void
+    public function test_stok_ozetinde_adet_guncel_stoktur_red_odasi_ayri_gorunur(): void
     {
         $u = $this->veri();
-        $this->actingAs($u)->get('/stok')->assertOk()
-            ->assertSee('SKT geçen (Red Odası): 1', false)->assertSee('1 adedinin son kullanma tarihi geçmiş', false);
-        $this->actingAs($u)->get('/stok?ara=650153')->assertOk()->assertDontSee('SKT geçen (Red Odası)', false);
+        $r = $this->actingAs($u)->get('/stok')->assertOk();
+        $r->assertSee('Güncel stok (kutu): 3', false)->assertSee('Red Odası: 1', false)->assertSee('1 adedinin son kullanma tarihi geçmiş', false);
+        $this->actingAs($u)->get('/stok?ara=650153')->assertOk()->assertDontSee('Red Odası: 1', false);
         $this->actingAs($u)->get('/stok?excel=1')->assertOk();
     }
 }
