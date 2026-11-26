@@ -29,7 +29,7 @@ class StokController extends Controller
         $tid = $request->user()->tenant_id;
         StokKalemi::redOdasinaAl($tid);
         $q = StokKalemi::where('tenant_id', $tid)->where('durum', 'stokta')
-            ->selectRaw('gtin, count(*) as adet, min(skt) as en_yakin_skt')->groupBy('gtin')->orderBy('gtin');
+            ->selectRaw('gtin, count(*) as adet, min(skt) as en_yakin_skt, sum(case when skt is not null and skt < ? then 1 else 0 end) as miad_gecen', [now()->toDateString()])->groupBy('gtin')->orderBy('gtin');
         if ($ara = $request->query('ara')) {
             $q->where('gtin', 'like', '%'.preg_replace('/\D/', '', $ara).'%');
         }
@@ -53,14 +53,15 @@ class StokController extends Controller
             $veri = $satirlar->map(fn ($r) => [
                 $adlar[$r->gtin] ?? '', $r->gtin, $receteler[$r->gtin] ?? '', (int) $r->adet,
                 $r->en_yakin_skt ? \Illuminate\Support\Carbon::parse($r->en_yakin_skt)->format('d.m.Y') : '',
+                (int) $r->miad_gecen,
             ])->all();
-            $veri[] = ['TOPLAM ('.$satirlar->count().' kalem)', '', '', (int) $satirlar->sum('adet'), ''];
+            $veri[] = ['TOPLAM ('.$satirlar->count().' kalem)', '', '', (int) $satirlar->sum('adet'), '', (int) $satirlar->sum('miad_gecen')];
 
             return \App\Support\XlsxYazici::indir('stok-'.now()->format('Ymd-His').'.xlsx',
-                ['İlaç', 'GTIN', 'Reçete', 'Adet', 'En Yakın SKT'], $veri, 'Stok');
+                ['İlaç', 'GTIN', 'Reçete', 'Adet', 'En Yakın SKT', 'SKT Geçen (Red Odası)'], $veri, 'Stok');
         }
 
-        return view('stok.index', ['kalem' => $satirlar->count(), 'kutu' => (int) $satirlar->sum('adet'), 'satirlar' => $satirlar, 'adlar' => $adlar, 'ara' => $ara, 'sirala' => $sirala, 'yon' => $yon, 'receteler' => $receteler]);
+        return view('stok.index', ['kalem' => $satirlar->count(), 'kutu' => (int) $satirlar->sum('adet'), 'miadGecen' => (int) $satirlar->sum('miad_gecen'), 'satirlar' => $satirlar, 'adlar' => $adlar, 'ara' => $ara, 'sirala' => $sirala, 'yon' => $yon, 'receteler' => $receteler]);
     }
 
     /** GTIN (barkod) bazlı stok: ürün başına adet ve parti/SKT kırılımı; Excel çıktısı. */
