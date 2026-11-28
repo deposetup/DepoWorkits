@@ -12,6 +12,26 @@
 @endif
 @if($tenant)
 @php $gun = $tenant->kalanGun(); @endphp
+@if(isset($depoDegisimleri) && $depoDegisimleri->isNotEmpty())
+@php $yeniler = $depoDegisimleri->where('olay', 'yeni'); $kapananlar = $depoDegisimleri->where('olay', 'pasif'); @endphp
+<div class="card border-warning mb-3">
+  <div class="card-header bg-warning-subtle d-flex flex-wrap align-items-center gap-2">
+    <span class="fw-semibold"><i class="bi bi-bell-fill me-1"></i>Depo listesi değişiklikleri <small class="fw-normal text-muted">(son 24 saat)</small></span>
+    @if($yeniler->count())<span class="badge text-bg-success">{{ $yeniler->count() }} yeni depo</span>@endif
+    @if($kapananlar->count())<span class="badge text-bg-danger">{{ $kapananlar->count() }} depo kapandı</span>@endif
+  </div>
+  <div class="card-body py-2">
+    <div class="small text-muted mb-2">İTS depo listesinde yapılan günlük kontrolde tespit edildi. Satış ve devir işlemlerinden önce karşı tarafın durumunu <a href="{{ route('paydaslar') }}">Paydaşlar</a> ekranından da kontrol edebilirsiniz.</div>
+    <table class="table table-sm align-middle mb-0">
+      @foreach($depoDegisimleri as $d)
+      <tr><td class="text-nowrap small text-muted">{{ \Illuminate\Support\Carbon::parse($d->created_at)->timezone('Europe/Istanbul')->format('d.m.Y H:i') }}</td>
+        <td>{{ $d->unvan }}</td><td class="font-monospace small">{{ $d->gln }}</td><td class="small">{{ $d->il ?: '—' }}</td>
+        <td class="text-end"><span class="badge text-bg-{{ $d->olay === 'yeni' ? 'success' : 'danger' }}">{{ $d->olay === 'yeni' ? 'Yeni eklendi' : 'Kapandı (pasif)' }}</span></td></tr>
+      @endforeach
+    </table>
+  </div>
+</div>
+@endif
 <div class="d-flex justify-content-between align-items-start mb-3">
   <h4 class="mb-0">Ana Sayfa</h4>
   <div class="text-end">

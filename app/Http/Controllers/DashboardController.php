@@ -23,7 +23,20 @@ class DashboardController extends Controller
             'sarf' => $tenant->sarfYapabilir() ? $this->aylikSarf($tenant->id) : null,
             'pts' => $this->ptsHavuzu($tenant->id),
             'bugun' => $this->bugunGirenler($tenant->id),
+            'depoDegisimleri' => $tenant->tur === 'depo' ? $this->sonDepoDegisimleri() : collect(),
         ] : []));
+    }
+
+    /** Son 24 saatte İTS depo listesinde yeni eklenen veya pasife alınan depolar (yalnızca depo müşterilerine gösterilir). */
+    private function sonDepoDegisimleri(): \Illuminate\Support\Collection
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('paydas_degisimleri')) {
+            return collect();
+        }
+
+        return \Illuminate\Support\Facades\DB::table('paydas_degisimleri')
+            ->where('tip', 'depo')->whereIn('olay', ['yeni', 'pasif'])->where('created_at', '>=', now()->subDay())
+            ->orderByDesc('id')->limit(100)->get();
     }
 
     /** Son 6 ayın sarf özeti; müşteri hiç sarf bildirimi yapmadıysa null (kart gizlenir). */
