@@ -104,6 +104,8 @@ Route::middleware(['auth', 'musteri-gozu', 'kvkk'])->group(function () {
         Route::post('/kullanicilar/{user}/sifre', [\App\Http\Controllers\Admin\YoneticiController::class, 'sifreDegistir'])->name('yoneticiler.sifre');
         Route::post('/kullanicilar/{user}/aktif', [\App\Http\Controllers\Admin\YoneticiController::class, 'aktifToggle'])->name('yoneticiler.aktif');
         Route::post('/talepler/{talep}/durum', [\App\Http\Controllers\Admin\TalepController::class, 'durum'])->name('talepler.durum');
+        Route::get('/mail-ayarlari', [\App\Http\Controllers\Admin\MailAyarController::class, 'form'])->name('mail-ayarlari');
+        Route::post('/mail-ayarlari', [\App\Http\Controllers\Admin\MailAyarController::class, 'kaydet'])->name('mail-ayarlari.kaydet');
         Route::get('/paydas-degisimleri', [\App\Http\Controllers\Admin\PaydasDegisimController::class, 'index'])->name('paydas-degisimleri');
         Route::post('/paydas-degisimleri/test-mail', [\App\Http\Controllers\Admin\PaydasDegisimController::class, 'testMail'])->middleware('throttle:3,1')->name('paydas-degisimleri.test-mail');
         Route::get('/musteriler/{tenant}/stok-csv', [\App\Http\Controllers\Admin\StokCsvController::class, 'form'])->name('stok-csv');

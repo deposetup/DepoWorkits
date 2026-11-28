@@ -23,16 +23,16 @@ class PaydasDegisimController extends Controller
         $izlenen = $hazir ? DB::table('paydas_anliklari')->where('tip', 'depo')->count() : 0;
         $sonKontrol = $hazir ? DB::table('paydas_anliklari')->where('tip', 'depo')->max('updated_at') : null;
 
-        return view('admin.paydas-degisimleri', ['kayitlar' => $kayitlar, 'olaylar' => self::OLAYLAR, 'f' => $v, 'izlenen' => $izlenen, 'sonKontrol' => $sonKontrol, 'alici' => config('its.bildirim_eposta'), 'mailAyarli' => ! in_array(config('mail.default'), ['log', 'array'], true)]);
+        return view('admin.paydas-degisimleri', ['kayitlar' => $kayitlar, 'olaylar' => self::OLAYLAR, 'f' => $v, 'izlenen' => $izlenen, 'sonKontrol' => $sonKontrol, 'alici' => implode(', ', \App\Support\MailAyari::alicilar()), 'mailAyarli' => \App\Support\MailAyari::gonderimAcik()]);
     }
 
     /** Mail ayarlarını denemek için bildirim adresine test e-postası yollar. */
     public function testMail(Request $request)
     {
-        if (in_array(config('mail.default'), ['log', 'array'], true)) {
-            return back()->with('hata', 'E-posta ayarı yapılmamış (MAIL_MAILER='.config('mail.default').'). Canlı .env dosyasında SMTP bilgilerini girin.');
+        if (! \App\Support\MailAyari::gonderimAcik()) {
+            return back()->with('hata', 'E-posta gönderimi kapalı veya ayarlanmamış. Yönetim > Mail Ayarları ekranından SMTP bilgilerini girip gönderimi açın.');
         }
-        $alici = config('its.bildirim_eposta');
+        $alici = \App\Support\MailAyari::alicilar();
         try {
             \Illuminate\Support\Facades\Mail::raw("Bu bir test e-postasıdır. DepoWork İTS paydaş değişikliği bildirimleri bu ayarlarla gönderilecek.\n\nGönderen yönetici: ".$request->user()->email, function ($m) use ($alici) {
                 $m->to($alici)->subject('DepoWork İTS test e-postası');
@@ -44,6 +44,6 @@ class PaydasDegisimController extends Controller
         }
         \App\Models\AuditLog::kaydet('mail_test', ['alici' => $alici]);
 
-        return back()->with('ok', 'Test e-postası '.$alici.' adresine gönderildi. Gelen kutusunu (ve spam klasörünü) kontrol edin.');
+        return back()->with('ok', 'Test e-postası '.implode(', ', $alici).' adresine gönderildi. Gelen kutusunu (ve spam klasörünü) kontrol edin.');
     }
 }

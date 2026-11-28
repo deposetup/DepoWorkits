@@ -6,6 +6,7 @@
 <div class="alert alert-secondary small">İTS depo listesi hafta içi her gün <b>12:00 ve 17:00</b>'de karşılaştırılır. Şu an izlenen depo: <b>{{ number_format($izlenen, 0, ',', '.') }}</b>. Son kontrol: <b>{{ $sonKontrol ? \Illuminate\Support\Carbon::parse($sonKontrol)->timezone('Europe/Istanbul')->format('d.m.Y H:i') : 'henüz yapılmadı' }}</b>.
 Bildirim adresi: <b>{{ $alici }}</b>.
 <form method="post" action="{{ route('admin.paydas-degisimleri.test-mail') }}" class="d-inline ms-2">@csrf<button class="btn btn-sm btn-outline-secondary py-0"><i class="bi bi-envelope me-1"></i>Test maili gönder</button></form>
+<a href="{{ route('admin.mail-ayarlari') }}" class="btn btn-sm btn-outline-primary py-0 ms-1"><i class="bi bi-gear me-1"></i>Mail Ayarları</a>
 @unless($mailAyarli)<br><span class="text-danger">E-posta ayarı yapılmadı: değişiklikler yalnızca bu sayfada görünür, e-posta ayarlanınca bekleyenler tek postada gider.</span>@endunless</div>
 <form method="get" class="row g-2 mb-3">
   <div class="col-md-3"><select name="olay" class="form-select form-select-sm"><option value="">Tüm olaylar</option>@foreach($olaylar as $k => [$ad])<option value="{{ $k }}" @selected(($f['olay'] ?? null) === $k)>{{ $ad }}</option>@endforeach</select></div>

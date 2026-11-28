@@ -146,6 +146,7 @@
         <a class="yan-link {{ request()->routeIs('admin.yoneticiler*') ? 'aktif' : '' }}" href="{{ route('admin.yoneticiler') }}"><i class="bi bi-shield-lock"></i>Kullanıcılar</a>
         <a class="yan-link {{ request()->routeIs('admin.talepler*') ? 'aktif' : '' }}" href="{{ route('admin.talepler') }}"><i class="bi bi-life-preserver"></i>Destek Talepleri @if($yeniTalep)<span class="badge text-bg-warning ms-auto">{{ $yeniTalep }}</span>@endif</a>
         <a class="yan-link {{ request()->routeIs('admin.paydas-degisimleri') ? 'aktif' : '' }}" href="{{ route('admin.paydas-degisimleri') }}"><i class="bi bi-bell"></i>Paydaş Değişimleri</a>
+        <a class="yan-link {{ request()->routeIs('admin.mail-ayarlari*') ? 'aktif' : '' }}" href="{{ route('admin.mail-ayarlari') }}"><i class="bi bi-envelope-at"></i>Mail Ayarları</a>
         <a class="yan-link {{ request()->routeIs('admin.giris-kayitlari') ? 'aktif' : '' }}" href="{{ route('admin.giris-kayitlari') }}"><i class="bi bi-clock-history"></i>Giriş Kayıtları</a>
       @endif
       <a class="yan-link {{ request()->routeIs('kilavuz') ? 'aktif' : '' }}" href="{{ route('kilavuz') }}"><i class="bi bi-book"></i>Kullanım Kılavuzu</a>

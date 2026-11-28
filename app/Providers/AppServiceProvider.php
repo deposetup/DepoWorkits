@@ -24,5 +24,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Illuminate\Pagination\Paginator::useBootstrapFive();
+        \App\Support\MailAyari::uygula(); // Yönetim > Mail Ayarları (varsa .env değerlerinin yerine geçer)
     }
 }
