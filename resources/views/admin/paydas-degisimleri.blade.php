@@ -3,7 +3,7 @@
 @section('icerik')
 <h4>Paydaş Değişimleri <small class="text-muted">Depolar</small></h4>
 @if(! $kayitlar)<div class="alert alert-warning">İzleme tabloları henüz oluşturulmadı (migration çalıştırılmalı).</div>@else
-<div class="alert alert-secondary small">İTS depo listesi hafta içi her gün <b>12:00 ve 17:00</b>'de karşılaştırılır. Şu an izlenen depo: <b>{{ number_format($izlenen, 0, ',', '.') }}</b>. Son kontrol: <b>{{ $sonKontrol ? \Illuminate\Support\Carbon::parse($sonKontrol)->timezone('Europe/Istanbul')->format('d.m.Y H:i') : 'henüz yapılmadı' }}</b>.
+<div class="alert alert-secondary small">İTS depo listesi hafta içi her gün <b>12:00 ve 17:05</b>'te karşılaştırılır. Şu an izlenen depo: <b>{{ number_format($izlenen, 0, ',', '.') }}</b>. Son kontrol: <b>{{ $sonKontrol ? \Illuminate\Support\Carbon::parse($sonKontrol)->timezone('Europe/Istanbul')->format('d.m.Y H:i') : 'henüz yapılmadı' }}</b>.
 Bildirim adresi: <b>{{ $alici }}</b>.
 <form method="post" action="{{ route('admin.paydas-degisimleri.test-mail') }}" class="d-inline ms-2">@csrf<button class="btn btn-sm btn-outline-secondary py-0"><i class="bi bi-envelope me-1"></i>Test maili gönder</button></form>
 <a href="{{ route('admin.mail-ayarlari') }}" class="btn btn-sm btn-outline-primary py-0 ms-1"><i class="bi bi-gear me-1"></i>Mail Ayarları</a>
